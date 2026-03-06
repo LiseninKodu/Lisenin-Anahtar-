@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Matematik";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Mantık ve Önermeler",
+                    summary: "Doğru ya da yanlış kesin hüküm bildiren ifadelerin cebiri.",
+                    description: "<p>Mantık, matematiksel ispatın temelidir. Doğru ya da yanlış kesin hüküm bildiren ifadelere 'Önerme' denir ve p, q, r gibi harflerle gösterilir. Bir önerme doğruysa doğruluk değeri $\\equiv 1$, yanlışsa $\\equiv 0$'dır.</p><p>İki veya daha fazla önermenin bağlaçlarla birleşmesine 'Bileşik Önerme' denir.<br><strong>VE ($\\land$):</strong> Çarpma işlemi gibidir, sadece her ikisi de doğruyken (1 $\\land$ 1) sonuç 1 çıkar.<br><strong>VEYA ($\\lor$):</strong> Toplama gibidir, içinde bir tane bile 1 varsa sonuç 1 çıkar.<br><strong>İSE ($\\Rightarrow$):</strong> Koşullu önermedir. Sadece (1 $\\Rightarrow$ 0) durumu 0'dır, diğer tüm durumlar 1'dir.<br><strong>ANCAK VE ANCAK ($\\Leftrightarrow$):</strong> İkisi aynıysa (1,1 veya 0,0) sonuç 1, farklıysa 0 çıkar.</p>",
+                    items: ["Önerme Kavramı ve Doğruluk Tablosu", "Bileşik Önermeler ($\\land, \\lor, \\veebar$)", "De Morgan Kuralları", "Koşullu Önermeler ($\\Rightarrow$) ve Karşıt, Ters, Karşıt Ters", "Her ($\\forall$) ve Bazı ($\\exists$) Niceleyicileri"],
+                    formula: "$$p \\Rightarrow q \\equiv p' \\lor q$$ $$(p \\lor q)' \\equiv p' \\land q' \\text{ (De Morgan)}$$",
+                    question: "$p \\equiv 1, q \\equiv 0$ ve $r \\equiv 1$ olduğuna göre; $(p \\Rightarrow q) \\lor (q' \\land r)$ bileşik önermesinin doğruluk değerini bulunuz.",
+                    solution: "1. Verilen değerleri yerlerine koyalım: $(1 \\Rightarrow 0) \\lor (0' \\land 1)$<br>2. $(1 \\Rightarrow 0)$ kural gereği (100 kuralı) 0'a denktir.<br>3. İkinci parantezdeki $0'$ (sıfırın değili) 1 demektir. Dolayısıyla ikinci parantez $(1 \\land 1) \\equiv 1$ olur.<br>4. Ortadaki VEYA ($\\lor$) işlemine göre iki tarafı birleştirelim: $0 \\lor 1 \\equiv 1$<br><br><strong>Cevap: 1</strong>",
+                    shortcut: "Bir $p \\Rightarrow q$ koşullu önermesinin 'Karşıt Tersi', $q' \\Rightarrow p'$ şeklindedir ve bir önerme her zaman kendi karşıt tersine mantıksal olarak denktir."
+                },
+                {
+                    title: "2. Kümeler",
+                    summary: "Küme gösterimleri, alt küme, kümelerde işlemler ve Venn şeması problemleri.",
+                    description: "<p>İyi tanımlanmış, birbirinden farklı nesneler topluluğuna küme denir. Kümeler Liste Yöntemi, Ortak Özellik Yöntemi ve Venn Şeması ile gösterilir.</p><p>Bir A kümesinin tüm elemanları B kümesinin de elemanıysa A, B'nin <strong>alt kümesidir</strong> ($A \\subset B$). n elemanlı bir kümenin alt küme sayısı $2^n$ formülü ile bulunur.</p><p><strong>Kümelerde İşlemler:</strong><br>- <strong>Birleşim ($\\cup$):</strong> Her iki kümedeki tüm elemanların birer kez yazılmasıdır.<br>- <strong>Kesişim ($\\cap$):</strong> Sadece her iki kümede ortak olan elemanların alınmasıdır.<br>- <strong>Fark ($A \\setminus B$ veya $A-B$):</strong> A kümesinde olup B kümesinde olmayan elemanlardır.</p>",
+                    items: ["Küme Kavramı ve Gösterim Yöntemleri", "Alt Küme ve Özalt Küme", "Birleşim, Kesişim, Fark ve Tümleme İşlemleri", "Küme Problemleri (Venn Şeması ile Çözüm)", "Sıralı İkili ve Kartezyen Çarpım"],
+                    formula: "$$s(A \\cup B) = s(A) + s(B) - s(A \\cap B)$$ $$\\text{Alt Küme Sayısı} = 2^n$$",
+                    question: "Bir sınıfta hem futbol hem basketbol oynayanların sayısı 5, sadece futbol oynayanların sayısı 14, sadece basketbol oynayanların sayısı 9'dur. Sınıf mevcudu 32 olduğuna göre hiçbir spor yapmayan kaç kişi vardır?",
+                    solution: "Venn şeması çizerek veya küme mantığıyla çözebiliriz:<br>1. Kesişim (Her iki sporu yapanlar) = 5 kişi.<br>2. Sadece futbol = 14 kişi.<br>3. Sadece basketbol = 9 kişi.<br>4. Sınıfta herhangi bir spor yapanların toplamı = $14 + 5 + 9 = 28$ kişi.<br>5. Hiç spor yapmayanları bulmak için sınıf mevcudundan spor yapanları çıkarırız: $32 - 28 = 4$ kişi.<br><br><strong>Cevap: 4</strong>",
+                    shortcut: "Küme problemlerini okurken her zaman 'en içten', yani her iki dili konuşan, her iki sporu yapan (kesişim) kısmından başlayarak sayıları yerleştir."
+                },
+                {
+                    title: "3. Sayı Kümeleri ve Bölünebilme",
+                    summary: "Sayı inşası, asal çarpanlar ve EBOB-EKOK uygulamaları.",
+                    description: "<p>Bu ünite matematiğin alfabesidir.<br><strong>Sayı Kümeleri:</strong> Doğal sayılar ($\\mathbb{N}$), Tam sayılar ($\\mathbb{Z}$), Rasyonel sayılar ($\\mathbb{Q}$) ve İrrasyonel sayılar ($\\mathbb{Q}'$). Tüm bu kümelerin birleşimi Reel (Gerçek) sayıları oluşturur.</p><p><strong>Bölünebilme Kuralları:</strong> 2, 3, 4, 5, 8, 9, 10 ve 11 ile tam bölünebilme şartları incelenir.</p><p><strong>EBOB ve EKOK:</strong> İki veya daha fazla sayının En Büyük Ortak Böleni (EBOB) tarlayı eş parsellere bölme, ağaç dikme gibi 'bütünden parçaya' gidilen sorularda kullanılır. En Küçük Ortak Kat (EKOK) ise periyodik nöbet, zil çalma gibi 'parçadan bütüne' gidilen sorularda kullanılır.</p>",
+                    items: ["Sayı Kümeleri Özellikleri", "Bölünebilme Kuralları (2, 3, 4, 5, 8, 9, 10, 11)", "Asal Sayılar ve Aralarında Asallık", "EBOB - EKOK Problemleri"],
+                    formula: "$$A \\cdot B = \\text{EBOB}(A,B) \\cdot \\text{EKOK}(A,B)$$",
+                    question: "Boyutları 15 m ve 20 m olan dikdörtgen şeklindeki bir bahçenin etrafına, köşelere de gelmek şartıyla eşit aralıklarla en az kaç ağaç dikilebilir?",
+                    solution: "Bütünü parçaladığımız ve 'en geniş/eşit aralık' dendiği için EBOB kullanmalıyız.<br>1. İki ağaç arası mesafeyi bulalım: $\\text{EBOB}(15, 20) = 5$ metre.<br>2. Ağaçlar bahçenin çevresine dikileceği için çevreyi bulalım: $\\text{Çevre} = 2 \\cdot (15 + 20) = 70$ metre.<br>3. Toplam ağaç sayısı = $\\frac{\\text{Çevre}}{\\text{İki Ağaç Arası Mesafe}} = \\frac{70}{5} = 14$ ağaç.<br><br><strong>Cevap: 14</strong>",
+                    shortcut: "Ardışık iki tam sayının (örneğin 14 ve 15) her zaman EBOB'u 1'dir (aralarında asaldırlar) ve EKOK'ları ise o iki sayının çarpımına eşittir."
+                },
+                {
+                    title: "4. Denklem, Eşitsizlik, Üslü ve Köklü İfadeler",
+                    summary: "Cebirsel ifadelerin çözümü, mutlak değer ve eşitsizlik aralıkları.",
+                    description: "<p><strong>Denklem ve Eşitsizlikler:</strong> Birinci dereceden bir ve iki bilinmeyenli denklemlerin çözüm kümeleri. Eşitsizliklerde sayı doğrusu üzerinde aralık ($<, \\le, >, \\ge$) gösterme.</p><p><strong>Mutlak Değer:</strong> Bir sayının sayı doğrusunda sıfıra (başlangıç noktasına) olan uzaklığıdır ve asla negatif olamaz. İçerisi negatifse eksi ile çarpılarak (pozitif yapılarak) dışarı çıkarılır.</p><p><strong>Üslü ve Köklü Sayılar:</strong> Üslü sayılarda çarpma, bölme kuralları. Köklü ifadelerin kök dışına çıkarılması ve paydadaki köklü ifadenin eşleniği ile çarpılarak rasyonel yapılması işlemleri.</p>",
+                    items: ["1. Dereceden Denklemler", "1. Dereceden Eşitsizlikler ve Aralık Kavramı", "Mutlak Değerli Denklem ve Eşitsizlikler", "Üslü İfadelerde Kurallar", "Köklü İfadeler ve Eşlenik Çarpımı"],
+                    formula: "$$|x| \\le a \\implies -a \\le x \\le a$$ $$a^x \\cdot a^y = a^{x+y}$$ $$\\sqrt[n]{x^m} = x^{\\frac{m}{n}}$$",
+                    question: "$|2x - 5| \\le 7$ eşitsizliğini sağlayan tam sayıların toplamı kaçtır?",
+                    solution: "Mutlak değer eşitsizliği kuralına göre içerdeki ifadeyi artılısı ve eksilisi arasına almalıyız:<br>1. $-7 \\le 2x - 5 \\le 7$<br>2. Her tarafa 5 ekleyelim (x'i yalnız bırakmak için): $-2 \\le 2x \\le 12$<br>3. Her tarafı 2'ye bölelim: $-1 \\le x \\le 6$<br>4. Bu aralıktaki tam sayılar: $-1, 0, 1, 2, 3, 4, 5, 6$<br>5. Toplamları: $(-1) + 0 + 1 + 2 + 3 + 4 + 5 + 6 = 20$<br><br><strong>Cevap: 20</strong>",
+                    shortcut: "Bir eşitsizliği çözerken, eşitsizliğin her iki tarafını negatif (-) bir sayıyla çarpar ya da bölersen aradaki işaret ($<, >$) YÖN DEĞİŞTİRMEK ZORUNDADIR."
+                },
+                {
+                    title: "5. Problemler (Oran-Orantı)",
+                    summary: "Matematiksel modelleme kurarak yaş, yüzde, hareket problemleri çözümü.",
+                    description: "<p>Problemler, TYT (üniversite sınavı) matematiğinin neredeyse yarısını oluşturur. İşin temeli <strong>Oran-Orantı</strong>dır. İki çokluk birlikte artıyor veya azalıyorsa doğru orantı (bölme şeklinde), biri artarken diğeri azalıyorsa ters orantı (çarpma şeklinde) vardır.</p><p><strong>Problem Çeşitleri:</strong><br>- Sayı ve Kesir problemleri (Bilinmeyene $x$ veya kesrin paydasına göre $10x$ demek).<br>- Yaş problemleri (Geçen sürenin herkes için aynı olması).<br>- Yüzde, Kâr-Zarar ve Karışım problemleri (Maliyete 100x demek hayat kurtarır).<br>- Hareket (Hız) problemleri ($X = V \\cdot t$).</p>",
+                    items: ["Oran ve Orantı Kavramları (Doğru ve Ters Orantı)", "Sayı ve Kesir Problemleri", "Yaş Problemleri", "Yüzde, Kâr-Zarar ve Karışım Problemleri", "Hareket (Hız) Problemleri"],
+                    formula: "$$\\frac{a}{b} = \\frac{c}{d} = k \\text{ (Orantı Sabiti)}$$ $$X = V \\cdot t \\text{ (Yol = Hız } \\times \\text{ Zaman)}$$",
+                    question: "Bir malın maliyet fiyatı üzerinden %20 kârla belirlenen etiket fiyatına, etiket fiyatı üzerinden %10 indirim uygulanıyor. Bu malın satışından elde edilen son durumdaki kâr-zarar durumu nedir?",
+                    solution: "Yüzde problemlerinde maliyete her zaman 100x demek en kolay yoldur.<br>1. Maliyet = $100x$ olsun.<br>2. %20 kâr eklendiğinde ilk satış (etiket) fiyatı: $100x + 20x = 120x$ olur.<br>3. Bu etiket fiyatı üzerinden %10 indirim yapacağız. $120x$'in %10'u: $120x \\cdot \\frac{10}{100} = 12x$ indirim miktarıdır.<br>4. Son satış fiyatı = $120x - 12x = 108x$ olur.<br>5. Başlangıçta maliyet $100x$ idi, son satış $108x$. Yani 100 üzerinden 8 fazlalık var.<br><br><strong>Cevap: %8 kâr edilir.</strong>",
+                    shortcut: "Karışım problemlerinde yüzdeleri tek tek hesaplamak yerine şu formülü kullan: $(\\%_1 \\cdot \\text{Kütle}_1) + (\\%_2 \\cdot \\text{Kütle}_2) = \\%_{\\text{Son}} \\cdot \\text{Toplam Kütle}$"
+                }
+
+            ],
+            10: [
+                                {
+                    title: "1. Sayma, Permütasyon, Kombinasyon ve Olasılık",
+                    summary: "Sıralama, seçme, Binom açılımı ve ihtimal hesapları.",
+                    description: "<p><strong>Sayma Yöntemleri:</strong> Ayrık olaylar toplanarak, ardışık olaylar çarpılarak sayılır. Faktöriyel ($n!$) kavramı bu ünitenin temelidir.</p><p><strong>Permütasyon ($P$):</strong> Nesnelerin yan yana <strong>sıralanması/dizilmesidir</strong>. Sıra önemlidir. Tekrarlı permütasyonda, aynı olan nesnelerin faktöriyeline bölme işlemi yapılır.</p><p><strong>Kombinasyon ($C$) ve Binom:</strong> Nesnelerin <strong>seçilmesidir</strong> (Grup oluşturma). Sıranın önemi yoktur. Binom açılımı, Pascal üçgeni katsayıları kullanılarak $(x+y)^n$ ifadesinin terimlerini bulmaya yarar.</p><p><strong>Olasılık:</strong> İstenen olası durumların sayısının, tüm durumlara (örnek uzay) bölünmesidir.</p>",
+                    items: ["Sayma Kuralları ve Faktöriyel", "Permütasyon ve Tekrarlı Permütasyon", "Kombinasyon (Seçme)", "Pascal Üçgeni ve Binom Açılımı", "Basit Olayların Olasılığı"],
+                    formula: "$$P(n,r) = \\frac{n!}{(n-r)!} \\quad C(n,r) = \\frac{n!}{r!(n-r)!}$$ $$\\text{Olasılık} = \\frac{\\text{İstenen Durum}}{\\text{Tüm Durumlar}}$$",
+                    question: "5 kız ve 4 erkek öğrenci arasından, içinde en az 1 erkek bulunan 3 kişilik bir grup kaç farklı şekilde oluşturulabilir?",
+                    solution: "Bu tarz 'en az' sorularında en pratik yol: <strong>Tüm Durumlar - İstenmeyen Durum</strong> yapmaktır.<br>1. Tüm durumlar (9 kişiden 3 kişi seçmek): $C(9,3) = \\frac{9 \\cdot 8 \\cdot 7}{3 \\cdot 2 \\cdot 1} = 84$<br>2. İstenmeyen durum (Sadece kızların seçilmesi, hiç erkek olmaması): $C(5,3) = \\frac{5 \\cdot 4 \\cdot 3}{3 \\cdot 2 \\cdot 1} = 10$<br>3. Sonuç: $84 - 10 = 74$<br><br><strong>Cevap: 74</strong>",
+                    shortcut: "'Diziliş, sıralanış, şifre oluşturma' kelimelerini görürsen Permütasyon yap. 'Seçim, ekip kurma, alt küme oluşturma' kelimelerini görürsen Kombinasyon yap."
+                },
+                {
+                    title: "2. Fonksiyonlar",
+                    summary: "Matematiksel makineler, fonksiyon türleri, bileşke ve ters fonksiyon.",
+                    description: "<p><strong>Fonksiyon Kavramı:</strong> Tanım kümesindeki her bir elemanı, değer kümesindeki yalnız bir elemana eşleyen matematiksel kurallardır. Makine gibi düşünülür; x girer, kural işler, y (veya f(x)) çıkar.</p><p><strong>Fonksiyon Çeşitleri:</strong> Birebir (her eleman farklı yere gider), Örten (değer kümesinde boşta eleman kalmaz), Sabit ($f(x)=c$), Birim ($f(x)=x$) ve Doğrusal ($f(x)=ax+b$) fonksiyonlardır.</p><p><strong>İşlemler:</strong> Fonksiyonlarda dört işlem yapılabilir. İki fonksiyonun iç içe girmesine <strong>Bileşke Fonksiyon</strong> ($f \\circ g$), bir fonksiyonun kuralının tersine çevrilmesine <strong>Ters Fonksiyon</strong> ($f^{-1}$) denir.</p>",
+                    items: ["Fonksiyon Kavramı ve Tanım/Değer Kümeleri", "Fonksiyon Çeşitleri (Birebir, Örten, Sabit, Birim)", "Fonksiyonlarda Dört İşlem", "Bileşke Fonksiyon ($f \\circ g$)", "Bir Fonksiyonun Tersi ($f^{-1}$)"],
+                    formula: "$$f(x) = y \\iff f^{-1}(y) = x$$ $$(f \\circ g)(x) = f(g(x))$$",
+                    question: "$f(x) = 3x - 4$ ve $(f \\circ g)(x) = 6x + 5$ olduğuna göre $g(x)$ fonksiyonu nedir?",
+                    solution: "1. Bileşke demek, f'in içine g(x) yazmak demektir: $f(g(x)) = 6x + 5$.<br>2. f fonksiyonunun kuralı 'içindeki sayıyı 3 ile çarpıp 4 çıkarmaktır'.<br>3. O halde $f(g(x))$ işlemi şöyle olur: $3 \\cdot g(x) - 4 = 6x + 5$<br>4. -4'ü karşıya atalım: $3 \\cdot g(x) = 6x + 9$<br>5. Her tarafı 3'e bölelim: $g(x) = 2x + 3$<br><br><strong>Cevap: $g(x) = 2x + 3$</strong>",
+                    shortcut: "Doğrusal bir fonksiyonun ($f(x) = ax + b$) tersini çok hızlı almak için: Aradaki işareti değiştir ve x'in katsayısını bölü olarak alta at. Formül: $f^{-1}(x) = \\frac{x-b}{a}$"
+                },
+                {
+                    title: "3. Polinomlar",
+                    summary: "Çok terimlilerde işlemler ve bölme yapmadan kalan bulma teoremi.",
+                    description: "<p><strong>Polinom Kavramı:</strong> $P(x) = a_nx^n + ... + a_1x + a_0$ şeklindeki çok terimlilerdir. Bir ifadenin polinom olabilmesi için değişkenin ($x$) üslerinin <strong>SADECE DOĞAL SAYI</strong> ($0, 1, 2...$) olması şarttır. Derece, başkatsayı ve sabit terim kavramları önemlidir.</p><p><strong>Polinomlarda Bölme:</strong> TYT ve AYT'nin banko konusudur. $P(x)$ polinomunun $(ax+b)$ gibi bir ifadeye bölümünden kalanı bulmak için uzun bölme işlemi YAPILMAZ. <strong>Kalan Bulma Teoremi</strong> uygulanır.</p>",
+                    items: ["Polinom Olma Şartları", "Derece, Başkatsayı ve Sabit Terim", "Polinomların Eşitliği ve Dört İşlem", "Kalan Bulma Teoremi", "Polinomları Çarpanlara Ayırma"],
+                    formula: "$$P(x) = Q(x) \\cdot B(x) + K(x)$$ $$\\text{Bölen: } Q(x)=0 \\text{ ise Kalan: } K(x) = P(x)$$",
+                    question: "$P(x) = x^3 - 2x^2 + ax + 4$ polinomu $x-2$ ile tam bölünebildiğine göre $a$ kaçtır?",
+                    solution: "Kalan bulma kurallarına göre;<br>1. Önce bölen ifadeyi sıfıra eşitleriz: $x - 2 = 0 \\implies x = 2$.<br>2. Tam bölündüğü için (kalan sıfır olduğu için) P(x) polinomunda x yerine 2 yazdığımızda sonuç 0 çıkmalıdır. Yani $P(2) = 0$.<br>3. Denklemde x yerine 2 yazalım: $2^3 - 2(2^2) + a(2) + 4 = 0$<br>4. $8 - 8 + 2a + 4 = 0 \\implies 2a + 4 = 0 \\implies 2a = -4 \\implies a = -2$<br><br><strong>Cevap: -2</strong>",
+                    shortcut: "Polinomlarda P(x)'in katsayılar toplamı sorulursa içerisi ne olursa olsun x yerine her zaman 1 yazılır ($P(1)$ bulunur). Sabit terim sorulursa x yerine 0 yazılır ($P(0)$ bulunur)."
+                },
+                {
+                    title: "4. İkinci Dereceden Denklemler",
+                    summary: "$ax^2+bx+c=0$ denkleminin kökleri, diskriminant ve karmaşık sayılar.",
+                    description: "<p>Derecesi 2 olan denklemlerdir. Denklemi sağlayan x değerlerine <strong>Kök (Çözüm Kümesi)</strong> denir. İlk yöntem ifadeyi çarpanlarına ayırmaktır. Çarpanlarına ayrılamıyorsa <strong>Diskriminant ($\\Delta$)</strong> formülü kullanılır.</p><p>$\\Delta = b^2 - 4ac$ formülünde;<br>- $\\Delta > 0$ ise birbirinden farklı iki reel kök vardır.<br>- $\\Delta = 0$ ise birbirine eşit (çakışık, tam kare) tek reel kök vardır.<br>- $\\Delta < 0$ ise reel kök yoktur. Sanal kök vardır ve Karmaşık Sayılar ($i = \\sqrt{-1}$) devreye girer.</p>",
+                    items: ["Çarpanlara Ayırma ile Kök Bulma", "Diskriminant ($\\Delta$) Yöntemi", "Karmaşık Sayılara Giriş ($i^2 = -1$)", "Kökler Toplamı ve Kökler Çarpımı Bağıntıları"],
+                    formula: "$$\\Delta = b^2 - 4ac \\quad x_{1,2} = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$$ $$x_1 + x_2 = \\frac{-b}{a} \\quad x_1 \\cdot x_2 = \\frac{c}{a}$$",
+                    question: "$x^2 - 6x + m + 1 = 0$ denkleminin çakışık (birbirine eşit) iki kökü olduğuna göre $m$ kaçtır?",
+                    solution: "1. Kurala göre, denklemin eşit (çakışık) iki kökü olması için Diskriminant ($\\Delta$) sıfır olmalıdır.<br>2. Denklemdeki değerler: $a=1, b=-6, c=m+1$<br>3. $\\Delta = b^2 - 4ac = 0$<br>4. $(-6)^2 - 4 \\cdot 1 \\cdot (m+1) = 0$<br>5. $36 - 4m - 4 = 0 \\implies 32 = 4m \\implies m = 8$<br><br><strong>Cevap: 8</strong>",
+                    shortcut: "Sınavda kökler istenmiyorsa, sadece kökler toplamı veya kökler çarpımı soruluyorsa, diskriminant ile tek tek kök bulmakla vakit kaybetme. Direkt formülleri ($-b/a$ ve $c/a$) yapıştır!"
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. Trigonometri (AYT'nin Kalbi)",
+                    summary: "Birim çember, fonksiyon grafikleri, ters trigonometri ve teoremler.",
+                    description: "<p>Matematikte en çok formül barındıran ve AYT'de en çok soru gelen konudur. Açıların ölçüleri Derece ve Radyan ($\\pi$) cinsinden ifade edilir. Esas ölçü bulma, birim çember ($x^2 + y^2 = 1$) üzerinde Sinüs (y ekseni) ve Kosinüs (x ekseni) değerlerinin bulunması ile başlar.</p><br>[Birim çember üzerinde sinüs ve kosinüs eksenlerinin gösterimi]<p><strong>Trigonometrik Fonksiyonlar:</strong> Dar açıların dik üçgendeki oranları (Karşı/Hipotenüs vs.). Bölgelere göre işaret incelemesi ('Bütün Sınıf Kara Tahtada Coştu' kuralı). İndirgeme bağıntılarında $\\pi$ ve $2\\pi$ isim değiştirmez, $\\pi/2$ ve $3\\pi/2$ isim değiştirir.</p><p><strong>Teoremler ve Grafikler:</strong> Üçgenlerde bilinmeyen kenarı bulmak için Kosinüs Teoremi, çevrel çemberin yarıçapını bulmak için Sinüs Teoremi kullanılır. Fonksiyonların periyotları ve Ters Trigonometrik Fonksiyonlar (arcsin, arccos) işlenir.</p>",
+                    items: ["Yönlü Açılar ve Esas Ölçü", "Trigonometrik Fonksiyonlar (Sin, Cos, Tan, Cot, Sec, Cosec)", "Bölgelere Göre İşaretler ve İndirgeme Bağıntıları", "Kosinüs ve Sinüs Teoremleri", "Trigonometrik Grafikler ve Ters Fonksiyonlar"],
+                    formula: "$$\\sin^2x + \\cos^2x = 1 \\quad \\tan x = \\frac{\\sin x}{\\cos x}$$ $$a^2 = b^2 + c^2 - 2bc\\cos(\\hat{A}) \\text{ (Kosinüs Teoremi)}$$",
+                    question: "$\\sin(270^\\circ - x) + \\cos(180^\\circ + x)$ ifadesinin en sade halini bulunuz.",
+                    solution: "İndirgeme yaparken önce bölgeye ve işarete bakılır, sonra ismin değişip değişmeyeceğine karar verilir:<br>1. $\\sin(270^\\circ - x)$: Açı 3. bölgededir. 3. bölgede sinüs negatiftir (-). $270^\\circ$ kullandığımız için isim DEĞİŞİR (cos olur). Sonuç: $-\\cos x$<br>2. $\\cos(180^\\circ + x)$: Açı 3. bölgededir. 3. bölgede kosinüs negatiftir (-). $180^\\circ$ kullandığımız için isim DEĞİŞMEZ (cos kalır). Sonuç: $-\\cos x$<br>3. İki ifadeyi toplayalım: $(-\\cos x) + (-\\cos x) = -2\\cos x$<br><br><strong>Cevap: $-2\\cos x$</strong>",
+                    shortcut: "Birbirini 90 dereceye tamamlayan (Tümler) açıların sinüsü kosinüsüne, tanjantı kotanjantına eşittir. (Örn: $\\sin 20^\\circ = \\cos 70^\\circ$ veya $\\tan 10^\\circ = \\cot 80^\\circ$). Bu kural sadeleştirme sorularında çok işe yarar."
+                },
+                {
+                    title: "2. Analitik Geometri",
+                    summary: "Nokta analitiği, doğru denklemleri, eğim ve iki doğru arası ilişkiler.",
+                    description: "<p>Geometrinin cebirle (denklemlerle) birleştiği yerdir. Koordinat düzleminde noktaların birbirine uzaklığı ($|AB| = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$) ve orta nokta bulma ile başlar.</p><p><strong>Doğru Analitiği:</strong> Bir doğrunun x ekseniyle yaptığı pozitif yönlü açının tanjantına <strong>Eğim ($m$)</strong> denir. Sağa yatık doğruların eğimi pozitif, sola yatıkların negatiftir. Eğimi ve geçtiği bir noktası bilinen doğrunun denklemi yazılır.</p><p><strong>Doğruların Durumları:</strong> İki doğru birbirine paralelse eğimleri eşittir ($m_1 = m_2$). Dik kesişiyorlarsa eğimleri çarpımı -1'dir ($m_1 \\cdot m_2 = -1$). Noktanın doğruya uzaklığı formülüyle alan hesaplamaları yapılır.</p>",
+                    items: ["İki Nokta Arası Uzaklık ve Orta Nokta", "Eğim (m) Bulma Yöntemleri", "Doğru Denklemi Yazma ($y - y_1 = m(x - x_1)$)", "Paralel ve Dik Doğrular", "Noktanın Doğruya ve Paralel İki Doğru Arası Uzaklık"],
+                    formula: "$$m = \\frac{y_2 - y_1}{x_2 - x_1}$$ $$Ax + By + C = 0 \\implies m = -\\frac{A}{B}$$",
+                    question: "$3x - 4y + 12 = 0$ doğrusuna paralel olan ve orijinden (0,0) geçen doğrunun denklemi nedir?",
+                    solution: "1. Doğrular paralelse eğimleri kesinlikle eşittir. Önce verilen doğrunun eğimini bulalım.<br>2. y'yi yalnız bırakırsak: $4y = 3x + 12 \\implies y = \\frac{3}{4}x + 3$. Demek ki Eğim $m = 3/4$.<br>3. İstenen doğrunun eğimi de $3/4$ olmalı. Orijinden $(0,0)$ geçtiğine göre $x_1=0, y_1=0$.<br>4. Doğru denklemi formülü: $y - y_1 = m(x - x_1)$<br>5. $y - 0 = \\frac{3}{4}(x - 0) \\implies y = \\frac{3x}{4} \\implies 4y - 3x = 0$<br><br><strong>Cevap: $4y - 3x = 0$</strong>",
+                    shortcut: "Bir doğrunun eksenleri kestiği noktaları bulmak çok kolaydır: x eksenini kestiği yeri bulmak için denklemde y yerine 0 ver, y eksenini kestiği yeri bulmak için denklemde x yerine 0 ver."
+                },
+                {
+                    title: "3. Fonksiyonlarda Uygulamalar ve Parabol",
+                    summary: "Fonksiyon dönüşümleri (öteleme/simetri), tepe noktası ve eşitsizlikler.",
+                    description: "<p><strong>Fonksiyon Dönüşümleri:</strong> Bir $f(x)$ grafiği biliniyorken yeni grafikler çizmektir. Fonksiyona dışarıdan eklenen sayı ($f(x)+b$) grafiği y ekseninde aşağı/yukarı öteler. İçeriye eklenen sayı ($f(x-a)$) grafiği x ekseninde TERS yönde sağa/sola öteler. Eksi ile çarpmak ($-f(x)$) x eksenine göre simetrisini aldırır.</p><p><strong>Parabol ($y=ax^2+bx+c$):</strong> İkinci dereceden fonksiyonların U veya ters U şeklindeki grafiğidir. Tepe noktası ($T(r,k)$) en önemli yeridir ($r = -b/2a$). Parabol ile doğrunun kesişim durumlarını Diskriminant ($\\Delta$) belirler.</p><p><strong>Eşitsizlikler:</strong> Kökleri bularak işaret tablosu oluşturulur ve çözüm aralığı (pozitif veya negatif bölgeler) taranır.</p>",
+                    items: ["Fonksiyon Grafikleri Üzerinde Öteleme ve Simetri", "Parabolün Tepe Noktası ($T(r,k)$) ve Çizimi", "Parabol ile Doğrunun Birbirine Göre Durumları", "İkinci Dereceden Eşitsizlik Tabloları"],
+                    formula: "$$r = \\frac{-b}{2a} \\quad k = f(r)$$ $$\\Delta = b^2 - 4ac$$",
+                    question: "$y = x^2 - 4x + 3$ parabolünün x eksenini kestiği noktalar arasındaki uzaklık kaç birimdir?",
+                    solution: "1. X eksenini kestiği noktaları (kökleri) bulmak için fonksiyonu sıfıra eşitleriz ($y=0$).<br>2. $x^2 - 4x + 3 = 0$<br>3. Çarpanlarına ayıralım: $(x-3)(x-1) = 0$<br>4. Kökler: $x_1 = 1$ ve $x_2 = 3$.<br>5. Aralarındaki uzaklık: $3 - 1 = 2$ birim.<br><br><strong>Cevap: 2 birim</strong>",
+                    shortcut: "Bir parabolün tepe noktasının apsisi ($r = -b/2a$) her zaman simetri eksenidir. Yani köklerin tam ortasındadır. $r = (x_1 + x_2) / 2$ şeklinde de bulunabilir."
+                },
+                {
+                    title: "4. Limit ve Süreklilik",
+                    summary: "Kalkülüsün başlangıcı, sağ/sol limit ve 0/0 belirsizliği.",
+                    description: "<p><strong>Limit:</strong> $x$ değişkeni bir $a$ değerine çok ama çok yaklaşırken (hiçbir zaman a olmaz), $f(x)$ fonksiyonunun yaklaştığı sayısal hedeftir. Bir noktada limit olabilmesi için o noktaya sağdan ve soldan yaklaştığımızda aynı değere ulaşmalıyız (Sağ Limit = Sol Limit).</p><br>[Limitin sağdan ve soldan yaklaşımını gösteren grafik]<p><strong>Süreklilik:</strong> Bir fonksiyonun grafiğinde kopma, sıçrama veya boşluk yoksa süreklidir. Süreklilik şartı 3 adımlıdır: 1) O noktada tanımlı olmalı, 2) Limiti olmalı, 3) Limiti fonksiyonun o noktadaki değerine eşit olmalı.</p><p><strong>Belirsizlikler:</strong> Limit hesaplarken $0/0$ veya $\\infty/\\infty$ çıkarsa çarpanlara ayırma, eşlenikle çarpma veya (ileride) L'Hôpital kuralı kullanılır.</p>",
+                    items: ["Limitin Tanımı ve Sağdan-Soldan Yaklaşım", "Kritik Noktalarda Limit (Parçalı Fonksiyonlar)", "0/0 Belirsizliği ve Çözüm Yolları", "Süreklilik Şartları"],
+                    formula: "$$\\lim_{x \\to a^+} f(x) = \\lim_{x \\to a^-} f(x) = L$$",
+                    question: "$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}$ limitinin değeri kaçtır?",
+                    solution: "1. Önce x yerine 2 koyarak limiti kontrol ederiz: $\\frac{2^2 - 4}{2 - 2} = \\frac{0}{0}$. (Belirsizlik var, işlem bitmedi).<br>2. Payı iki kare farkı şeklinde çarpanlarına ayırırız: $x^2 - 4 = (x-2)(x+2)$.<br>3. Limiti tekrar yazalım: $\\lim_{x \\to 2} \\frac{(x-2)(x+2)}{(x-2)}$<br>4. Belirsizlik yaratan $(x-2)$ çarpanları sadeleşir. Geriye $\\lim_{x \\to 2} (x+2)$ kalır.<br>5. Şimdi x yerine tekrar 2 koyarız: $2 + 2 = 4$.<br><br><strong>Cevap: 4</strong>",
+                    shortcut: "Polinom fonksiyonlarda (içinde kök, kesir veya mutlak değer olmayan dümdüz denklemlerde) sağdan veya soldan limite bakmaya gerek yoktur. Limiti sorulan sayıyı direkt x yerine yazıp sonucu bulabilirsin."
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. Türev Alma Kuralları",
+                    summary: "Fonksiyonun anlık değişim hızı ve teğetin eğimi.",
+                    description: "<p><strong>Türevin Tanımı:</strong> Bir fonksiyonun herhangi bir noktasındaki anlık değişim oranıdır. Geometrik olarak, o noktadan eğriye çizilen <strong>teğet doğrusunun eğimidir</strong> ($m_T = f'(x_0)$).</p><p><strong>Temel Kurallar:</strong> Sabit sayının türevi sıfırdır. $x^n$ şeklindeki ifadelerde üs başa çarpım olarak geçer ve üs 1 azaltılır.</p><p><strong>İşlem Kuralları:</strong> Toplama/çıkarmada ayrı ayrı türev alınır. Çarpım ve Bölüm türevleri özel formüllere sahiptir. <strong>Zincir Kuralı (Bileşke Türevi):</strong> İç içe geçmiş fonksiyonlarda önce dışın türevi çarpı için türevi alınır.</p>",
+                    items: ["Türevin Geometrik Yorumu (Teğet Eğimi)", "Polinom Fonksiyonların Türevi", "Çarpım ve Bölüm Türevi Kuralları", "Bileşke Fonksiyon Türevi (Zincir Kuralı)", "L'Hôpital Kuralı (Limit Belirsizliklerinde)"],
+                    formula: "$$(x^n)' = n \\cdot x^{n-1}$$ $$(f \\cdot g)' = f' \\cdot g + f \\cdot g'$$ $$\\left(\\frac{f}{g}\\right)' = \\frac{f' \\cdot g - f \\cdot g'}{g^2}$$",
+                    question: "$f(x) = (2x^2 - 3x + 1)^3$ fonksiyonunun türevini alınız.",
+                    solution: "Zincir kuralı (İçin türevi) uygulamalıyız.<br>1. Önce en dıştaki üssü (3) başa çarpım olarak atıp üssü 1 azaltırız (İçeriye dokunmadan): $3 \\cdot (2x^2 - 3x + 1)^2$<br>2. Sonra parantezin İÇİNİN türevini alıp bu ifadeyle çarparız. İçin türevi: $(4x - 3)$<br>3. İkisini çarpım durumunda yazarız: $3 \\cdot (2x^2 - 3x + 1)^2 \\cdot (4x - 3)$<br><br><strong>Cevap: $3(2x^2 - 3x + 1)^2(4x - 3)$</strong>",
+                    shortcut: "Köklü ifadelerin türevini alırken formül ezberleme. Köklü ifadeyi üslü sayıya çevir (Örn: $\\sqrt{x} = x^{1/2}$) ve normal polinom türevi alarak üssü başa atıp 1 eksilt."
+                },
+                {
+                    title: "2. Türevin Uygulamaları (Maks/Min)",
+                    summary: "Artan-azalan aralıklar ve ekstremum noktalar.",
+                    description: "<p><strong>Artan ve Azalanlık:</strong> Bir fonksiyonun türevi pozitifse ($f'(x) > 0$) o aralıkta fonksiyon artandır (yukarı çıkar). Türevi negatifse ($f'(x) < 0$) o aralıkta fonksiyon azalandır (aşağı iner).</p><p><strong>Ekstremum Noktalar (Maksimum/Minimum):</strong> Fonksiyonun tepe ve çukur yaptığı yerlerdir. Bu noktalarda çizilen teğetler x eksenine paralel olduğu için <strong>Türev SIFIRDIR</strong> ($f'(x_0) = 0$).</p><br>[Artan, azalan ve ekstremum noktaları gösteren fonksiyon grafiği]<p><strong>Maks/Min Problemleri:</strong> Geometrik şekillerin en büyük alanını, en küçük maliyeti vb. bulmak için istenen şey tek değişkenli denkleme çevrilir, türevi alınıp 0'a eşitlenir.</p>",
+                    items: ["Artan ve Azalan Fonksiyon Aralıkları", "Yerel ve Mutlak Ekstremum Noktalar", "Birinci Türev Testi ve İşaret Tablosu", "Maksimum ve Minimum Problemleri"],
+                    formula: "$$\\text{Ekstremum Noktada: } f'(x_0) = 0$$",
+                    question: "$f(x) = x^3 - 3x^2 - 9x + 5$ fonksiyonunun yerel minimum noktasının apsisini bulunuz.",
+                    solution: "1. Ekstremum noktaları bulmak için birinci türevi alıp 0'a eşitleriz.<br>2. $f'(x) = 3x^2 - 6x - 9 = 0$<br>3. Her tarafı 3'e bölelim: $x^2 - 2x - 3 = 0$<br>4. Çarpanlarına ayıralım: $(x-3)(x+1) = 0$. Kökler $x=3$ ve $x=-1$.<br>5. İşaret tablosu yaparsak (en sağdan + ile başlar); -1'in solunda artan (+), -1 ile 3 arasında azalan (-), 3'ün sağında artandır (+).<br>6. Fonksiyon x=-1'de tepe (maksimum), x=3'te ise çukur (minimum) yapar.<br><br><strong>Cevap: 3</strong>",
+                    shortcut: "Bir polinom fonksiyonda, türev köklerinden işaret tablosu oluşturduğunda işareti eksiden (-) artıya (+) geçen kök daima MİNİMUM, artıdan (+) eksiye (-) geçen kök daima MAKSİMUM noktasıdır."
+                },
+                {
+                    title: "3. İntegral Alma Kuralları",
+                    summary: "Türevin ters işlemi, ilkel fonksiyon ve değişken değiştirme.",
+                    description: "<p><strong>Belirsiz İntegral ($\\int$):</strong> 'Hangi fonksiyonun türevi budur?' sorusunun cevabını aramaktır. Türev alma işleminin tam tersidir. Tüm belirsiz integrallerin sonuna mutlaka bir integral sabiti ($+ C$) eklenmelidir.</p><p><strong>Temel Kurallar:</strong> $x^n$ şeklindeki ifadelerin integrali alınırken, üs 1 artırılır ve oluşan yeni üsse bölünür. Sabit sayının yanına x gelir.</p><p><strong>Değişken Değiştirme ($u$ Dönüşümü):</strong> Karmaşık ve çarpım/bölüm durumundaki integralleri çözmek için kullanılır. İfadenin bir kısmına $u$ denir, türevi ($du$) yanındaysa ifade basitleşir.</p>",
+                    items: ["Belirsiz İntegralin Tanımı ve Türevle İlişkisi", "Polinom Fonksiyonların İntegrali", "İntegral Sabiti (+ C)", "Değişken Değiştirme Yöntemi (u Dönüşümü)"],
+                    formula: "$$\\int f'(x) \\, dx = f(x) + C$$ $$\\int x^n \\, dx = \\frac{x^{n+1}}{n+1} + C$$",
+                    question: "$\\int (4x^3 - 6x + 5) \\, dx$ belirsiz integralini hesaplayınız.",
+                    solution: "Kurala göre her terimin üssünü 1 artırıp yeni üsse böleceğiz:<br>1. $4x^3 \\implies 4 \\cdot \\frac{x^4}{4} = x^4$<br>2. $-6x^1 \\implies -6 \\cdot \\frac{x^2}{2} = -3x^2$<br>3. $5 \\implies 5x$<br>4. Terimleri birleştirip sonuna C sabitini ekleriz.<br><br><strong>Cevap: $x^4 - 3x^2 + 5x + C$</strong>",
+                    shortcut: "Bir integral sorusunda, parantez içindeki veya kök içindeki ifadenin türevi sorunun başka bir yerinde çarpım durumundaysa KESİNLİKLE değişken değiştirme (u dönüşümü) yapmalısın."
+                },
+                {
+                    title: "4. Belirli İntegral ve Alan Hesabı",
+                    summary: "Sınır değerleri ve eğri altında kalan alanın bulunması.",
+                    description: "<p><strong>Belirli İntegral:</strong> Sınırları (alt sınır $a$, üst sınır $b$) belli olan integraldir. Belirsiz integral alınır, $+C$ konmaz. Önce üst sınır (b) x yerine yazılır, sonra alt sınır (a) x yerine yazılır ve birbirinden çıkarılır ($F(b) - F(a)$).</p><p><strong>Eğri Altında Kalan Alan:</strong> Geometrik olarak, belirli integral $f(x)$ eğrisi ile x ekseni arasında kalan bölgenin (veya iki eğri arasındaki bölgenin) alanını verir.</p><br>[Bir eğri altında kalan alanı gösteren Riemann toplamı grafiği]<p>Alan hesaplarken eğrinin grafiği x ekseninin <strong>ALTINDAYSA</strong> integralin sonucu negatif (-) çıkar. Alan negatif olamayacağı için çıkan sonuç eksiyle çarpılarak pozitife çevrilir. İki eğri arasındaki alan bulunurken üstteki eğriden alttaki eğri çıkarılıp integrali alınır.</p>",
+                    items: ["Belirli İntegralin Özellikleri ve Sınır Değerleri", "Eğri ile x veya y Ekseni Arasında Kalan Alan", "İki Eğri Arasında Kalan Bölgenin Alanı", "Parçalı ve Mutlak Değerli Fonksiyonların İntegrali"],
+                    formula: "$$\\int_a^b f(x) \\, dx = F(b) - F(a)$$ $$\\text{Alan} = \\int_a^b (\\text{Üst Eğri} - \\text{Alt Eğri}) \\, dx$$",
+                    question: "$y = x^2$ parabolü, x ekseni, x=1 ve x=3 doğruları arasında kalan kapalı bölgenin alanı kaç birimkaredir?",
+                    solution: "1. Alan formülünü yazarız: $\\int_1^3 (x^2) \\, dx$<br>2. Önce belirsiz integralini alırız: $\\frac{x^3}{3}$<br>3. Sınırları yerine koyarız (Üst sınır 3, alt sınır 1):<br>4. $F(3) = \\frac{3^3}{3} = \\frac{27}{3} = 9$<br>5. $F(1) = \\frac{1^3}{3} = \\frac{1}{3}$<br>6. $F(3) - F(1) = 9 - \\frac{1}{3} = \\frac{27-1}{3} = \\frac{26}{3}$<br><br><strong>Cevap: $\\frac{26}{3}$ birimkare</strong>",
+                    shortcut: "Bir belirli integralde üst sınır ile alt sınır yer değiştirirse, integralin sonucunun SADECE İŞARETİ değişir. (Örn: a'dan b'ye integral 5 ise, b'den a'ya integral -5'tir)."
+                }
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
