@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Din kültürü";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Bilgi ve İnanç",
+                    summary: "İslam'da doğru bilginin kaynakları, inanç çeşitleri ve bilgi aşamaları.",
+                    description: "<p><strong>İslam'da Doğru Bilginin Kaynakları (AYT Bankosu):</strong> İslam'a göre rüyalar, ilham, sezgi veya büyü kesin bilgi kaynağı DEĞİLDİR. Sadece üç temel kaynak vardır:<br>1. <em>Selim Akıl:</em> İnsanın iyi ile kötüyü ayırmasını sağlayan, önyargılardan ve hastalıklardan uzak, sağlıklı akıldır.<br>2. <em>Sadık Haber (Vahiy ve Sünnet):</em> Allah'tan peygamberlere gelen vahiy (Kur'an-ı Kerim) ve peygamberin sünnetidir (Mütevatir Haber). Kesin ve şüphe edilmez doğru bilgidir.<br>3. <em>Salim Duyu Organları:</em> İnsanın çevresini algıladığı, kusursuz işleyen beş duyusudur (Deney ve gözlem).</p><p><strong>İnancın (İmanın) Çeşitleri:</strong><br>- <em>Taklidî İman:</em> Araştırmadan, sadece anne-babadan veya çevreden görerek inanmaktır (Zayıftır, şüpheyle sarsılabilir).<br>- <em>Tahkikî İman:</em> Araştırarak, kavrayarak, akıl ve delillere dayanan güçlü imandır (İslam'ın istediği budur).<br>- <em>İcmalî İman:</em> İnanılacak şeylere kısaca, toptan inanmaktır (Kelime-i Şehadet getirmek gibi).<br>- <em>Tafsilî İman:</em> İnanılacak şeylerin her birine (Amentü'ye) ayrıntılı olarak inanmaktır.</p><p><strong>Bilginin Aşamaları (Kesinlik Dereceleri):</strong><br>- <em>İlmel Yakîn:</em> Bir şeyi habere, bilgiye dayanarak bilmek (Örn: Ateşin yakıcı olduğunu kitaptan okumak).<br>- <em>Aynel Yakîn:</em> Bir şeyi gözlemleyerek (bizzat görerek) bilmek (Örn: Ateşin yandığını gözle görmek).<br>- <em>Hakkal Yakîn:</em> Bir şeyi bizzat yaşayarak, tecrübe ederek bilmek (Örn: Ateşe dokunup yanmak - en kesin bilgidir).</p>",
+                    items: ["İslam'da Kesin Bilgi Kaynakları (Akıl, Vahiy, Duyu)", "Rüya, İlham ve Keşfin Bilgi Kaynağı Olmaması", "Taklidî (Geleneksel) ve Tahkikî (Araştırmacı) İman Farkı", "İcmalî (Toptan) ve Tafsilî (Ayrıntılı) İman", "Bilgi Kademeleri: İlmel, Aynel ve Hakkal Yakîn"],
+                    formula: null,
+                    question: "Bir Müslümanın, 'Allah vardır ve birdir, O'nun meleklerine, kitaplarına ve peygamberlerine inandım' diyerek iman esaslarının tamamını ayrıntılarıyla kabul etmesi, hangi tür imana örnektir?",
+                    solution: "İmanın detay seviyesine göre ikiye ayrıldığını hatırlayalım:<br>1. Sadece 'Ben Allah'a ve Peygamberine inandım' diyerek toptan bir giriş yapmak <strong>İcmalî (Özet) İman</strong>dır.<br>2. İmanın 6 şartını (Amentü duasındaki gibi; meleklere, kitaplara, ahirete, kadere vs.) tek tek sayarak, hepsinin detayını ve hükümlerini bilip kabul etmek ise daha kapsamlı olan <strong>Tafsilî (Ayrıntılı) İman</strong>dır.<br><br><strong>Cevap: Tafsilî İman.</strong>",
+                    shortcut: "Bir soruda 'Önyargılardan arınmış, insanın doğru karar vermesini sağlayan akıl' diyorsa bu <strong>Selim Akıl</strong>'dır. Babadan oğula körü körüne geçen inanç diyorsa <strong>Taklidî İman</strong>'dır."
+                },
+                {
+                    title: "2. Din ve İslam",
+                    summary: "Dinin tanımı, Tevhit inancı ve Allah'ın isimleri (Esma-i Hüsna).",
+                    description: "<p><strong>Dinin Tanımı ve Kaynağı:</strong> Din, Allah tarafından peygamberler aracılığıyla akıl sahibi insanlara gönderilen, onları dünya ve ahirette mutluluğa ulaştırmayı hedefleyen ilahi kurallar bütünüdür. İslam'a göre dinin kaynağı insani (sosyolojik) değil, <strong>İlahidir (Vahiy kaynaklıdır)</strong>. İnsan doğuştan inanma ihtiyacıyla (Fıtrat) yaratılmıştır.</p><br><p><strong>Tevhit İnancı:</strong> İslam'ın temelidir. Allah'ın var ve BİR olması, eşi, benzeri ve ortağının bulunmamasıdır. Zıddı ise <strong>Şirk (Ortak koşmak)</strong>tir ve İslam'da affedilmeyen tek büyük günahtır.</p><p><strong>Esma-i Hüsna (Allah'ın En Güzel İsimleri):</strong> Kur'an'da ve hadislerde geçen Allah'ın isimleridir. Sınavlarda sıkça sorulan bazıları:<br>- <em>Rahman ve Rahim:</em> Çok merhamet eden, acıyan, esirgeyen.<br>- <em>Rezzak:</em> Bütün canlıların rızkını (yiyeceğini, geçimini) veren.<br>- <em>Muhyi:</em> Can veren, hayat veren. / <em>Mümit:</em> Can alan, öldüren.<br>- <em>Alîm:</em> Her şeyi hakkıyla bilen (Geçmişi, geleceği, gizliyi).<br>- <em>Kadir:</em> Her şeye gücü yeten, sonsuz kudret sahibi.<br>- <em>Basar:</em> Her şeyi eksiksiz gören. / <em>Semi:</em> Her şeyi eksiksiz işiten.</p>",
+                    items: ["Dinin Özellikleri ve Fıtrat (Doğuştan İnanma İhtiyacı)", "Tevhit (Birlik) ve Şirk (Ortak Koşma) Kavramları", "Haniflik İnancı (Hz. İbrahim'in Dini)", "Esma-i Hüsna (Allah'ın Güzel İsimleri) ve Anlamları", "İslam Dininin Evrenselliği"],
+                    formula: null,
+                    question: "'O, karanlık bir gecede, siyah bir taşın üzerinde yürüyen siyah bir karıncanın ayak sesini bile işitendir.'<br>Bu cümle, Allah'ın 'Esma-i Hüsna'da yer alan hangi sıfatını (ismini) vurgulamaktadır?",
+                    solution: "Allah'ın sıfatlarını hatırlayalım:<br>1. Alîm: Bilmesi.<br>2. Basar: Görmesi.<br>3. Kudret/Kadir: Gücünün yetmesi.<br>4. Semi: İşitmesi.<br>Sorudaki cümlede açıkça 'ayak sesini bile İŞİTENDİR' vurgusu yapıldığı için, Allah'ın her türlü gizli veya açık sesi duyabilme sıfatı olan Semi sıfatı kastedilmiştir.<br><br><strong>Cevap: Semi (Her şeyi işiten).</strong>",
+                    shortcut: "Eğer bir metinde insanın yaratılıştan (doğuştan) gelen temiz yapısından, inanmaya eğilimli olmasından ve bir yaratıcı arama ihtiyacından bahsediliyorsa oradaki anahtar kavram <strong>'Fıtrat'</strong> tır."
+                },
+                {
+                    title: "3. İslam ve İbadet",
+                    summary: "İbadetin amacı, çeşitleri ve geçerli olmasının şartları.",
+                    description: "<p><strong>İbadet Nedir?</strong> İnsanın yaratıcısına karşı sevgi, saygı, itaat ve kulluk görevini yerine getirmesidir. İslam'da ibadet sadece namaz kılıp oruç tutmakla sınırlı değildir; Allah'ın rızasını kazanmak amacıyla yapılan <strong>her türlü güzel ve faydalı iş (Salih Amel)</strong> ibadet sayılır.</p><p><strong>İbadetin Temel Şartları:</strong> Bir ibadetin Allah katında kabul olması için üç şart gerekir:<br>1. <em>Niyet:</em> İbadetin sadece Allah için yapılmaya başlanmasıdır (Bilinçli olmak).<br>2. <em>İhlas (Samimiyet):</em> İbadeti gösterişten (Riya) uzak, dünyevi bir çıkar beklemeden, kalpten ve sadece Allah'ın sevgisini kazanmak için yapmaktır. (Riya, ihlasın tam zıddıdır ve gizli şirk sayılır).<br>3. <em>Sünnete Uygunluk:</em> İbadetin, Hz. Muhammed'in gösterdiği ve Kur'an'ın emrettiği kurallara (şekil şartlarına) uygun yapılmasıdır.</p><p><strong>İbadet Çeşitleri:</strong><br>- <em>Bedenî İbadetler:</em> Sadece vücutla (bedenle) yapılan, zenginlik gerektirmeyen ibadetlerdir (Örn: Namaz kılmak, Oruç tutmak).<br>- <em>Malî İbadetler:</em> Sadece malla/parayla yapılan, zenginlik (Nisap miktarı) gerektiren ibadetlerdir (Örn: Zekat vermek, Sadaka, Fitre).<br>- <em>Hem Bedenî Hem Malî İbadetler:</em> Hem fiziki güç hem de maddi güç gerektiren ibadetlerdir (Örn: Hac, Umre).</p>",
+                    items: ["İbadetin Bireysel ve Toplumsal Faydaları", "Salih Amel (Faydalı İş) Kavramı", "İbadette İhlas (Samimiyet) ve Riya (Gösteriş) Çatışması", "Bedenî, Malî ve Hem Bedenî Hem Malî İbadetler", "Farz, Vacip, Sünnet ve Müstehap Kavramları"],
+                    formula: null,
+                    question: "Cuma namazında en ön safta yer kaparak mahallesindeki insanlara ne kadar dindar olduğunu göstermeye çalışan bir kişinin kıldığı bu namaz, İslam'ın ibadet şartlarından hangisini (hangi ilkeyi) zedelemiş olur?",
+                    solution: "İbadetin Allah katında geçerli olmasının en büyük şartı, o ibadetin <strong>sadece ve sadece Allah rızası için</strong> yapılmasıdır.<br>1. İnsanların takdirini toplamak, dindar görünmek veya çıkar sağlamak için yapılan eylemlere <strong>Riya (Gösteriş)</strong> denir.<br>2. Riya, ibadetin içindeki o temiz samimiyeti, yani <strong>İhlas</strong> ilkesini ortadan kaldırır.<br>3. İhlası olmayan (riyakar) bir ibadet şekil olarak tam olsa bile manen geçersiz sayılır.<br><br><strong>Cevap: İhlas (Samimiyet) ilkesini zedelemiştir. Yaptığı davranış Riya (gösteriş) dır.</strong>",
+                    shortcut: "Bir soruda 'Sadece Allah için yapmak, saf niyet, gösterişten uzak durmak, kalbini temiz tutmak' kelimeleri bir aradaysa o sorunun cevabı kesinlikle <strong>'İhlas'</strong> tır."
+                },
+                {
+                    title: "4. Gençlik ve Değerler",
+                    summary: "Dört temel ahlaki erdem: Adalet, Hikmet, Şecaat ve İffet.",
+                    description: "<p><strong>Değer:</strong> Bir toplumun, kültürün veya inancın iyi, doğru ve güzel olarak kabul ettiği kurallar bütünüdür. İslam ahlak felsefesinde (özellikle Farabi ve Gazali gibi düşünürlerde) insan ruhunun güçleri <strong>dört temel erdemde (değerde)</strong> toplanmıştır. TYT'nin en çok sorduğu kavramlar bunlardır:</p><p><strong>Dört Temel Erdem:</strong><br>1. <strong>Hikmet (Bilgelik):</strong> İnsanın 'Akıl' gücünün eğitilmesiyle ulaşılan erdemdir. Doğruyu yanlıştan, iyiyi kötüden ayırabilme, ilim ve derin anlayış sahibi olmaktır. Zıddı cehalet ve ahmaklıktır.<br>2. <strong>Şecaat (Cesaret):</strong> İnsanın 'Öfke/Savunma' gücünün eğitilmesiyle ulaşılır. Hakkı savunmak, zalime karşı korkmadan durabilmek, yiğitlik göstermektir. Şecaat; korkaklık ile delicesine (akılsızca) atılganlık arasındaki altın orta yoldur.<br>3. <strong>İffet (Namus/Ölçülülük):</strong> İnsanın 'Arzu/Şehvet' gücünün kontrol altına alınmasıdır. Yeme, içme, bedeni arzular ve haram karşıtı konularda nefsi tutmak, namuslu ve haya (utanma) sahibi olmaktır.<br>4. <strong>Adalet:</strong> Hikmet, Şecaat ve İffet erdemlerinin bir insanda dengeli bir şekilde toplanması ve o kişinin her hak sahibine hakkını eksiksiz vermesidir. Zulmün ve haksızlığın zıddıdır.</p>",
+                    items: ["Değerlerin Oluşumunda Dinin Etkisi", "Kişiliğin Gelişiminde Temel Değerler", "Hikmet (Aklın Erdemi) ve Bilgelik", "Şecaat (Cesaret) ve Öfkenin Kontrolü", "İffet (Nefsi Kontrol) ve Adalet (Denge)"],
+                    formula: null,
+                    question: "İslam ahlak felsefesinde 'Aşırıya kaçmamak ve geride kalmamak, ikisinin ortasında dengeli bir yol tutmak (İtidal)' esastır. Buna göre, savaşta hiçbir tedbir almadan kendini tehlikeye atan 'Saldırganlık (Tehevvür)' ile her şeyden korkup kaçan 'Korkaklık (Cebanet)' arasındaki dengeli/erdemli yola (orta yola) ne ad verilir?",
+                    solution: "Ahlaki erdemler her zaman aşırılıkların ortasındaki dengedir (Aristoteles'in Altın Orta kuralının İslam felsefesindeki yansıması).<br>1. Akıl eksikliğine ahmaklık, fazlasına kurnazlık, ikisinin ortasına <strong>Hikmet</strong> denir.<br>2. Nefsi arzuların eksikliğine uyuşukluk, fazlasına sapkınlık, ortasına <strong>İffet</strong> denir.<br>3. Öfkenin (savaşma gücünün) eksikliğine korkaklık, fazlasına saldırganlık/delilik, ikisinin tam ortasında durarak aklıyla, cesurca hakkını savunmaya ise <strong>Şecaat</strong> denir.<br><br><strong>Cevap: Şecaat (Cesaret).</strong>",
+                    shortcut: "Soruda kavramların anahtar kelimelerine dikkat et:<br>- Akıl, derin anlayış, doğru karar = <strong>Hikmet</strong><br>- Namus, haramdan kaçınma, arzuları tutma = <strong>İffet</strong><br>- Kahramanlık, korkuyu yenme, hakkı savunma = <strong>Şecaat</strong><br>- Hakkını verme, eşit/dengeli olma = <strong>Adalet</strong>"
+                },
+                {
+                    title: "5. Gönül Coğrafyamız",
+                    summary: "İslam medeniyetinin yayıldığı temel bölgeler ve kültürel izleri.",
+                    description: "<p><strong>İslam Medeniyeti:</strong> Arap yarımadasında doğmuş, ancak kısa sürede farklı milletlerin (Türkler, Farslar, Hintliler, Afrikalılar, Avrupalılar) katkısıyla <strong>Evrensel</strong> bir medeniyet (sentez) haline gelmiştir. Temel kaynağı vahiy ve akıldır.</p><p><strong>Gönül Coğrafyamızın Önemli Havzaları:</strong><br>- <em>Hicaz Bölgesi:</em> İslam'ın doğduğu, Kabe'nin, Mekke ve Medine'nin bulunduğu merkezdir. (Haremeyn).<br>- <em>Kudüs (Mescid-i Aksa):</em> Üç ilahi din için de kutsaldır. Müslümanların <strong>İlk Kıblesi</strong>'dir. İsra ve Miraç olayları burada yaşanmıştır.<br>- <em>Şam ve Bağdat:</em> Emeviler (Şam) ve Abbasiler (Bağdat) döneminde başkentlik yapmışlardır. Bağdat'taki <strong>Beytü'l Hikme (Bilgelik Evi)</strong> antik eserlerin çevrildiği büyük bir bilim merkezidir.<br>- <em>Horasan ve Maveraünnehir:</em> Türklerin yoğun yaşadığı, Semerkant, Buhara ve Taşkent gibi şehirleri barındıran İlim ve İrfan merkezleridir. (İbn Sina, Farabi, İmam Buhari buralarda yetişmiştir).<br>- <em>Endülüs (İspanya):</em> Tarık bin Ziyad'ın fethiyle Avrupa'da kurulan İslam devletidir. Kurtuba Camii ve El-Hamra Sarayı en önemli eserleridir. Avrupa'ya bilimi ve aydınlanmayı taşımıştır.<br>- <em>Balkanlar:</em> Osmanlı'nın iskan ve istimalet (hoşgörü) politikasıyla İslamlaştırdığı (Bosna, Makedonya, Arnavutluk) bölgelerdir. Mostar Köprüsü (Mimar Sinan'ın öğrencisi Hayreddin yapmıştır) en ünlü eserlerdendir.</p>",
+                    items: ["İslam Medeniyetinin Özellikleri (Evrensel, Sentezci)", "Hicaz (Mekke-Medine) ve Kudüs'ün Kutsiyeti", "Bağdat (Beytü'l Hikme) ve Bilimsel Gelişmeler", "Horasan Havzası ve Türk-İslam Alimleri", "Endülüs (İspanya) ve Balkanlardaki İslami Eserler"],
+                    formula: null,
+                    question: "Avrupa Kıtası'nda, günümüz İspanya sınırları içerisinde (İber Yarımadası) kurulan, başkenti Kurtuba olan ve Orta Çağ'da Avrupa karanlık içindeyken büyük bir bilim/kütüphane merkezi olarak Rönesans'a ilham kaynağı olan İslam medeniyeti havzası hangisidir?",
+                    solution: "1. İslam medeniyeti Emeviler döneminde Kuzey Afrika'yı geçerek Tarık bin Ziyad komutasında Cebelitarık Boğazı'nı aşmış ve İspanya'ya (Avrupa'ya) girmiştir.<br>2. Burada 800 yıl hüküm süren ve mimaride (El Hamra Sarayı), felsefede (İbn Rüşd) zirveye çıkan bu medeniyet merkezine Müslümanlar <strong>Endülüs</strong> adını vermişlerdir.<br>3. Endülüs, Avrupa'nın bilimsel uyanışında (Rönesans) çok büyük bir köprü görevi görmüştür.<br><br><strong>Cevap: Endülüs Havzası (Medeniyeti).</strong>",
+                    shortcut: "Kudüs için sorulacak en banko bilgi <strong>'Müslümanların İlk Kıblesi'</strong> olması ve Peygamberimizin göğe yükseldiği (Miraç) yer olmasıdır. Beytü'l Hikme (Bilgi Evi) sorulursa <strong>Bağdat (Abbasiler)</strong>, El Hamra Sarayı sorulursa <strong>Endülüs (İspanya)</strong> aklına gelsin."
+                }
+
+
+            ],
+            10: [
+                                {
+                    title: "1. Allah İnancı ve İnsan",
+                    summary: "Allah'ın varlığının delilleri ve insanın Allah ile irtibat yolları.",
+                    description: "<p><strong>Allah'ın Varlığı ve Birliğinin Delilleri:</strong> İslam bilginleri (Kelamcılar) Allah'ın varlığını akılla kanıtlamak için bazı deliller sunmuşlardır:<br>- <em>Gaye ve Nizam (Düzen) Delili:</em> Evrendeki kusursuz işleyiş, hassas ayar ve ekolojik denge tesadüf olamaz. Her şeyin bir amacı (gayesi) ve düzeni (nizamı) varsa, bu düzeni kuran üstün bir Yaratıcı (Nâzım) vardır.<br>- <em>Ekmel (Mükemmel) Varlık Delili (Ontolojik Delil):</em> İnsan zihninde 'en mükemmel varlık' düşüncesi doğuştan vardır. İnsan kendisi eksik ve acizken bu mükemmel düşünceyi kendisi üretemez, bunu insan zihnine koyan bizzat o mükemmel varlığın (Allah'ın) kendisidir. (Descartes ve İbn Sina savunur).<br>- <em>Hudûs (Sonradan Olma) Delili:</em> Evren sonradan yaratılmıştır (Hadis'tir). Sonradan yaratılan her şeyin bir yaratıcıya (Muhdis) ihtiyacı vardır.</p><p><strong>İnsanın Allah İle İrtibat Yolları:</strong> İnsan sadece zor anlarında değil, her zaman Yaratıcısıyla bağ kurmalıdır. Bu bağın 4 temel yolu vardır:<br>1. <strong>Dua:</strong> İnsanın acizliğini kabul edip Allah'tan yardım istemesi, O'na sığınmasıdır.<br>2. <strong>İbadet:</strong> Allah'ın emirlerini yerine getirmek ve O'nun rızasını kazanmak için yapılan her türlü güzel davranıştır.<br>3. <strong>Tövbe ve İstiğfar:</strong> İnsanın bilerek veya bilmeyerek işlediği günahlardan dolayı pişman olup (tövbe), Allah'tan af dilemesidir (istiğfar). Tövbenin kabulü için samimiyet (Nasuh tövbesi) şarttır.<br>4. <strong>Kur'an Okuma (Tilavet/Kıraat):</strong> Allah'ın sözlerini anlayarak, düşünerek (Tefekkür) ve hayatına uygulamak amacıyla okumaktır.</p>",
+                    items: ["Gaye ve Nizam (Düzen) Delili", "Ekmel Varlık ve Hudûs Delilleri", "Duanın İnsan Psikolojisine Etkisi", "Tövbe ve İstiğfar Arasındaki İlişki", "Kur'an'ı Anlayarak Okumanın (Tertil/Tilavet) Önemi"],
+                    formula: null,
+                    question: "'Güneşin ve Ayın belirli bir yörüngede akıp gitmesi, gece ile gündüzün şaşmaz bir şekilde birbirini takip etmesi ve arıların kusursuz bir geometriyle petek örmesi, kör bir tesadüfün eseri olamaz.'<br>Bu cümlede Allah'ın varlığını ispatlamak için kullanılan kelam delili aşağıdakilerden hangisidir?",
+                    solution: "Paragraftaki anahtar kelimelere bakalım:<br>1. Güneşin/Ayın yörüngesi, gece-gündüzün takibi, arıların kusursuz geometrisi... Bunların hepsi evrendeki 'Hassas Ayar', 'İşleyiş' ve 'Düzen'i vurgulamaktadır.<br>2. İslam felsefesinde evrendeki bu muhteşem tasarımdan, ahenkten ve düzenden yola çıkarak 'Öyleyse bir Tasarımcı (Düzenleyici) vardır' sonucuna ulaşan delile <strong>Gaye ve Nizam Delili</strong> (Teleolojik Delil) denir.<br><br><strong>Cevap: Gaye ve Nizam (Düzen) Delili.</strong>",
+                    shortcut: "Soruda 'Evren, doğa, düzen, işleyiş, hassas ayar' geçiyorsa cevap %100 <strong>Gaye ve Nizam Delili</strong>'dir. Eğer soruda 'Sonradan yaratılma, maddenin bir başlangıcının olması' diyorsa cevap <strong>Hudûs Delili</strong>'dir."
+                },
+                {
+                    title: "2. Allah'ın Kulu ve Elçisi: Hz. Muhammed",
+                    summary: "Peygamberlerin ortak sıfatları ve Hz. Muhammed'in şahsiyeti.",
+                    description: "<p>Hz. Muhammed hem bir insan (kul) hem de Allah'ın elçisidir (Peygamber/Resul). O da herkes gibi yer, içer, uyur, üzülür ve vefat ederdi (Beşeri yönü). Ancak aldığı vahyi insanlara ulaştırması ve örnek olması onun peygamberlik (Risalet) yönüdür.</p><br><p><strong>Peygamberlerin Ortak Sıfatları (AYT Bankosu):</strong> Bütün peygamberlerde bulunması zorunlu olan 5 temel özellik vardır:<br>1. <strong>Sıdk (Doğruluk):</strong> Peygamberlerin özünde, sözünde ve davranışlarında her zaman doğru ve dürüst olmalarıdır. Asla yalan söylemezler.<br>2. <strong>Emanet (Güvenilirlik):</strong> Kendilerine verilen her türlü emaneti (vahyi, eşyayı, sırrı) korumalarıdır. (Hz. Muhammed'e peygamberlikten önce bile 'Muhammedü'l-Emin' denirdi).<br>3. <strong>Fetanet (Akıl ve Zeki Olma):</strong> Peygamberlerin üstün bir akla, zekaya ve ikna yeteneğine sahip olmalarıdır.<br>4. <strong>İsmet (Günahsızlık):</strong> Peygamberlerin gizli veya açık hiçbir günah işlememeleri, Allah tarafından günahlardan korunmalarıdır.<br>5. <strong>Tebliğ (Bildirme):</strong> Allah'tan aldıkları vahyi hiçbir ekleme veya çıkarma yapmadan (eksiksiz) insanlara ulaştırmalarıdır.</p><p><strong>Kur'an'da Hz. Muhammed İçin Kullanılan Kavramlar:</strong><br>- <em>Hatemü'l-Enbiya:</em> Peygamberlerin sonuncusu, mührü.<br>- <em>Üsve-i Hasene:</em> İnanç, ibadet ve ahlak konusunda tüm insanlar için 'En güzel örnek, model' olması.<br>- <em>Rahmeten li'l-Âlemîn:</em> Alemlere rahmet (sevgi/merhamet) olarak gönderilmesi.</p>",
+                    items: ["Peygamberlerin Beşeri (İnsani) ve Risalet (Elçi) Yönü", "Sıdk (Doğruluk) ve Emanet (Güvenilirlik) Sıfatları", "Fetanet (Zeka), İsmet (Günahsızlık) ve Tebliğ", "Üsve-i Hasene (En Güzel Örnek) Kavramı", "Hatemü'l-Enbiya (Son Peygamber)"],
+                    formula: null,
+                    question: "Mekke'nin fethinden önce İslam'ı tebliğ ederken kendisine en büyük düşmanlığı yapan müşrikler bile, yolculuğa çıkacakları zaman kıymetli eşyalarını saklaması için (kendilerinden olanlara değil) Hz. Muhammed'e bırakırlardı. Bu durum peygamberlerin ortak sıfatlarından hangisiyle doğrudan ilgilidir?",
+                    solution: "Peygamberlerin sıfatlarını hatırlayalım:<br>1. Sıdk: Doğru söylemek.<br>2. Fetanet: Zeki olmak.<br>3. İsmet: Günah işlememek.<br>4. Emanet: Kendisine bırakılan canı, malı veya sırrı hıyanet etmeden korumak (Güvenilir olmak).<br>Müşriklerin bile en kıymetli eşyalarını ona bırakması, onun 'Muhammedü'l-Emin' (Güvenilir Muhammed) lakabının ve <strong>Emanet</strong> sıfatının bir sonucudur.<br><br><strong>Cevap: Emanet (Güvenilirlik).</strong>",
+                    shortcut: "Sıfatları karıştırmamak için kodla: <strong>SİFET</strong> (Sıdk, İsmet, Fetanet, Emanet, Tebliğ). Soruda zeka/ikna kabiliyeti diyorsa Fetanet; günah işlememe diyorsa İsmet; eksiksiz duyurma/bildirme diyorsa Tebliğ'dir."
+                },
+                {
+                    title: "3. Kur'an'da Bazı Kavramlar",
+                    summary: "Hidayet, İhsan, İhlas, Takva, Sırat-ı Müstakim ve Cihat kavramları.",
+                    description: "<p>TYT Din Kültürü testinin en çok sorulan kelime (kavram) bilgisi bölümüdür:</p><p><strong>1. Hidayet:</strong> Allah'ın insana doğru yolu, İslam'ı, iyi ve güzeli göstermesi; insanın da kendi iradesiyle bu doğru yolu seçmesidir. Zıddı <em>Dalalet</em>'tir (Sapıklık, yoldan çıkma).</p><p><strong>2. İhsan:</strong> 'Allah'ı görüyormuşçasına' ibadet etmek ve yaşatmaktır. İnsan Allah'ı görmese bile Allah'ın onu her an gördüğünün bilincinde (kamera kaydında gibi) olmaktır.</p><p><strong>3. İhlas:</strong> Tutum ve davranışlarda, ibadetlerde sadece Allah'ın rızasını gözetmek, gösterişten (riya) ve ikiyüzlülükten uzak, saf ve samimi olmaktır.</p><p><strong>4. Takva:</strong> Allah'a derin bir saygı ve sevgi duyarak, O'nun yasakladığı günahlardan titizlikle kaçınmak, kendini kötülüklerden korumak ve sorumluluk bilinciyle (oto-kontrol) yaşamaktır.</p><p><strong>5. Sırat-ı Müstakim:</strong> Dosdoğru yol demektir. Kur'an'ın ve Hz. Muhammed'in gösterdiği, aşırılıklardan uzak, dengeli İslam yoludur (Fatiha suresinde istenir).</p><p><strong>6. Cihat:</strong> Kelime anlamı 'çaba göstermek, gayret etmek'tir. Sadece silahlı savaş demek DEĞİLDİR. İnsanın nefsiyle (kötü duygularıyla) mücadele etmesi (En büyük cihat), cehaletle savaşması, iyiliği emredip kötülükten alıkoyması (Emr-i bi'l-maruf) cihadın en önemli türleridir.</p>",
+                    items: ["Hidayet (Doğru Yol) ve Dalalet (Sapıklık)", "İhsan (Allah'ı Görüyormuşçasına Yaşamak)", "İhlas (Samimiyet) ve Riya Çatışması", "Takva (Günahlardan Titizlikle Korunma)", "Sırat-ı Müstakim ve Cihadın Geniş Anlamı"],
+                    formula: null,
+                    question: "Cebrail (a.s) insan kılığında Hz. Muhammed'in yanına gelerek ona 'Bana ... nedir anlat?' diye sormuştur. Peygamberimiz de: 'O, Allah'ı görüyormuşsun gibi ona ibadet etmendir. Çünkü sen onu görmesen de O seni görmektedir.' şeklinde cevap vermiştir (Cibril Hadisi). Yukarıdaki hadiste boş bırakılan ve tanımlanan kavram nedir?",
+                    solution: "Kur'ani kavramların tanımlarını inceleyelim:<br>1. İhlas, samimiyet demektir (gösteriş yapmamak).<br>2. Takva, günahtan korkup kaçınmaktır.<br>3. Hidayet, doğru yola girmektir.<br>4. <strong>İhsan</strong> ise kulluk bilincinin zirvesidir. İnsanın her an Allah'ın gözetiminde olduğu şuuruyla (sanki onu görüyormuş gibi) işini en güzel, en mükemmel şekilde yapmasıdır. Cibril hadisinde tam olarak bu kelime tanımlanmıştır.<br><br><strong>Cevap: İhsan.</strong>",
+                    shortcut: "Eğer soruda 'Savaşmak, kalemle mücadele etmek, kötü huyları yenmek için çaba göstermek' geçiyorsa <strong>Cihat</strong>; 'Dosdoğru yol, sapmamak' geçiyorsa <strong>Sırat-ı Müstakim</strong>; 'Sanki Allah'ı görüyor gibi davranmak' geçiyorsa <strong>İhsan</strong>'dır."
+                },
+                {
+                    title: "4. Ahlaki Tutum ve Davranışlar",
+                    summary: "İslam ahlakında övülen davranışlar ve kaçınılması gereken kötü huylar.",
+                    description: "<p><strong>Kaçınılması Gereken Kötü Huylar (Yerilen Davranışlar):</strong><br>- <strong>Gıybet (Dedikodu):</strong> Bir kimsenin arkasından, duyduğunda hoşlanmayacağı şeyleri konuşmaktır. Konuşulan şey gerçek/doğru olsa bile gıybettir. (Kur'an'da ölü kardeşinin etini yemeye benzetilir).<br>- <strong>İftira:</strong> Bir kimseye yapmadığı bir suçu, söylemediği bir sözü kasıtlı olarak isnat etmektir. Yalanın en ağır halidir.<br>- <strong>Haset (Kıskançlık/Çekememezlik):</strong> Başkasının sahip olduğu nimetleri, başarıyı veya malı çekememek ve o nimetin o kişiden gitmesini (yok olmasını) istemektir. (Gıpta etmekten farklıdır, gıpta özenmektir, haset ise yıkıcıdır ve ilk işlenen günahtır-Kabil).<br>- <strong>Suizan (Kötü Zan):</strong> Bir kişi veya olay hakkında kesin bir kanıtı (belgesi) olmadan, içi fesatlıkla dolu olarak aleyhte (kötü) tahminde bulunmaktır. (Zıddı Hüsnüzan'dır - iyi tahminde bulunmak).<br>- <strong>Tecessüs:</strong> İnsanların gizli hallerini, sırlarını, ayıplarını ve özel hayatlarını merak edip araştırmaktır (Röntgenlemektir). Kesinlikle haramdır.<br>- <strong>Yalan ve Hile:</strong> Gerçeği gizlemek, ticarette eksik tartmak (mutaffifin) ve aldatmaktır.</p>",
+                    items: ["İslam Ahlakının Kaynağı (Kur'an ve Sünnet)", "Gıybet ve İftira Arasındaki Temel Fark", "Haset (Çekememezlik) ve Gıpta (İmrenme)", "Suizan (Kötü Ön Yargı) ve Hüsnüzan", "Tecessüs (Özel Hayatı Araştırma Mahremiyeti)"],
+                    formula: null,
+                    question: "İki arkadaş konuşurken Büşra, sınıftaki Ali hakkında 'Duydun mu, Ali geçen haftaki sınavda kopya çekmiş.' der. Ayşe ise 'Neden böyle söylüyorsun, görmedin ki, emin misin?' diye sorar. Büşra: 'Eminim, kopya çektiği herkesin dilinde, bu bir iftira değil ki, olan bir şeyi söylüyorum.' diyerek kendini savunur. İslam ahlakına göre Büşra'nın 'olan bir şeyi arkasından konuşması' onu günah işlemekten kurtarır mı? Bu davranışın İslami kavram karşılığı nedir?",
+                    solution: "Toplumda en çok karıştırılan ahlaki durum budur:<br>1. İnsanlar, birinin arkasından gerçek olan bir şeyi konuştuklarında bunun dedikodu olmadığını savunurlar. Oysa <strong>İftira</strong>, olmayan bir şeyi söylemektir.<br>2. <strong>Gıybet</strong> ise; bir kişinin arkasından, duyduğunda üzüleceği <strong>GERÇEK OLAN (var olan)</strong> bir kusurunu veya eylemini başkalarına anlatmaktır.<br>3. Dolayısıyla Büşra'nın konuştuğu şey gerçek olsa dahi, Ali'nin arkasından hoşlanmayacağı bir şekilde konuştuğu için bu eylem kesinlikle <strong>Gıybet</strong> günahıdır ve Büşra günah işlemekten kurtulmaz.<br><br><strong>Cevap: Kurtarmaz. Olan (gerçek) bir kusuru arkadan konuşmaya 'Gıybet' denir. Olmayan bir şeyi söylemeye ise 'İftira' denir.</strong>",
+                    shortcut: "Birinin telefonunu veya günlüğünü gizlice karıştırmak, kapı deliğinden dinlemek <strong>Tecessüs</strong>'tür. Delil yokken 'Kesin o çalmıştır' demek <strong>Suizan</strong>'dır. 'Onun arabası var benim neden yok, inşallah kaza yapar' demek <strong>Haset</strong>'tir."
+                },
+                {
+                    title: "5. İslam Düşüncesinde İtikadi, Siyasi ve Fıkhi Yorumlar",
+                    summary: "Mezheplerin ortaya çıkış nedenleri, inanç (itikad) ve ibadet (fıkıh) mezhepleri.",
+                    description: "<p><strong>Yorum Farklılıklarının (Mezheplerin) Çıkış Sebepleri:</strong> İslam dini tektir (Vahiy). Ancak Hz. Muhammed'in vefatından sonra Müslümanların farklı coğrafyalara yayılması, farklı kültürlerle (Yunan, Fars) karşılaşmaları, siyasi liderlik (Halifelik) kavgaları ve ayetlerin farklı anlaşılabilmesi nedeniyle 'Mezhepler (Yorumlar)' ortaya çıkmıştır. Mezhepler dinin kendisi değil, dinin beşeri (insani) yorumudur, değişebilirler.</p><p><strong>1. İtikadi ve Siyasi Yorumlar (İnanç Konusundaki Mezhepler):</strong> Allah, ahiret, peygamberlik gibi temel inanç konularındaki farklılıklardır. AYT'de kesin çıkar!<br>- <em>Ehl-i Sünnet:</em> Peygamberin ve sahabelerin (çoğunluğun) yolundan gidenlerdir. İkiye ayrılır: <strong>Maturidilik</strong> (İmam Maturidi kurucusudur. Aklı ön planda tutar. Türkler arasında çok yaygındır) ve <strong>Eşarilik</strong> (İmam Eşari kurucusudur. Nakli/ayeti aklın önüne koyar).<br>- <em>Şia (Şiilik):</em> Hz. Muhammed'den sonra halifeliğin (imametin) Hz. Ali ve onun soyundan gelenlerin hakkı olduğunu, bunun siyasi bir mesele değil 'dini/inançsal' bir zorunluluk olduğunu savunan mezheptir.<br>- <em>Mutezile:</em> Aklı ve hür iradeyi (kaderi insanın yarattığını) çok aşırı savunan felsefi mezheptir.</p><br><p><strong>2. Ameli ve Fıkhi Yorumlar (İbadet/Hukuk Konusundaki Mezhepler):</strong> Namaz nasıl kılınır, abdesti ne bozar gibi pratik hayatla ilgili hukuk kurallarıdır.<br>- <em>Hanefilik:</em> İmam Azam Ebu Hanife'nin görüşleridir (Akıl ve kıyas yöntemini çok kullanır, Türkiye'de en yaygındır).<br>- <em>Malikilik:</em> İmam Malik (Medine halkının uygulamalarına çok önem verir, Kuzey Afrika'da yaygındır).<br>- <em>Şafiilik:</em> İmam Şafii (Türkiye'nin doğusunda ve Mısır'da yaygındır).<br>- <em>Hanbelilik:</em> İmam Ahmed bin Hanbel (Hadislere sıkı sıkıya bağlıdır, en katı olandır, Suudi Arabistan'da yaygındır).<br>- <em>Caferilik:</em> Şia'nın (Ehlibeyt'in) fıkhi (ibadet) koludur.</p>",
+                    items: ["Mezheplerin Ortaya Çıkış Nedenleri (Dini Değil, Beşeri Nedenler)", "İtikadi (İnanç) Mezhepleri: Maturidilik ve Eşarilik", "Şia Mezhebinin İmamet (Halifelik) Anlayışı", "Fıkhi (İbadet/Hukuk) Mezhepler: Hanefilik, Şafiilik, Malikilik, Hanbelilik", "Mezheplerin Dinin Aslı Olmadığı Gerçeği"],
+                    formula: null,
+                    question: "İslam düşüncesinde ortaya çıkan 'Mezhepler' (Hanefilik, Şafiilik, Maturidilik vb.) için; I. Dinin bizzat kendisidir, II. Zamanla ve şartlara göre değişebilirler, III. Kurucusunun (İmamın) kişisel ictihadı (yorumudur). Yargılarından hangileri doğrudur?",
+                    solution: "Mezheplerin doğasını iyi anlamak gerekir.<br>1. Din (Kur'an ve Sünnet) ilahidir, sabittir ve değişmez. Ancak Mezhepler, alimlerin (din adamlarının) bu ilahi kuralları kendi akılları, coğrafyaları ve kültürlerine göre <strong>yorumlamasıdır (İctihad)</strong>. (III doğru).<br>2. İnsan yorumu olduğu için mezhepler 'Dinin kendisi' DEĞİLDİR, dinin insani anlayış biçimleridir. (I yanlış).<br>3. İnsan yorumu olduğu için, zamanın ve şartların (örneğin teknolojinin, coğrafyanın) değişmesiyle yeni sorunlara yeni çözümler (fetvalar) üretilerek değişebilir, gelişebilirler. (II doğru).<br><br><strong>Cevap: II ve III doğrudur. Mezhepler dinin kendisi değil, değişebilen insan (alim) yorumlarıdır.</strong>",
+                    shortcut: "AYT sınavında bir soruda 'İmamet (Halifelik hakkı Hz. Ali'nindir), Ehlibeyt sevgisi ve Masum (Günahsız) İmamlar' kavramlarını görüyorsan, cevap KESİNLİKLE <strong>Şia (Şiilik)</strong> mezhebidir."
+                }
+
+
+            ],
+            11: [
+                                {
+                    title: "1. Dünya ve Ahiret İnancı",
+                    summary: "Dünya hayatının amacı ve ahiret hayatının aşamaları (Berzah, Ba's, Mizan).",
+                    description: "<p><strong>Dünya Hayatı ve Ahiret:</strong> İslam'a göre dünya hayatı bir imtihan (sınav) yeridir, geçici ve aldatıcıdır. Asıl ve sonsuz olan hayat Ahiret hayatıdır. Ahiret inancı, insanın bu dünyada yaptıklarının hesabını vereceği bilinciyle (sorumluluk) daha ahlaklı ve adaletli yaşamasını sağlar.</p><br><p><strong>Ahiret Hayatının Aşamaları (AYT Bankosu):</strong> Ölümle başlayan ve sonsuza kadar süren bu sürecin kavramları sınavlarda sıkça sorulur:<br>1. <strong>Berzah (Kabir Hayatı):</strong> Ölümle başlayıp kıyametin kopmasına (dirilişe) kadar geçen, dünya ile ahiret arasındaki bekleme yurdudur (engel/perde demektir).<br>2. <strong>Kıyamet:</strong> İsrafil (a.s) adlı meleğin Sûr borusuna birinci kez üflemesiyle evrendeki tüm yaşamın sona ermesi, kozmik düzenin yıkılmasıdır.<br>3. <strong>Ba's (Diriliş):</strong> İsrafil'in Sûr'a ikinci kez üflemesiyle tüm ölülerin Allah tarafından yeniden diriltilmesidir.<br>4. <strong>Haşr ve Mahşer:</strong> Diriltilen insanların hesap vermek üzere bir araya toplanmasına <em>Haşr</em>, toplanılan o büyük meydana ise <em>Mahşer</em> denir.<br>5. <strong>Hesap ve Mizan:</strong> İnsanların amel defterlerinin (Kiramen Katibin melekleri tarafından yazılan) ortaya konması ve sevap/günahların tartıldığı ilahi/hassas teraziye <em>Mizan</em> denir.<br>6. <strong>Cennet ve Cehennem:</strong> Hesabın sonucunda gidilecek sonsuz mutluluk veya ceza yurtlarıdır.</p>",
+                    items: ["Dünya Hayatının Geçiciliği ve İmtihan Sırrı", "Ölüm (Ecel) ve Berzah (Kabir Alemi)", "Kıyamet ve İsrafil'in Sûr Borusuna Üflemesi", "Ba's (Yeniden Diriliş) ve Haşr (Toplanma)", "Amel Defteri, Mizan (Terazi) ve Sırat Köprüsü"],
+                    formula: null,
+                    question: "'İsrafil'in Sûr'a ikinci kez üflemesiyle kabirlerinden kalkan insanlar, dünyada yaptıklarının hesabını vermek üzere büyük bir meydanda bir araya gelirler ve beklemeye başlarlar.'<br>İslam inancına göre insanların hesap için toplandıkları bu meydana ve toplanma olayına ne ad verilir?",
+                    solution: "Ahiret aşamalarının sıralamasını ve Arapça karşılıklarını bilmek zorundayız.<br>1. Diriliş olayına: Ba's.<br>2. Dirilen insanların bir araya toplanmasına (eyleme): <strong>Haşr</strong>.<br>3. Bu toplanmanın gerçekleştiği o devasa toplanma yerine (mekana): <strong>Mahşer</strong> denir.<br>4. Hesap terazisine: Mizan denir.<br><br><strong>Cevap: Toplanma eylemine Haşr, toplanılan yere Mahşer denir.</strong>",
+                    shortcut: "Bir soruda 'Kıyamet koptuktan sonra insanların yeniden diriltilmesi' geçiyorsa cevap kesinlikle <strong>Ba's</strong>'tır. 'Amellerin tartıldığı hassas terazi' diyorsa cevap <strong>Mizan</strong>'dır."
+                },
+                {
+                    title: "2. Kur'an'a Göre Hz. Muhammed'in Konumu",
+                    summary: "Peygamberin görevleri: Tebliğ, Tebyin, Teşri ve Temsil.",
+                    description: "<p>Kur'an-ı Kerim'de Hz. Muhammed'in sadece vahyi getiren bir postacı olmadığı, dinin inşasında aktif görevleri olduğu belirtilir. Bu görevler 4 temel kavramla açıklanır:</p><p><strong>1. Tebliğ (İletme):</strong> Peygamberin, Allah'tan aldığı vahiyleri (ayetleri) hiçbir kelimesini değiştirmeden, eksiltmeden veya ekleme yapmadan insanlara aynen ulaştırmasıdır.</p><p><strong>2. Tebyin (Açıklama):</strong> Kur'an'daki bazı ayetler kısa ve özet (mücmel) olarak inmiştir. Peygamberimizin bu anlaşılması zor veya özet ayetleri sözleri ve uygulamalarıyla <strong>açıklaması, detaylandırmasıdır</strong>. (Örn: Kur'an 'Namaz kılın' der ama nasıl kılınacağını, rekatlarını söylemez. Peygamberimiz 'Ben nasıl kılıyorsam öyle kılın' diyerek namazı tebyin etmiştir).</p><p><strong>3. Teşri (Hüküm/Kanun Koyma):</strong> 'Şeriat' kelimesiyle aynı köktendir. Peygamberin, Kur'an'da hiç bahsedilmeyen, hakkında ayet bulunmayan konularda, Allah'ın izniyle <strong>yeni bir dini hüküm, kural veya yasa koymasıdır</strong>. (Örn: Kur'an'da midye/kalamar gibi deniz ürünlerinin yenilip yenilmeyeceği yazmaz, bu konudaki helal/haram hükmünü hadisleriyle peygamber koymuştur).</p><p><strong>4. Temsil (Örnek Olma):</strong> Peygamberin, İslam'ın ahlakını ve kurallarını önce kendi hayatında (yaşayarak, uygulayarak) insanlara canlı bir model (Üsve-i Hasene) olarak göstermesidir.</p>",
+                    items: ["Tebliğ (Vahyi Eksiksiz İletme Görevi)", "Tebyin (Kapalı Ayetleri Açıklama Görevi)", "Teşri (Hakkında Ayet Olmayan Konularda Hüküm Koyma)", "Temsil (Yaşayarak En Güzel Örnek Olma)", "Peygamberin Sünnetinin Dindeki Bağlayıcılığı"],
+                    formula: null,
+                    question: "Kur'an-ı Kerim'de zekat verilmesi emredilmiş ancak zekatın hangi mallardan, yüzde kaç oranında ve ne zaman verileceği gibi detaylar yer almamıştır. Hz. Muhammed, 'Altın ve gümüşten kırkta bir (%2.5) oranında zekat verin' diyerek bu ibadetin detaylarını müslümanlara öğretmiştir. Hz. Muhammed'in bu görevi aşağıdakilerden hangisidir?",
+                    solution: "Hz. Muhammed'in görevlerini birbirinden ayıralım:<br>1. Tebliğ, sadece ayeti okuyup iletmektir.<br>2. Teşri, ayet olmayan yepyeni bir konuda sıfırdan kural koymaktır.<br>3. <strong>Tebyin (Beyan etme)</strong> ise; Kur'an'da var olan ancak kapalı, genel veya özet olan bir emrin (namaz, oruç, zekat gibi) detaylarını, oranlarını ve yapılış şeklini insanlara <strong>açıklamaktır</strong>.<br>4. Zekatın oranlarını açıklaması, peygamberin 'Tebyin' görevine girer.<br><br><strong>Cevap: Tebyin (Açıklama/Detaylandırma).</strong>",
+                    shortcut: "Eğer soruda 'Kur'an'da geçmeyen bir yasak/helal getirdi' diyorsa <strong>Teşri (Yasa yapma)</strong>, 'Kur'an'da geçen genel bir emri detaylandırdı, nasıl yapılacağını gösterdi' diyorsa <strong>Tebyin (Açıklama)</strong>'dır."
+                },
+                {
+                    title: "3. İnançla İlgili Felsefi Yaklaşımlar",
+                    summary: "Teizm, Deizm, Ateizm, Agnostisizm ve Materyalizm.",
+                    description: "<p>Din Kültürü ve Felsefe derslerinin ortak konusudur. AYT'de paragraf içinde mutlaka sorulur.</p><p><strong>1. Teizm (İlâhçılık):</strong> Evreni yaratan, öncesiz ve sonrasız, her şeye gücü yeten bir Tanrı'nın varlığını kabul eder. Bu Tanrı, evreni yarattıktan sonra onu başıboş bırakmamış; peygamberler, dinler ve kitaplar göndererek evrene ve insana sürekli müdahale etmiştir (İslam, Hristiyanlık ve Yahudilik teist dinlerdir).</p><p><strong>2. Deizm (Yaradancılık):</strong> Tanrı'nın varlığını ve evreni yarattığını kabul eder. ANCAK; Tanrı'nın evreni mükemmel bir saat gibi kurduğunu, sonra bir daha evrene hiç müdahale etmediğini ('Emekli Tanrı' modeli) savunur. Bu yüzden Deizmde <strong>Din, Peygamber, Vahiy ve Mucize kesinlikle YOKTUR</strong>. İnsan aklını tek rehber kabul eder.</p><p><strong>3. Materyalizm (Maddecilik):</strong> Evrendeki tek gerçekliğin 'Madde' olduğunu savunur. Madde öncesiz ve sonrasızdır (yaratılmamıştır). Ruh, melek, cennet, Tanrı gibi metafizik ve soyut olan her şeyi reddeder.</p><p><strong>4. Pozitivizm (Olguculuk):</strong> Sadece bilime, deneye ve gözleme dayanan somut olguların doğru olduğunu savunur. Dini inançları ve felsefeyi (metafiziği) insanlığın ilkel dönemine ait masallar olarak görür ve reddeder. (Auguste Comte).</p><p><strong>5. Sekülarizm (Dünyevileşme):</strong> Dini kuralların, inançların ve ahiret düşüncesinin devlet yönetiminden, hukuktan, eğitimden ve günlük yaşamdan tamamen dışlanması, sadece 'bu dünya' odaklı yaşanmasıdır.</p><p><strong>6. Agnostisizm ve Ateizm:</strong> Ateizm, Tanrı'nın varlığını kesin bir dille reddeder. Agnostisizm (Bilinemezcilik) ise insan aklının sınırları olduğunu, Tanrı'nın varlığının da yokluğunun da <strong>asla kanıtlanamayacağını ve bilinemeyeceğini</strong> savunur (Ne inananlara ne de reddedenlere katılır).</p>",
+                    items: ["Teizm (Müdahaleci Tanrı ve Dinler)", "Deizm (Müdahale Etmeyen Tanrı, Dini Reddetme)", "Materyalizm (Maddecilik) ve Ateizm (Tanrıtanımazlık)", "Agnostisizm (Bilinemezcilik - Tanrı Kanıtlanamaz)", "Sekülarizm (Dünyevileşme) ve Pozitivizm (Olguculuk)"],
+                    formula: null,
+                    question: "Bir düşünür, 'Ben evrenin mükemmel bir düzene sahip olduğuna ve bu düzeni kuran üstün bir Yaratıcı'nın var olduğuna inanıyorum. Ancak bu Yaratıcı, evreni kurup kendi kanunlarına terk etmiştir. Bize bir kitap veya elçi gönderdiğine, dualarımıza cevap verdiğine inanmıyorum. Benim tek rehberim aklımdır.' demektedir. Bu düşünürün savunduğu inanç yaklaşımı nedir?",
+                    solution: "Paragraftaki iddiaları inceleyelim:<br>1. 'Yaratıcı'nın varlığına inanıyorum' diyor. Bu yüzden Ateist veya Agnostik olamaz.<br>2. 'Evreni kendi kanunlarına terk etmiştir, müdahale etmez' diyor.<br>3. 'Kitap, elçi (peygamber) ve dualara cevap yoktur' diyerek Teizmi (İlahi dinleri) doğrudan reddediyor.<br>4. Tanrı'yı kabul edip, Dini ve Peygamberi reddeden bu sisteme (Emekli Tanrı inancına) felsefede <strong>Deizm</strong> denir.<br><br><strong>Cevap: Deizm (Yaradancılık).</strong>",
+                    shortcut: "Eğer soruda 'Tanrı var ama Din/Peygamber yok' diyorsa cevap <strong>Deizm</strong>. 'Tanrı var mı yok mu asla bilemeyiz, aklımız yetmez' diyorsa cevap <strong>Agnostisizm</strong>. 'Sadece madde vardır, ruh/ahiret yalandır' diyorsa cevap <strong>Materyalizm</strong>'dir."
+                },
+                {
+                    title: "4. İslam ve Bilim",
+                    summary: "İslam medeniyetinde eğitim kurumları ve Müslüman bilim öncüleri.",
+                    description: "<p><strong>İslam'da Bilim (İlim):</strong> Kur'an, insanları sürekli akletmeye, düşünmeye (tefekkür), evreni incelemeye teşvik eder. İslam alimleri, 'Dini ilimler (Tefsir, Fıkıh, Hadis)' ile 'Akli ilimleri (Matematik, Tıp, Astronomi)' birbirinden ayırmamış, ikisini de Allah'ı tanımanın bir yolu olarak görmüşlerdir.</p><br><p><strong>İslam Medeniyetinde Eğitim Kurumları:</strong><br>- <em>Mektep:</em> Okuma yazma öğretilen ilkokul seviyesindeki kısımlardır.<br>- <em>Medrese:</em> Bugünkü üniversitelere denk gelen, hem dini hem de pozitif bilimlerin okutulduğu yüksek eğitim kurumlarıdır. (Nizamiye Medreseleri en ünlüsüdür).<br>- <em>Beytü'l-Hikme (Bilgelik Evi):</em> Abbasiler döneminde Bağdat'ta kurulan, Antik Yunan eserlerinin Arapçaya çevrildiği devasa kütüphane ve araştırma merkezidir.<br>- <em>Rasathane (Gözlemevi):</em> Astronomi çalışmalarının yapıldığı yerdir. (Örn: Meraga Rasathanesi).<br>- <em>Şifahane (Bimaristan):</em> Tıp eğitiminin verildiği ve hastaların tedavi edildiği hastanelerdir (Müzik ve su sesiyle psikolojik tedaviler de yapılmıştır).</p><p><strong>Müslüman Bilim Öncüleri:</strong><br>- <strong>İbn Sina (Avicenna):</strong> 'El-Kanun fi't-Tıbb' (Tıbbın Kanunu) eseri Avrupa'da 500 yıl ders kitabı olarak okutulmuştur.<br>- <strong>Farabi (Alfarabius):</strong> Aristo'nun mantığını geliştirdiği için Muallim-i Sani (İkinci Öğretmen) denir.<br>- <strong>Harezmi:</strong> Cebirin (Matematiğin) kurucusudur, 'Sıfır' (0) rakamını Avrupa'ya öğretmiştir.<br>- <strong>Ali Kuşçu:</strong> Ünlü astronomdur, Fatih Sultan Mehmet döneminde Ayasofya Medresesi'ne başmüderris olmuştur.<br>- <strong>İbn Haldun:</strong> Sosyolojinin (Toplumbilim) ve Tarih felsefesinin kurucusudur. Başyapıtı 'Mukaddime'dir.</p>",
+                    items: ["İslam'ın Bilime (İlme) Verdiği Önem ve Tefekkür", "Mektep, Medrese ve Beytü'l Hikme (Çeviri Merkezi)", "Rasathane (Astronomi) ve Şifahane (Bimaristan)", "İbn Sina (Tıp) ve Farabi (Mantık)", "Harezmi (Cebir) ve İbn Haldun (Sosyoloji)"],
+                    formula: null,
+                    question: "Abbasiler döneminde Bağdat'ta kurulan; Antik Yunan, Hint ve Fars medeniyetlerine ait felsefe, tıp ve matematik eserlerinin Arapçaya çevrildiği, İslam dünyasının bilimde 'Altın Çağ' yaşamasını sağlayan devasa bilim/araştırma akademisinin adı nedir?",
+                    solution: "Orta Çağ'da Avrupa kilise baskısıyla karanlık çağ yaşarken, İslam dünyası bu kurum sayesinde dünyanın en aydınlık ve bilimsel dönemini yaşamıştır.<br>1. Sadece bir kütüphane değil, aynı zamanda çevirmenlerin, astronomların ve filozofların çalıştığı bir enstitüdür.<br>2. Halife Me'mun tarafından en parlak dönemine ulaştırılmıştır.<br>3. Moğol istilası (Hülagü Han) sırasında Bağdat yağmalanırken bu kütüphane yakılmış ve milyonlarca kitap Dicle nehrine atılarak nehrin günlerce mürekkep rengi (siyah) akmasına neden olmuştur.<br><br><strong>Cevap: Beytü'l-Hikme (Bilgelik Evi).</strong>",
+                    shortcut: "Eşleştirmelere dikkat et: <strong>İbn Sina = Tıp</strong> (El-Kanun), <strong>İbn Haldun = Sosyoloji</strong> (Mukaddime, Coğrafya Kaderdir), <strong>Harezmi = Matematik/Sıfır</strong> (Cebir), <strong>Farabi = Felsefe/Mantık</strong> (Muallim-i Sani)."
+                },
+                {
+                    title: "5. Anadolu'da İslam (Tasavvufi Yorumlar)",
+                    summary: "Tasavvufun amacı, Anadolu Erenleri ve Alevilik-Bektaşilik.",
+                    description: "<p><strong>Tasavvuf Nedir?</strong> İslam'ın temel kurallarını (şeriat) reddetmeden, dinin daha çok <strong>kalbi, ahlaki ve manevi</strong> boyutuna odaklanmaktır. Amacı; nefsi (kötü duyguları) terbiye etmek, dünyevi aşırı hırslardan arınmak ve Allah'a aşk ile ulaşmaktır (İnsan-ı Kamil olmak).</p><p><strong>Anadolu'yu Aydınlatan Mutasavvıflar (Erenler):</strong><br>- <em>Hoca Ahmet Yesevi:</em> İlk büyük Türk mutasavvıfıdır. 'Divan-ı Hikmet' eseriyle İslam'ı Türklere onların anlayacağı dilde ve hece ölçüsüyle anlatmıştır. (Anadolu'ya gelen dervişlerin hocasıdır).<br>- <em>Mevlana Celaleddin Rumi:</em> İnsan sevgisi ve hoşgörünün sembolüdür. Mesnevi ve Divan-ı Kebir en ünlü eserleridir. (Mevlevilik tarikatı).<br>- <em>Yunus Emre:</em> Anadolu'da Türkçe şiirin ve ilahi aşkın öncüsüdür (Risaletü'n Nushiyye).<br>- <em>Hacı Bektaş Veli:</em> 'Makalat' adlı eseri vardır. Yeniçeri Ocağı'nın manevi piridir (Bektaşilik).<br>- <em>Ahi Evran:</em> Anadolu'da esnaf teşkilatını (Ahilik) kurmuştur. Ahilik, hem mesleki dayanışma (kaliteli üretim) hem de ahlaki eğitim merkezidir.</p><p><strong>Alevilik-Bektaşilikteki Temel Kavramlar:</strong><br>- <em>Cem:</em> Toplanma, bir araya gelme demektir. Alevi-Bektaşi inancının temel ibadet törenidir (Cemevinde yapılır).<br>- <em>Dedelik:</em> Cem törenini yöneten, Hz. Ali ve Ehlibeyt soyundan geldiğine inanılan manevi önderdir.<br>- <em>Semah:</em> Cem töreni sırasında, evrenin dönüşünü ve Allah'a aşkı temsil eden müzik (bağlama) eşliğindeki ritmik dönüştür.<br>- <em>Musahiplik (Yol Kardeşliği):</em> Kan bağı olmayan iki ailenin (kişinin), dede huzurunda söz vererek ahiret kardeşliği kurmasıdır (Hz. Muhammed'in Ensar ve Muhacir'i kardeş yapmasına dayanır).<br>- <em>Gülbank:</em> Bektaşilikte okunan kısa ve özlü dualara verilen isimdir.</p>",
+                    items: ["Tasavvufun Amacı (Nefis Terbiyesi ve İnsan-ı Kamil)", "Hoca Ahmet Yesevi (Divan-ı Hikmet) ve Mevlana", "Ahi Evran ve Ahilik (Esnaf/Ahlak) Teşkilatı", "Hacı Bektaş Veli ve Yeniçeri Ocağı ile Bağlantısı", "Alevilik-Bektaşilik: Cem, Semah, Musahiplik ve Gülbank"],
+                    formula: null,
+                    question: "Anadolu'da kurulan Ahilik teşkilatı, sadece ayakkabı, kılıç veya elbise üreten sıradan bir 'esnaf ve zanaatkar' odası değildi. Ahiliğin, günümüzdeki meslek odalarından farkı neydi ve çıraklara mesleki eğitimin yanında ne veriliyordu?",
+                    solution: "Ahi Evran tarafından Kırşehir merkezli kurulan Ahilik teşkilatı, İslam ahlakıyla (Fütüvvet) yoğrulmuş bir kurumdu.<br>1. Günümüzdeki odalar sadece ticari kazancı ve kaliteyi denetler.<br>2. Ahilikte ise bir çırağın kalfa veya usta olabilmesi için sadece mesleği iyi yapması yetmezdi.<br>3. Ona yalan söylememesi, ölçüde/tartıda hile yapmaması, müşteriyi kandırmaması, cömert olması gibi <strong>İslami ve Ahlaki</strong> eğitimler de verilirdi.<br>4. Pabucu dama atılmak deyimi, hileli mal üreten esnafın ceza olarak dükkanının kapatılmasından gelir.<br><br><strong>Cevap: Ahilik teşkilatında mesleki eğitimin yanında İslam ahlakı, dürüstlük, cömertlik ve nefis terbiyesi gibi 'Ahlaki/Manevi' eğitimler de zorunlu olarak verilirdi.</strong>",
+                    shortcut: "ÖSYM bu isimleri eserleriyle eşleştirmeyi çok sever: Ahmet Yesevi = Divan-ı Hikmet. Mevlana = Mesnevi / Divan-ı Kebir. Yunus Emre = Risaletü'n Nushiyye (Nasihatler Kitabı). Hacı Bektaş Veli = Makalat."
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. Güncel Dini Meseleler",
+                    summary: "Dinamik fıkıh anlayışı; tıbbi, gıda ve ekonomik meselelere İslami çözümler.",
+                    description: "<p><strong>Dinin Güncel Sorunlara Yaklaşımı:</strong> İslam dini, kıyamete kadar geçerli evrensel bir dindir. Yeni ortaya çıkan teknolojik ve tıbbi sorunlara, Kur'an ve Sünnet'in genel ilkeleri (Kıyas ve İcma yöntemleriyle) ışığında din alimleri tarafından yeni çözümler (Fetvalar) üretilir. Buna <em>Dinamik Fıkıh</em> denir.</p><p><strong>Tıbbi ve Sağlık Meseleleri:</strong><br>- <em>Organ Bağışı:</em> Zaruret (zorunluluk) hallerinde, bağışlayanın rızası olması, beyin ölümünün gerçekleşmesi ve karşılığında kesinlikle <strong>para (ücret) alınmaması</strong> şartıyla caizdir (sevaptır).<br>- <em>Otopsi:</em> Bir cinayeti aydınlatmak, bulaşıcı hastalığı tespit etmek veya tıp eğitimi gibi zorunlu (zaruri) durumlarda caizdir. Ölünün bedenine saygı esastır.<br>- <em>Ötanazi (Kendi isteğiyle ölme):</em> Yaşam hakkını Allah verir ve Allah alır. İnsanın kendi canına son vermesi intihar (cinayet) sayılır, İslam'da kesinlikle haramdır.</p><p><strong>Ekonomik ve Gıda Meseleleri:</strong><br>- <em>Faiz (Riba):</em> Emek harcamadan paradan para kazanmaktır. İslam'da kesinlikle haramdır, çünkü zengini daha zengin, fakiri daha fakir yapar.<br>- <em>Rüşvet ve Karaborsacılık (İhtikar):</em> Piyasada malı saklayıp fiyatını suni olarak artırmak kul hakkıdır, haramdır.<br>- <em>Gıda:</em> Alkol, uyuşturucu, domuz eti haramdır. Günümüzde 'Helal Sertifikası' ile ürünlerin İslami usullere (besmeleyle kesim, katkı maddeleri) uygunluğu denetlenmektedir.</p>",
+                    items: ["Dinamik Fıkıh ve Yeni Fetvalar (Kıyas/İcma)", "Organ Bağışının Dini Şartları (Karşılıksız Olması)", "Otopsi ve Ötanazi Arasındaki Dini Hüküm Farkı", "Faiz (Riba), Rüşvet ve Karaborsacılığın (İhtikar) Yasaklanması", "Helal Gıda ve Tüketim Ahlakı (İsraftan Kaçınma)"],
+                    formula: null,
+                    question: "İslam dinine göre, tedavisi mümkün olmayan ağır bir hastanın kendi isteğiyle (imza vererek) doktorlar tarafından hayatına son verilmesi (Ötanazi) uygulaması neden kesinlikle haram (yasak) kabul edilmiştir?",
+                    solution: "İslam hukukunda (fıkhında) yaşam hakkı en kutsal haktır.<br>1. İnsanın bedeni ve canı kendisine ait bir mal değildir; Allah tarafından insana verilmiş <strong>kutsal bir emanettir</strong>.<br>2. Canı veren Allah olduğu için, onu geri alacak olan da yalnızca Allah'tır (Ecel).<br>3. İnsanın hastalıklara karşı sabretmesi (imtihan bilinci) istenir. Bu yüzden ötanazi, kişinin kendi emanetine ihanet etmesi ve 'İntihar (kendini öldürme)' hükmünde olduğu için haramdır.<br><br><strong>Cevap: Canın Allah'ın emaneti olması ve insanın kendi ecelini (ölümünü) belirleme yetkisinin bulunmaması.</strong>",
+                    shortcut: "İslam hukukunda 'Zaruretler (Zorunluluklar) haramları mubah kılar' diye genel bir kural vardır. Örneğin açlıktan ölmek üzere olan biri, ölmeyecek kadar domuz eti yiyebilir veya hastalık bulaşmaması için otopsi yapılabilir. Ancak Ötanazi hiçbir şekilde zaruret sayılmaz."
+                },
+                {
+                    title: "2. İslam'ın Korumayı Hedeflediği Temel Gayeler (Zarurat-ı Diniyye)",
+                    summary: "Canın, aklın, dinin, neslin ve malın korunması (Makasıd'üş-Şeria).",
+                    description: "<p>İslam hukukunun (şeriatın) koyduğu bütün kuralların ve yasakların arkasında insanı ve toplumu korumaya yönelik <strong>5 temel ilke (Zarurat-ı Hamse)</strong> vardır. (ÖSYM bu ilkeleri paragraflara gizlemeyi çok sever):</p><p><strong>1. Canın Korunması:</strong> En temel haktır. Yaşama hakkı kutsaldır. İş sağlığı ve güvenliği tedbirleri almak farz, cinayet işlemek, kan davası gütmek ve intihar etmek haramdır. Bir insanı haksız yere öldürmek tüm insanlığı öldürmek gibidir.</p><p><strong>2. Aklın Korunması:</strong> İnsanı hayvandan ayıran ve dinden sorumlu tutan tek güç akıldır. Bu yüzden aklı uyuşturan, düşünme melekelerini bozan <strong>Alkol, uyuşturucu ve her türlü bağımlılık yapıcı madde</strong> kesinlikle haram kılınmıştır.</p><p><strong>3. Dinin Korunması:</strong> Dinin, Kur'an ve Sünnet olan asıl kaynaklarından öğrenilmesidir. Dini, sonradan uydurulan yalanlardan (Bid'at ve Hurafelerden), sihir, büyü, falcılık ve en önemlisi <strong>Şirk'ten (Allah'a ortak koşmaktan)</strong> korumaktır.</p><p><strong>4. Neslin Korunması:</strong> Sağlıklı bir toplum, sağlıklı ailelerle kurulur. Bu nedenle evlilik (nikah) teşvik edilmiş; nesli bozan, aileyi yıkan <strong>Zina (evlilik dışı ilişki)</strong> ve her türlü sapkınlık haram kılınmıştır.</p><p><strong>5. Malın Korunması:</strong> İslam'da özel mülkiyet haktır, herkes emeğinin karşılığını alır. Ancak haksız kazanç yolları olan <strong>Hırsızlık, faiz, rüşvet, kumar ve israf</strong> haram kılınmış, helal lokma ve dürüst ticaret farz kılınmıştır.</p>",
+                    items: ["Canın Korunması (Yaşam Hakkı ve İş Güvenliği)", "Aklın Korunması (Alkol ve Uyuşturucu Yasağı)", "Dinin Korunması (Hurafeler, Bid'at ve Falcılıktan Uzak Durmak)", "Neslin Korunması (Evlilik ve Zina Yasağı)", "Malın Korunması (Hırsızlık, Kumar ve Helal Kazanç)"],
+                    formula: null,
+                    question: "Kur'an-ı Kerim'de, 'Ey iman edenler! İçki, kumar, dikili taşlar (putlar) ve fal okları şeytan işi birer pisliktir. Bunlardan uzak durun ki kurtuluşa eresiniz.' (Mâide suresi) buyrulmuştur. Bu ayetteki yasaklar, İslam'ın korumayı hedeflediği 5 temel ilkeden (Zarurat) sırasıyla hangilerini korumaya yöneliktir?",
+                    solution: "Ayetteki yasakları ilkelerle eşleştirelim:<br>1. <strong>İçki (Alkol):</strong> İnsanın sarhoş olup şuurunu kaybetmesine neden olur. Bu, <strong>Aklın Korunması</strong> ilkesiyle ilgilidir.<br>2. <strong>Kumar:</strong> Emek harcamadan başkasının parasına göz dikmektir ve haksız kazançtır. Bu, <strong>Malın Korunması</strong> ilkesiyle ilgilidir.<br>3. <strong>Dikili taşlar (Putlar) ve Fal okları:</strong> Tevhit inancını bozarak şirke ve hurafelere kapı aralar. Bu da <strong>Dinin Korunması</strong> ilkesiyle ilgilidir.<br><br><strong>Cevap: Sırasıyla; Aklın, Malın ve Dinin Korunması ilkelerine yöneliktir.</strong>",
+                    shortcut: "Sınavda bir haber metni (örneğin: 'Bir lisede gençleri uyuşturucu tehlikesine karşı uyaran seminer verildi') verilip bunun hangi ilkeyle ilgili olduğu sorulur. Uyuşturucu/Alkol görürsen direkt <strong>'Aklın Korunması'</strong> şıkkını işaretle."
+                },
+                {
+                    title: "3. Yaşayan Dünya Dinleri: Yahudilik ve Hristiyanlık",
+                    summary: "İbrahimi (Semavi) dinlerin kurucuları, inanç esasları, kitapları ve sembolleri.",
+                    description: "<p><strong>Yahudilik (Musevilik):</strong><br>- <em>İnanç:</em> Tarihin en eski tek tanrılı dinidir. Ancak evrensel değildir, <strong>Milli bir dindir</strong> (Sadece İsrailoğullarına/İbrani soyuna gönderildiğine inanırlar). Tanrılarının adı <strong>Yehova (Yahve)</strong>'dır. Hz. Musa en büyük peygamberleridir.<br>- <em>Kutsal Kitap:</em> <strong>Tanah</strong> (Tevrat, Zebur ve diğer peygamber metinlerini içerir). Talmud ise din adamlarının tefsirleridir.<br>- <em>Mekan ve Sembol:</em> İbadethanelerine <strong>Havra veya Sinagog</strong> denir. Din adamlarına <em>Haham</em> denir. Kudüs ve Ağlama Duvarı kutsaldır. Sembolleri <strong>Davut Yıldızı</strong> (İç içe iki üçgen) ve Yedi Kollu Şamdan'dır (Menora).</p><br><p><strong>Hristiyanlık:</strong><br>- <em>İnanç:</em> Hz. İsa aracılığıyla yayılmıştır. En belirgin inanç esası <strong>Teslis (Üçleme)</strong> inancıdır. Tanrı'yı; Baba, Oğul (İsa) ve Kutsal Ruh olarak üçe bölerler (İslam bu inancı 'Şirk/Ortak koşma' kabul eder). Ayrıca her insanın doğuştan <strong>Asli Günah</strong> ile (Hz. Adem'in elma yemesi yüzünden) günahkar doğduğuna ve vaftiz edilmesi gerektiğine inanırlar.<br>- <em>Kutsal Kitap:</em> <strong>Kitab-ı Mukaddes</strong> (Eski Ahit-Tevrat ve Yeni Ahit-İncil'den oluşur). Dört büyük İncil kabul görür: Matta, Markos, Luka, Yuhanna.<br>- <em>Mekan ve Mezhepler:</em> İbadethane Kilise, din adamı Rahip/Papaz'dır. Temel sembolü 'Haç'tır (Hz. İsa'nın çarmıha gerildiğine inanırlar). Üç büyük mezhebi vardır: Katolik (Papa'ya bağlı, katı), Ortodoks (Doğu Roma/Patrik) ve Protestanlık (Martin Luther'in dinde reform yaparak kiliseyi eleştirmesiyle doğan yenilikçi mezhep).</p>",
+                    items: ["Yahudiliğin Milli Din Olma Özelliği ve Siyonizm", "Yahudiliğin Sembolleri (Menora, Davut Yıldızı, Sinagog)", "Hristiyanlıkta Teslis (Üçleme) ve Asli Günah İnancı", "Dört Kanonik İncil (Matta, Markos, Luka, Yuhanna)", "Hristiyanlık Mezhepleri (Katolik, Ortodoks, Protestan)"],
+                    formula: null,
+                    question: "İslam dinine göre yeni doğan her bebek tertemiz (İslam fıtratı üzerine) doğar, günah ve sevap ergenlikten sonra yazılır. Ancak Hristiyanlık inancında yeni doğan bir bebeğin 'günahkâr' doğduğuna inanılır ve bebek ilk iş olarak kutsal suyla yıkanır. Hristiyanlıktaki bu inancın adı ve suyla yıkanma töreninin ismi nedir?",
+                    solution: "1. Hristiyan teolojisinde (inancında), Hz. Adem ile Hz. Havva'nın cennette yasak elmayı yiyerek işledikleri o ilk suç, genetik olarak tüm insanlığa miras kalmıştır.<br>2. Bu inanca <strong>Asli Günah (İlk Günah)</strong> denir. İnsanın doğuştan lekeli olduğunu savunurlar.<br>3. Bebeğin bu Adem'den gelen günahtan temizlenmesi ve Hristiyanlık dinine kabul edilmesi için kilisede kutsal suyla yıkanmasına (veya suya daldırılmasına) ise <strong>Vaftiz Töreni</strong> denir.<br><br><strong>Cevap: İnancın adı 'Asli Günah', törenin adı 'Vaftiz'dir.</strong>",
+                    shortcut: "ÖSYM Hristiyanlıktaki 'Teslis (Üçleme: Baba, Oğul, Kutsal Ruh)' inancını sıkça sorar. İslam'ın Hristiyanlığı eleştirdiği (Tevhit inancını bozduğu için Şirk olarak gördüğü) en büyük mesele bu Teslis (Üçlü Tanrı) inancıdır."
+                },
+                {
+                    title: "4. Hint ve Çin Dinleri",
+                    summary: "Hinduizm, Budizm, Konfüçyanizm ve Taoizm'in temel felsefeleri.",
+                    description: "<p>Uzak Doğu Asya'da doğan, daha çok felsefi bir hayat tarzı olan (vahiye/ilahi bir kitaba dayanmayan) inanç sistemleridir.</p><p><strong>Hinduizm (Brahmanizm):</strong> Hindistan'ın milli dinidir. Çok tanrılıdır (Brahma-Yaratıcı, Vişnu-Koruyucu, Şiva-Yok Edici).<br>- <em>Kast Sistemi:</em> Toplumu kesin ve katı sınıflara böler (Rahipler, Askerler, Tüccarlar, Köylüler ve en altta dışlanan Paryalar/Paryalar insan bile sayılmaz). Sınıflar arası geçiş, evlilik yasaktır.<br>- <em>Karma ve Reenkarnasyon (Tenasüh):</em> İnsan öldükten sonra ruhu ölmez, dünyadaki yaptıklarına (Karma'sına) göre başka bir bedende (hayvan veya zengin bir insan) yeniden dünyaya gelir (Reenkarnasyon - Ruh Göçü). İnekler bereketin sembolü ve annelik figürü olduğu için kutsaldır. Ganj nehri kutsal yıkanma yeridir.</p><p><strong>Budizm:</strong> Hinduizmdeki acımasız <em>Kast Sistemine bir tepki</em> olarak doğmuştur. Kurucusu Siddharta Gautama'dır (Buda-Aydınlanmış kişi). Putlara tapmayı reddeder.<br>- <em>Nirvana:</em> Dünyevi her türlü hırstan, arzudan, acıdan ve istekten tamamen arınıp, ruhun huzura ve 'Hiçliğe' (Aydınlanmaya) ulaşmasıdır. Sekiz Dilimli Yüce Yol felsefesini savunur.</p><p><strong>Konfüçyanizm:</strong> Çin'in milli ahlak felsefesidir. Kurucusu Kong-Fuzi (Konfüçyüs)'dir. Büyük yaratıcıya <em>Tien (Gök Tanrı)</em> derler. Temel felsefesi: <strong>Atalara saygı, büyüklere itaat ve devlet kurallarına sıkı sıkıya bağlılıktır.</strong> (Erdemli insan yetiştirme).</p><p><strong>Taoizm:</strong> Çin'de Lao-Tzu tarafından kurulmuştur. Doğadaki mükemmel denge ve uyum (Tao) felsefesine dayanır. Evrendeki iyi-kötü, karanlık-aydınlık, erkek-dişi gibi zıtlıkların birbirini tamamlaması inancına <strong>Yin-Yang</strong> denir. 'Su gibi ol, doğaya müdahale etme, akışına bırak' (Wu-Wei eylemsizliği) temel yaşam felsefesidir.</p>",
+                    items: ["Hinduizm'de Kast Sistemi (Sınıf Ayrımcılığı)", "Reenkarnasyon (Ruh Göçü) ve Karma İnancı", "Budizm ve Nirvana'ya (Aydınlanmaya) Ulaşma", "Konfüçyüsçülük (Atalara ve Devlete Saygı)", "Taoizm ve Yin-Yang (Zıtlıkların Uyumu) Felsefesi"],
+                    formula: null,
+                    question: "Hindistan'da doğan, ruhun bir bedenden başka bir bedene geçerek sonsuz bir döngüde dünyada kalacağına (Reenkarnasyon) inanan ve toplumu geçişi imkansız sınıflara (Kast) bölen dine Hinduizm denir. Buna göre İslam inancının (Tevhit dininin), Hinduizm'de yer alan 'Kast' ve 'Reenkarnasyon' inançlarını reddetmesinin temel sebepleri nelerdir?",
+                    solution: "İslam inancının temel direkleri (Amentü) bu iki inancı da kökten reddeder.<br>1. <strong>Kast Sisteminin Reddedilme Sebebi:</strong> İslam'da 'Eşitlik' esastır. Bütün insanlar tarağın dişleri gibi eşittir, üstünlük sadece 'Takva' (Allah'a saygı ve iyi ahlak) iledir. Kast sistemindeki kölelik ve doğuştan sınıf ayrımcılığı İslam'ın adaletine terstir.<br>2. <strong>Reenkarnasyonun Reddedilme Sebebi:</strong> İslam'da 'Ahiret İnancı (Yeniden Diriliş)' vardır. İnsan bu dünyaya bir kere gelir, ölür ve kıyamette (Ba's) kendi bedeniyle dirilerek cennet/cehenneme gider. Ruhun dünyada başka hayvan/insan bedenlerinde dönüp dolaşması (Tenasüh), Ahiret (Mahşer ve Mizan) inancını tamamen yıktığı için şirktir/haramdır.<br><br><strong>Cevap: Kast sistemi İslam'ın 'Eşitlik' ve 'Üstünlük takvadadır' ilkesine terstir; Reenkarnasyon ise İslam'ın 'Ahiret ve Mahşer' inancına terstir.</strong>",
+                    shortcut: "Budizm ile Hinduizm çok karışır. Farkı şudur: Hinduizm'de katı <strong>Kast Sistemi</strong> vardır, Budizm ise tamamen Kast Sistemini <strong>yıkan/karşı çıkan</strong> dindir. Ayrıca 'Yin-Yang' logosu siyah-beyaz zıtlıkları simgeler ve Taoizm'e aittir."
+                },
+                {
+                    title: "5. YKS Din Kültürü Sık Sorulan Kavramlar Sözlüğü",
+                    summary: "TYT ve AYT sınavlarında paragraflarda gizlenen fıkhi ve kelami terimler.",
+                    description: "<p>Din Kültürü netlerini fullemek için bu terimleri çok iyi bilmelisin:</p><p><strong>Temel Dini İlimler:</strong><br>- <em>Tefsir:</em> Kur'an-ı Kerim ayetlerini açıklayan, detaylandıran ve yorumlayan bilim dalıdır (Yazarına <em>Müfessir</em> denir).<br>- <em>Hadis:</em> Peygamberimizin söz, fiil ve onaylarını inceleyen bilim dalıdır (Yazarına <em>Muhaddis</em> denir).<br>- <em>Fıkıh:</em> İslam'ın hukuk bilimidir (Namaz, oruç, miras, ticaret kurallarını inceler. Uzmanına <em>Fakih</em> denir).<br>- <em>Kelam:</em> İslam'ın inanç esaslarını (Allah'ın varlığı, Ahiret vb.) felsefi akıllar ve deliller kullanarak savunan bilim dalıdır.</p><p><strong>Davranış Hükümleri (Ef'al-i Mükellefin):</strong><br>- <em>Farz:</em> Allah'ın kesin ve emredici kurallarıdır (Beş vakit namaz, Zekat).<br>- <em>Vacip:</em> Farz kadar kesin delili olmayan ama yapılması güçlü bir şekilde istenen ibadetlerdir (Kurban kesmek, Bayram namazı, Vitir namazı).<br>- <em>Müstehap / Mendup:</em> Yapılması sevap olan, yapılmadığında günah olmayan güzel işlerdir (Sadaka vermek, nafile namaz kılmak).<br>- <em>Mekruh:</em> Haram olmayan, ancak yapılması dinen çirkin, kötü ve sevilmeyen davranışlardır (Soğan/Sarımsak yiyip camiye gitmek).<br>- <em>Mubah:</em> Yapılması veya yapılmaması tamamen insanın serbest iradesine bırakılmış günlük sıradan eylemlerdir (Uyumak, yemek, yürümek).</p><p><strong>Ahlaki Kavramlar:</strong><br>- <em>Taassup:</em> Bir fikre, inanca veya lidere körü körüne, düşünmeden bağlanmak, fanatizm (yobazlık) yapmaktır. İslam aklı kullanmayı emrettiği için taassubu reddeder.<br>- <em>Teyemmüm:</em> Temiz suyun bulunmadığı durumlarda (veya hastalarda), abdest almak için niyet edip elleri temiz toprağa vurarak (sembolik) alınan abdesttir. İslam'ın ibadetlerdeki 'Kolaylaştırıcılık' ilkesine en büyük örnektir.</p>",
+                    items: ["Tefsir (Kur'an Yorumu) ve Hadis (Peygamber Sözü)", "Fıkıh (İslam Hukuku) ve Kelam (İnanç Savunması)", "Farz (Kesin Emir) ve Vacip (Kuvvetli İhtimal) Farkı", "Mekruh (Çirkin/İstenmeyen) ve Mubah (Serbest)", "Taassup (Körü Körü Fanatizm) ve Teyemmüm (Kolaylık)"],
+                    formula: null,
+                    question: "'Kur'an-ı Kerim'in dili Arapçadır. Ancak sadece kelime kelime çevrilmesi (Meal) onun içindeki derin anlamları anlamak için yeterli değildir. Ayetlerin hangi olay üzerine indiğini (Nüzul sebebi) ve ne demek istediğini uzun uzun açıklayan eserlere ihtiyaç vardır.'<br>Yukarıda bahsedilen, ayetleri uzun uzun açıklayıp yorumlayan İslami bilim dalı (ve eseri) aşağıdakilerden hangisidir?",
+                    solution: "Kur'an ile ilgili ilimleri ayırt edelim:<br>1. Kur'an'ı sadece bir dilden başka bir dile (Arapçadan Türkçeye) kelime kelime çevirmeye <strong>Meal (Çeviri)</strong> denir.<br>2. Ayetlerin arka planını, iniş sebeplerini, hukuki ve felsefi anlamlarını detaylıca araştıran, ciltler dolusu ansiklopedi gibi açıklayan yorum bilimine ise <strong>Tefsir</strong> denir.<br>3. Fıkıh: Hukuk (Helal/Haram) bilimidir.<br>4. Kelam: İnanç bilimidir.<br><br><strong>Cevap: Tefsir İlmi (Ayetleri yorumlama bilimi).</strong>",
+                    shortcut: "Bir kavram sorusunda 'Peygamberin izinden gitmek, onun gibi yaşamak' diyorsa cevap <strong>Sünnet</strong>'tir. 'Körü körüne bağlanmak, yeniliğe kapalı olmak' diyorsa cevap <strong>Taassup (Bağnazlık)</strong>'tır. 'Dine sonradan eklenmiş, dinde olmayan uydurma şeyler' diyorsa cevap <strong>Bid'at (Hurafe)</strong>'dir."
+                }
+
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
