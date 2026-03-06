@@ -1,5 +1,5 @@
-git clone [https://github.com/KULLANICI_ADIN/yks-dijital-kutuphane.git](https://github.com/KULLANICI_ADIN/yks-dijital-kutuphane.git)
-const apiKey = "BURAYA_KENDI_API_ANAHTARINI_YAZ";
+git clone [https://github.com/LiseninKodu/yks-dijital-kutuphane.git](https://github.com/LiseninKodu/yks-dijital-kutuphane.git)
+const apiKey = "AIzaSyCDQWieXsYuLKmmLUpwwGVp0Mo39SZsZgw";
 ├── index.html        # Ana menü ve ders seçim ekranı
 ├── matematik.html    # 9-12. Sınıf Matematik ve AI asistan
 ├── fizik.html        # 9-12. Sınıf Fizik ve AI asistan
