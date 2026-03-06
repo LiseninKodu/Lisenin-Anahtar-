@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "felsefe";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                // 9. Sınıf konuları buraya gelecek
+            ],
+            10: [
+                                {
+                    title: "1. Felsefeyi Tanıma (Felsefe Nedir?)",
+                    summary: "Felsefenin kelime anlamı, doğuşu ve felsefi düşüncenin nitelikleri.",
+                    description: "<p><strong>Felsefe (Philo-Sophia):</strong> Antik Yunanca 'Philia' (Sevgi) ve 'Sophia' (Bilgelik) kelimelerinin birleşmesinden oluşur. 'Bilgelik Sevgisi' demektir. İlk kez Pythagoras (Pisagor) tarafından kullanılmıştır. Felsefe, M.Ö. 6. yüzyılda İyonya'nın <strong>Milet</strong> (Aydın/Didim) kentinde, Thales ile sistemli bir şekilde başlamıştır.</p><p><strong>Neden Milet'te Doğdu?</strong> Deniz ticaretiyle zenginleşmiş olmaları (refah seviyesi yüksek insan düşünmeye vakit bulur), farklı kültürlerle etkileşim (hoşgörü) ve özgür düşünce ortamı sayesinde mitolojik (masalsı) açıklamalardan akılcı (rasyonel) açıklamalara geçilmiştir.</p><br><p><strong>Felsefi Düşüncenin Nitelikleri (Özellikleri):</strong><br>- <em>Özneldir (Subjektif):</em> Filozofun kendi kişisel bakış açısıdır, kesinlik (nesnellik) yoktur.<br>- <em>Rasyoneldir:</em> Akla ve mantığa dayanır.<br>- <em>Kümülatiftir (Yığılır):</em> Bilim gibi ilerlemez (eskiyi çöpe atmaz), tarih boyunca filozofların fikirleri üst üste yığılarak birikir.<br>- <em>Evrenseldir:</em> Tüm insanlığı ilgilendiren ortak konuları (doğruluk, adalet, ölüm) işler.<br>- <em>Sorgulayıcıdır (Eleştirel):</em> Hiçbir şeyi olduğu gibi kabul etmez, şüphe duyar.<br>- <em>Refleksiftir:</em> Düşünme üzerine düşünmektir. Kendi kendini sorgulayabilmesidir.<br>- <em>Sistemli ve Tutarlıdır:</em> Fikirler kendi içinde çelişmez.</p>",
+                    items: ["Philo-Sophia (Bilgelik Sevgisi) Kavramı", "Felsefenin Doğuşunu Hazırlayan Şartlar", "Felsefi Düşüncenin Özellikleri (Refleksif, Kümülatif vb.)", "Felsefenin Bireysel ve Toplumsal İşlevleri", "Felsefe ve Hikmet (Bütünsel Bilgi) Arasındaki Fark"],
+                    formula: null,
+                    question: "Bir felsefe tarihçisi 'Felsefede hiçbir düşünce eskimediği gibi, hiçbir problem de tam anlamıyla çözülüp bitirilemez. Platon'un M.Ö. 4. yüzyılda sorduğu devlet nedir sorusu, bugün hala felsefenin tartışma konusudur.' demiştir. Bu durum felsefi düşüncenin hangi özelliği ile ilgilidir?",
+                    solution: "Bilim ve felsefeyi ayıran en büyük özellik şudur:<br>1. Bilim <strong>İlerler</strong>. Yani yeni bir fizik kanunu bulunduğunda eski ve yanlış olan çöpe atılır. Bilim sürekli bir adım öteye gider.<br>2. Felsefe ise <strong>İlerlemez, Yığılır (Kümülatiftir)</strong>. 2500 yıl önceki bir düşünce çöpe atılmaz, bugünkü düşüncelerin yanına eklenir. Felsefede kesin bir cevap (bitmişlik) yoktur, sorular cevaplardan daha önemlidir.<br><br><strong>Cevap: Kümülatif (Yığılımlı) olması ve bitmişliğin (kesinliğin) olmaması.</strong>",
+                    shortcut: "Bir soruda 'Düşüncenin kendi üzerine dönmesi, aklın kendi kendini sorgulaması, düşünme üzerine düşünme' gibi ifadeler görüyorsan, felsefede bunun tek bir adı vardır: <strong>Refleksif (Yansımalı) Düşünce</strong>."
+                },
+                {
+                    title: "2. Felsefeyle Düşünme (Akıl Yürütme ve Argüman)",
+                    summary: "Tümdengelim, tümevarım, analoji, argüman ve önerme kavramları.",
+                    description: "<p><strong>Temel Kavramlar:</strong><br>- <em>Önerme:</em> Doğru veya yanlış <strong>kesin bir yargı bildiren</strong> cümlelerdir (Örn: 'Ankara Türkiye'nin başkentidir' doğru bir önermedir. 'Bugün hava çok güzel' özneldir, önerme değildir. Soru, emir, dua cümleleri önerme olamaz).<br>- <em>Argüman:</em> Belirli kanıtlara dayanarak ortaya atılan ve savunulan iddiadır (gerekçelendirme).<br>- <em>Tutarlılık:</em> Filozofun düşüncelerinin kendi içinde çelişmemesidir (Felsefenin en önemli şartıdır).</p><p><strong>Akıl Yürütme Türleri:</strong><br>1. <strong>Tümdengelim (Dedüksiyon):</strong> Bütünden parçaya, genelden özele gidiştir. (Örn: Bütün insanlar ölümlüdür / Sokrates de bir insandır / O halde Sokrates de ölümlüdür). Kesin bilgi verir.<br>2. <strong>Tümevarım (Endüksiyon):</strong> Parçadan bütüne, özelden genele gidiştir. (Örn: Demir ısınınca genleşir, bakır ısınınca genleşir... O halde tüm metaller ısınınca genleşir). Olasılıklıdır, bilim bunu çok kullanır.<br>3. <strong>Analoji (Benzeşim):</strong> İki özel durum veya olay arasındaki benzerliğe dayanarak birisi için geçerli olanı diğeri için de geçerli saymaktır. (Örn: İtalya bir Akdeniz ülkesidir ve zeytin yetişir / Türkiye de bir Akdeniz ülkesidir / O halde Türkiye'de de zeytin yetişir).</p>",
+                    items: ["Önerme Nedir? Hangi Cümleler Önerme Olamaz?", "Argüman (İddia/Gerekçe) ve Tutarlılık", "Gerçeklik (Nesne) ve Doğruluk (Zihin) Farkı", "Akıl Yürütme Türleri (Tümdengelim, Tümevarım, Analoji)", "Temellendirme (Dayanak Bulma)"],
+                    formula: null,
+                    question: "'Mars'ta atmosfer vardır ve orada hayat belirtisi olabilecek gazlar bulunmuştur. Jüpiter'de de atmosfer vardır. O halde Jüpiter'de de hayat belirtisi olabilecek gazlar bulunabilir.' şeklinde yapılan akıl yürütme türü aşağıdakilerden hangisidir?",
+                    solution: "Akıl yürütme türlerini hatırlayalım:<br>1. Tümdengelim (Bütünden $\\rightarrow$ Parçaya).<br>2. Tümevarım (Parçadan $\\rightarrow$ Bütüne).<br>3. Analoji (Parçadan $\\rightarrow$ Parçaya / Özelden $\\rightarrow$ Özele).<br>Soruda Mars (birinci özel durum) ile Jüpiter (ikinci özel durum) arasında 'atmosferleri olması' yönünden bir <strong>Benzerlik</strong> kurulmuş ve birindeki sonuç diğerine de aktarılmıştır. Bütüne (Tüm gezegenlerde hayat vardır gibi) ulaşılmamıştır.<br><br><strong>Cevap: Analoji (Benzeşim).</strong>",
+                    shortcut: "Eğer cümlenin başında <strong>'Bütün, Her, Tüm'</strong> gibi genel bir kelime varsa ve sonu özel bir kişi/durumla bitiyorsa bu %100 <strong>Tümdengelim</strong>'dir."
+                },
+                {
+                    title: "3. Bilgi Felsefesi (Epistemoloji)",
+                    summary: "Bilgi türleri, doğruluk ölçütleri ve 'Doğru bilgi mümkün müdür?' problemi.",
+                    description: "<p><strong>Bilgi:</strong> Özne (Bilen insan/Süje) ile Nesne (Bilinecek olan/Obje) arasındaki bağdan (bilgi aktı) ortaya çıkan üründür. <em>Gündelik Bilgi</em> deneyime dayanır. <em>Bilimsel Bilgi</em> nesnel, birikimli ve akılcıdır. <em>Felsefi Bilgi</em> öznel ve refleksiftir.</p><p><strong>Doğru Bilgi Mümkün Müdür?</strong> (Felsefe Tarihinin En Büyük Kavgası):<br>1. <strong>Mümkün Değildir Diyenler (Septisizm/Şüphecilik):</strong> İnsan duyuları yanıltıcıdır. Doğru bilgiye ulaşılamaz. Kurucusu Pyrrhon ve Timon'dur. (Buna Sofistleri de ekleriz: Protagoras'ın 'İnsan her şeyin ölçüsüdür, rüzgar üşüyene soğuktur' diyerek <em>Rölativizm/Göreceliliği</em> savunması gibi).<br><br>2. <strong>Mümkündür Diyenler (Dogmatizm):</strong> Doğru bilgiye ulaşılabileceğini savunurlar. Peki neyle ulaşılır?<br>- <em>Rasyonalizm (Akılcılık):</em> Bilgi doğuştan insan aklında (zihninde) vardır. Duyular yanıltır, akıl bulur. (Sokrates, Platon, Descartes, Hegel).<br>- <em>Empirizm (Deneyimcilik/Duyumculuk):</em> Akılda doğuştan hiçbir şey yoktur. İnsan zihni boş bir levhadır (<strong>Tabula Rasa</strong>). Her şey sonradan deneyim ve duyularla öğrenilir. (John Locke, David Hume).<br>- <em>Kritisizm (Eleştiricilik):</em> Kant'ın kurduğu akımdır. 'Kavramsız görüler kör, görüsüz kavramlar boştur.' diyerek Rasyonalizm (Akıl) ile Empirizmi (Deney) <strong>birleştirmiştir</strong>. Bilgi deneyle başlar, akılla işlenir.<br>- <em>Pozitivizm (Olguculuk):</em> Sadece deneye, deneye ve somut olgulara (bilime) dayanan bilgi doğrudur. Metafiziği reddeder. (Auguste Comte).<br>- <em>Pragmatizm (Faydacılık):</em> Bir bilgi günlük hayatta işe yarıyorsa, fayda sağlıyorsa doğrudur. (William James, John Dewey).</p>",
+                    items: ["Süje (Özne), Obje (Nesne) ve Bilgi Aktı", "Septisizm (Şüphecilik) ve Rölativizm (Görecelilik)", "Rasyonalizm (Sokrates/Platon) - Akılcılık", "Empirizm (John Locke - Tabula Rasa) - Deneyimcilik", "Kritisizm (Kant), Pozitivizm (Comte) ve Pragmatizm"],
+                    formula: null,
+                    question: "İngiliz filozof John Locke, 'İnsan zihni dünyaya gelirken üzerine hiçbir şey yazılmamış boş bir levha (Tabula Rasa) gibidir. Bütün bilgilerimiz, hayatımız boyunca beş duyumuzla elde ettiğimiz tecrübelerin bu levhaya yazılmasından ibarettir.' demiştir. John Locke, bu görüşüyle hangi felsefi akımı savunmakta ve kime karşı çıkmaktadır?",
+                    solution: "John Locke'un 'Boş Levha' (Tabula Rasa) benzetmesi bilgi felsefesinin en meşhur metaforudur.<br>1. Her şeyin doğduktan sonra yaşam tecrübesi (deney ve duyular) ile kazanıldığını savunan akım <strong>Empirizm (Deneyimcilik)</strong>'tir.<br>2. Bu düşünce, 'Hayır, insan matematik ve tanrı gibi bazı fikirleri doğuştan aklında hazır (yüklü) getirir' diyen <strong>Rasyonalizm (Akılcılık)</strong> akımına ve Descartes/Sokrates gibi filozoflara karşı çıkmaktadır.<br><br><strong>Cevap: Empirizm (Deneyimcilik) akımını savunur, Rasyonalizm (Akılcılık) akımına karşı çıkar.</strong>",
+                    shortcut: "Sınavda Immanuel Kant'ı (Kritisizm/Eleştiricilik) soracaklarsa paragrafın içinde %100 <strong>'SENTEZ, BİRLEŞTİRME, HEM AKIL HEM DENEY'</strong> kelimeleri geçer. Çünkü o, akılcılarla deneyimcilerin kavgasını ikisini birleştirerek bitiren kişidir."
+                },
+                {
+                    title: "4. Varlık Felsefesi (Ontoloji)",
+                    summary: "Varlığın ne olduğu, gerçek/ideal varlık, materyalizm ve idealizm.",
+                    description: "<p><strong>Bilime Göre Varlık:</strong> Varlığın var olduğundan şüphe duymaz, varlığı parçalara ayırarak (fizik, kimya, biyoloji) nesnel olarak inceler. <strong>Felsefeye Göre Varlık:</strong> Varlığın gerçekten var olup olmadığını sorgular, varlığı bir bütün olarak ele alır.</p><p><strong>Gerçek (Reel) ve İdeal (Düşünsel) Varlık:</strong><br>- <em>Reel Varlık:</em> İnsan zihninden bağımsız olarak uzayda ve zamanda var olan, duyu organlarıyla algılanabilen nesnelerdir (Örn: Masa, Ağaç, Gezegen).<br>- <em>İdeal Varlık:</em> Sadece insan zihninde var olan, uzayda yer kaplamayan, düşünsel soyut varlıklardır (Örn: Pi sayısı, Ekvator çizgisi, Kafdağı, Üçgen, Denizkızı).</p><p><strong>Varlığın Ne'liği Problemi (Varlık Nedir?):</strong><br>1. <strong>Oluş Olarak Varlık:</strong> Varlık statik (duran) bir şey değildir, sürekli bir değişim (oluş) halindedir. Herakleitos: 'Aynı nehirde iki kez yıkanılmaz, her şey akar (Pantha Rei).' demiştir.<br>2. <strong>İdea (Fikir) Olarak Varlık (İdealizm):</strong> Asıl varlık maddedeki değil, zihindeki fikirdir, düşüncedir. Platon (İdealar Dünyası - Mağara Alegorisi), Aristoteles, Hegel.<br>3. <strong>Madde Olarak Varlık (Materyalizm):</strong> Evrendeki her şey (düşünce bile) maddi süreçlerden (atomların çarpışmasından) oluşur. Ruh ve tanrı yoktur. Karl Marx, Demokritos, Thomas Hobbes.<br>4. <strong>Hem Madde Hem Ruh (Dualizm - İkicilik):</strong> Descartes'e göre varlık birbirine indirgenemeyen, ancak birleşerek insanı oluşturan ruh (düşünen) ve madde (yer kaplayan) olmak üzere iki özden oluşur.<br>5. <strong>Fenomen Olarak Varlık (Görüngübilim):</strong> Husserl'e göre varlığın arkasındaki özü (saf bilinci) kavrayabilmek için, ona ait tüm önyargıları (rengi, şekli vs.) paranteze alıp dışlamak gerekir.</p>",
+                    items: ["Gerçek (Reel) ve İdeal (Düşünsel) Varlık Farkı", "Nihilizm (Hiççilik) - Varlık Yoktur", "Oluş Olarak Varlık (Herakleitos ve Değişim)", "İdealizm (Platon'un Mağara Alegorisi)", "Materyalizm (Maddecilik) ve Dualizm (Descartes)"],
+                    formula: null,
+                    question: "İlk çağ filozofu Herakleitos, 'Aynı nehirde iki kez yıkanılmaz, çünkü ikinci kez girdiğinizde hem sular değişmiştir hem de siz eski siz değilsinizdir.' diyerek varlık felsefesinde hangi temel görüşü savunmuştur?",
+                    solution: "Herakleitos, evrende hiçbir şeyin sabit kalmadığını, durmadığını savunur.<br>1. Ona göre evrenin ana maddesi (arkhesi) 'Ateş'tir. Ateş sürekli dönüştüren ve değiştiren bir güçtür.<br>2. Varlığı sabit, durağan nesneler olarak değil; kesintisiz bir hareket, çatışma ve <strong>Oluş (Değişim süreci)</strong> olarak açıklar. (Değişmeyen tek şey değişimin kendisidir).<br><br><strong>Cevap: Varlığı 'Oluş' (Sürekli değişim ve hareket) olarak kabul etmiştir.</strong>",
+                    shortcut: "Platon'un efsanevi <strong>'Mağara Alegorisi'</strong> karşısına çıkarsa, bil ki bu İDEALİZM'in zirvesidir. Gölgeler (bu dünya) sahte, mağaranın dışı (İdealar/Fikirler dünyası) ise gerçektir. Gerçek varlık soyut fikirdedir."
+                },
+                {
+                    title: "5. Ahlak, Sanat, Din ve Siyaset Felsefesi",
+                    summary: "Felsefenin diğer alt disiplinlerindeki temel kavramlar ve yaklaşımlar.",
+                    description: "<p><strong>Ahlak Felsefesi (Etik):</strong> İnsan eylemlerinin iyi ve kötü yönlerini inceler.<br>- <em>Determinizm:</em> İnsan eylemlerinde özgür DEĞİLDİR (Toplum, psikoloji, doğa kanunları onu zorlar).<br>- <em>İndeterminizm:</em> İnsan eylemlerinde TAMAMEN ÖZGÜRDÜR (Aklı ve iradesiyle seçer).<br>- <em>Otodeterminizm (Ahlaki Özerklik):</em> Kant'a göre insan kendi ahlak yasasını kendi aklıyla koyduğu oranda özgürdür.<br>- Evrensel Ahlak Yasası <strong>Yoktur</strong> diyenler: Hedonizm (Hazcılık-Epiküros), Egoizm (Bencillik-Hobbes), Nihilizm (Nietzsche - Üstinsan), Egzistansiyalizm (Varoluşçuluk-Sartre).<br>- Evrensel Ahlak Yasası <strong>Vardır</strong> diyenler: Utilitarizm (Toplumsal Fayda-Bentham), Sezgicilik (Bergson), Ödev Ahlakı (Kant - İyi Niyet).</p><p><strong>Siyaset Felsefesi:</strong> Devletin kaynağını ve adaleti sorgular. <em>Doğal Devlet:</em> Devlet, insan doğasının bir devamı, canlı bir organizma gibidir (Platon). <em>Yapay Devlet:</em> Devlet, insanların kendi aralarında yaptığı bir sözleşmeyle (Toplum Sözleşmesi) sonradan kurulmuştur (J. Locke, J.J. Rousseau).</p><p><strong>Sanat (Estetik) Felsefesi:</strong> Güzeli inceler. Sanat doğanın <em>Taklididir (Mimesis)</em> diyenler (Platon, Aristoteles). Sanat <em>Oyun</em>dur diyenler (Schiller). Sanat bir <em>Yaratmadır</em> diyenler (Croce - sanatçı doğayı kopyalamaz, ruhundan biricik/yeni bir şey yaratır).</p><p><strong>Din Felsefesi:</strong> Tanrı'nın varlığı problemi: <em>Teizm</em> (Tanrı var, dine ve peygambere müdahale eder). <em>Deizm</em> (Tanrı evreni yarattı ama bir daha karışmadı, din/peygamber yoktur, evren saat gibi çalışır). <em>Panteizm</em> (Tümtanrıcılık - Tanrı ile evren bir bütündür, aynı şeydir - Spinoza). <em>Ateizm</em> (Tanrı'yı reddeder). <em>Agnostisizm</em> (Bilinemezcilik - Tanrının varlığı da yokluğu da kanıtlanamaz - Protagoras).</p>",
+                    items: ["Etik Kavramları (Özgürlük, Sorumluluk, Determinizm)", "Evrensel Ahlak Yasasını Reddedenler (Nietzsche - Nihilizm)", "Kant'ın Ödev Ahlakı (İyi Niyet ve Koşulsuz Buyruk)", "Siyaset: Doğal Devlet vs. Yapay Devlet (Toplum Sözleşmesi)", "Din: Teizm, Deizm (Emekli Tanrı), Panteizm ve Agnostisizm"],
+                    formula: null,
+                    question: "Immanuel Kant'ın 'Ödev Ahlakı' anlayışına göre; boğulmakta olan bir çocuğu kurtarmak için suya atlayan bir kişinin bu davranışı hangi niyetle yapılmışsa ahlaki açıdan 'İyi' kabul edilir? (Ödül beklemek, haberlere çıkmak veya vicdani ödev).",
+                    solution: "Kant'ın ahlak anlayışında davranışın 'sonucuna' değil, tamamen 'niyetine' (nedenine) bakılır.<br>1. Eğer kişi çocuğu; kahraman olmak, gazetelere çıkmak, para ödülü almak veya sadece çocuğun ailesi zengin olduğu için kurtarmışsa (Yani eyleminde bir çıkar/menfaat varsa) bu eylem ahlaki değildir.<br>2. Kant'a göre eylem <strong>'Koşulsuz Buyruk (Kategorik İmperatif)'</strong> ile yapılmalıdır. Yani kişi, 'İnsan hayatını kurtarmak benim insanlık görevimdir, aklımın bana emrettiği bir ödevdir' diyerek (hiçbir çıkar beklemeden) yaparsa ahlaki olur.<br><br><strong>Cevap: Hiçbir çıkar (menfaat) beklemeden, sırf insanlık ödevi (İyi Niyet) olduğu için yapılmışsa ahlakidir.</strong>",
+                    shortcut: "Bir ahlak sorusunda <strong>'Sonuç önemli değildir, önemli olan İyi Niyet ve Ödevdir'</strong> diyorsa cevap %100 <strong>Kant</strong>'tır. Eğer <strong>'En çok sayıda insana, en büyük faydayı sağlayan eylem iyidir'</strong> diyorsa cevap %100 Utilitarizm (Bentham/Mill)'dir."
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. MÖ 6. Yüzyıl - MS 2. Yüzyıl Felsefesi (Antik Yunan)",
+                    summary: "Doğa filozofları (Arkhe), Sofistler, Sokrates, Platon ve Aristoteles.",
+                    description: "<p><strong>Doğa Filozofları ve Arkhe Problemi:</strong> Evrenin ana maddesi (ilk nedeni) nedir? Thales 'Su', Anaksimenes 'Hava', Demokritos 'Atom', Empedokles 'Su, ateş, hava, toprak', Herakleitos ise 'Ateş' (Değişim/Oluş) demiştir.</p><p><strong>Sofistler ve Sokrates:</strong> Sofistler para karşılığı hitabet dersi veren gezgin öğretmenlerdir. <em>Protagoras</em>, 'İnsan her şeyin ölçüsüdür' diyerek kesin bilgiyi reddetmiş (Rölativizm/Görecelilik) ve ahlakın kişiden kişiye değişeceğini savunmuştur. Sofistlerin bu göreceliğine en büyük tepkiyi <strong>Sokrates</strong> vermiştir. Sokrates'e göre bilgi ve ahlak doğuştan aklımızda vardır, değişmez. Sorular sorarak doğuştan var olan bu bilgiyi açığa çıkarma yöntemine <em>Maiyotik (Doğurtmaca)</em> denir.</p><br><p><strong>Platon (İdealar Kuramı):</strong> Sokrates'in öğrencisidir. Varlığı ikiye ayırır: <em>Nesneler Dünyası</em> (İçinde yaşadığımız yalan, gölge ve geçici dünya) ve <em>İdealar Dünyası</em> (Sadece akılla kavranan, mükemmel ve asıl gerçek olan dünya). Meşhur 'Mağara Alegorisi' ile bunu açıklar.</p><p><strong>Aristoteles:</strong> Platon'un öğrencisi, Büyük İskender'in hocasıdır. Hocasının aksine İdealar dünyasını gökyüzünde aramaz, ideanın maddenin bizzat kendi içinde (Form) olduğunu söyler (<em>Madde-Form öğretisi</em>). Ahlakta ise <em>Altın Orta</em> kuralını savunur: Erdemli olmak, aşırılıklardan kaçıp dengeli (cesaret: korkaklık ile delicesine atılganlık arasındaki orta yoldur) olmaktır.</p>",
+                    items: ["İlk Neden (Arkhe) Problemi ve Doğa Filozofları", "Sofistlerin Göreceliği (Rölativizm)", "Sokrates'in İroni ve Maiyotik (Doğurtmaca) Yöntemi", "Platon'un İdealar Dünyası ve Mağara Alegorisi", "Aristoteles'in Madde-Form İlişkisi ve Altın Orta Kuralı"],
+                    formula: null,
+                    question: "Sokrates, hiç geometri bilmeyen bir köleye sadece sorular sorarak ve onu yönlendirerek karmaşık bir geometri problemini çözdürmüştür. Sokrates bu meşhur deneyiyle felsefede neyi kanıtlamaya çalışmıştır?",
+                    solution: "Sokrates'in bilgi felsefesindeki temel inancı (Rasyonalizm) şudur:<br>1. İnsan zihni doğduğunda boş bir levha değildir.<br>2. Bütün bilgiler (matematik, erdem, ahlak) insanın aklında <strong>doğuştan (apriori) yüklü olarak</strong> bulunur.<br>3. Öğrenmek denilen şey aslında yeni bir şey almak değil, ruhta zaten var olan bilgiyi <strong>Hatırlamak ve Açığa Çıkarmaktır</strong>.<br>4. Geometri bilmeyen kölenin problemi çözmesi, o bilginin kölenin zihninde doğuştan var olduğunu, Sokrates'in sadece bir ebe gibi o bilgiyi 'doğurttuğunu' (Maiyotik yöntem) kanıtlar.<br><br><strong>Cevap: Bilginin insan aklında doğuştan var olduğunu ve öğrenmenin sadece bir 'hatırlama' süreci olduğunu kanıtlamak istemiştir.</strong>",
+                    shortcut: "Bir soruda 'Gölge, Yansıma, Kopya dünya, Asıl gerçeklik' gibi kelimeler geçiyorsa bu %100 <strong>Platon'un İdealar Kuramı</strong>'dır."
+                },
+                {
+                    title: "2. MS 2. Yüzyıl - MS 15. Yüzyıl Felsefesi (Orta Çağ)",
+                    summary: "Hristiyan ve İslam felsefesinin temel özellikleri, inanç-akıl ilişkisi.",
+                    description: "<p>Bu dönem felsefesi teolojinin (dinin) hizmetindedir. Antik Yunan'ın aklı, dinin dogmalarını temellendirmek (kanıtlamak) için kullanılmıştır.</p><p><strong>Hristiyan Felsefesi (Skolastik Düşünce):</strong> 'Anlamak için inanıyorum' anlayışı hakimdir. Kilisenin otoritesi kesindir, bilimsel deney yasaktır. İki temel problem öne çıkar:<br>1. <em>Tanrı'nın Varlığı Problemi:</em> Anselmus'un <em>Ontolojik Kanıtı</em> (Tanrı en mükemmel varlıktır, mükemmel bir varlığın zihinde olup gerçekte olmaması düşünülemez) ve Thomas Aquinas'ın <em>Kozmolojik Kanıtı</em> (Evrendeki her şeyin bir nedeni vardır, bu nedenler zinciri geriye gidildiğinde ilk nedensiz nedene yani Tanrı'ya ulaşır).<br>2. <em>Tümeller Problemi:</em> Kavramların gerçekte var olup olmadığı tartışmasıdır (Kavram realizmi, Nominalizm/Adcılık, Konseptüalizm).</p><p><strong>İslam Felsefesi:</strong> Antik Yunan (özellikle Aristoteles) eserleri Arapçaya çevrilmiş, bilim ve felsefede Altın Çağ yaşanmıştır. Batı karanlıktayken İslam coğrafyası aydınlıktır.<br>- <em>Farabi:</em> Aristo'nun mantığını geliştirdiği için 'İkinci Öğretmen (Muallim-i Sani)' denir. 'El-Medinetü'l Fazıla' adlı eseriyle erdemli bir devletin nasıl olması gerektiğini anlatır.<br>- <em>İbn Sina (Avicenna):</em> Tıbbın Kanunu kitabının yazarıdır. Varlıkları; Zorunlu (Tanrı), Mümkün (Evren/İnsan) ve Mümkün Olmayan varlıklar olarak üçe ayırır.<br>- <em>Gazali:</em> Felsefeyi (aklı) eleştirir. Aklın yetersiz olduğunu, kesin bilgiye ancak Tanrı'nın kalbimize fırlattığı bir nurla, yani <strong>Sezgi (Kalp gözü)</strong> ile ulaşılabileceğini savunur.</p>",
+                    items: ["Skolastik Felsefenin Dogmatik Yapısı", "Tanrı'nın Varlığına Dair Ontolojik ve Kozmolojik Kanıtlar", "Tümeller Problemi (Nominalizm - Kavram Realizmi)", "Farabi'nin İdeal Devlet (Erdemli Şehir) Anlayışı", "İbn Sina'nın Varlık Sınıflandırması ve Gazali'nin Sezgiciliği"],
+                    formula: null,
+                    question: "Orta Çağ Hristiyan felsefesini özetleyen 'Felsefe, teolojinin (dinin) hizmetçisidir' sözü ne anlama gelmektedir?",
+                    solution: "Orta Çağ Avrupa'sında Skolastik düşünce hakimdir.<br>1. Felsefenin amacı artık Antik Yunan'da olduğu gibi 'Evrenin sırrını merak etmek ve özgürce sorgulamak' DEĞİLDİR.<br>2. Temel amaç; İncil'deki kuralları, kilisenin dogmalarını ve Tanrı'nın varlığını <strong>Akıl (Felsefe) yoluyla kanıtlamaya çalışmaktır</strong>.<br>3. Felsefe kendi başına bağımsız bir alan olmaktan çıkmış, sadece dinin kurallarını insanlara mantıklı göstermek için kullanılan bir <strong>'araç/hizmetçi'</strong> haline getirilmiştir.<br><br><strong>Cevap: Felsefenin bağımsızlığını kaybederek sadece dini inançları akıl yoluyla kanıtlamak için bir araç (savunma mekanizması) olarak kullanılması.</strong>",
+                    shortcut: "Eğer Orta Çağ'da Aristoteles felsefesi Avrupa'ya ulaşıp Rönesans'ı tetiklediyse, bu tamamen Endülüs (İspanya) ve Bağdat'taki <strong>İslam Filozoflarının (Farabi, İbn Rüşd) Çeviri Faaliyetleri</strong> sayesindedir."
+                },
+                {
+                    title: "3. 15. Yüzyıl - 17. Yüzyıl Felsefesi (Rönesans ve Kartezyen Felsefe)",
+                    summary: "Skolastiğin yıkılışı, Hümanizm, Bilimsel Yöntem, Descartes ve Machiavelli.",
+                    description: "<p><strong>Rönesans (Yeniden Doğuş):</strong> İtalya'da başlar. Orta Çağ'ın teosentrik (Tanrı merkezli) yapısı yıkılır, yerine <strong>Antroposentrik (İnsan merkezli)</strong> bir yapı, yani <strong>Hümanizm</strong> gelir. İnsan aklı, bedeni ve doğa değer kazanır (Da Vinci, Michelangelo).</p><br><p><strong>Bilimsel Yöntemin Gelişimi:</strong> Kopernik ve Galileo 'Dünya merkezli' evren anlayışını yıkıp, 'Güneş merkezli' evren anlayışını kanıtladılar. Francis Bacon 'Bilgi güçtür' diyerek, doğaya egemen olmak için deney ve gözleme dayalı <strong>Tümevarım</strong> yönteminin kullanılmasını savundu.</p><p><strong>Rene Descartes ve Kartezyen Felsefe:</strong> Modern felsefenin kurucusudur. Kesin bilgiye ulaşmak için her şeyden (duyulardan, rüyadan, hatta matematikten bile) şüphe eder. Ancak şüphe ettiği eylemin kendisinden (düşünmekten) şüphe edemez. Buradan <em>'Düşünüyorum, öyleyse varım (Cogito ergo sum)'</em> sonucuna ulaşır. Descartes'in şüphesi Septikler (şüpheciler) gibi bir amaç değil, doğru bilgiye ulaşmak için kullanılan bir <strong>'Yöntem (Metodik şüphe)'</strong>dir.</p><p><strong>Siyaset Felsefesi:</strong> <em>Niccolò Machiavelli</em> (Prens kitabı) ile siyaset ahlaktan ayrılır. 'Devletin bekası (güçlenmesi) için amaca giden her yol (yalan, şiddet, hile) mübahtır.' der (Makyavelizm). <em>Thomas More</em> ise kusursuz ve eşitlikçi bir devlet hayali kurarak 'Ütopya' adlı eserini yazar.</p>",
+                    items: ["Hümanizm (İnsanı Merkeze Alma) Akımı", "Kopernik ve Galileo'nun Bilimsel Devrimi", "Francis Bacon'ın Tümevarım Yöntemi (Bilgi Güçtür)", "Descartes'in Metodik Şüphesi (Cogito Ergo Sum)", "Machiavelli'nin Siyaset Anlayışı (Amaca Giden Her Yol Mübahtır)"],
+                    formula: null,
+                    question: "Descartes'in doğru bilgiye ulaşma sürecinde kullandığı 'Şüphe' ile, İlk Çağ'daki Septiklerin (Pyrrhon, Timon) kullandığı 'Şüphe' arasındaki temel fark nedir?",
+                    solution: "Her ikisi de her şeyden şüphe etmiş olsa da niyetleri tamamen farklıdır.<br>1. <strong>Septiklerin Şüphesi:</strong> Onlara göre insan aklı ve duyuları yetersizdir, kesin doğru bilgi diye bir şey <strong>yoktur</strong>. Bu yüzden her şeyden şüphe etmek onların varabileceği son noktadır (Şüphe bir AMAÇTIR).<br>2. <strong>Descartes'in Şüphesi:</strong> O, kesin doğru bilginin <strong>var olduğuna</strong> inanır (Rasyonalisttir). Şüpheyi, aklındaki tüm yanlış bilgileri temizlemek ve sarsılmaz bir doğruya ('Düşünüyorum öyleyse varım'a) ulaşmak için bir <strong>Araç/Yöntem</strong> olarak kullanır (Metodik Şüphe). Ulaştığında şüpheyi bırakır.<br><br><strong>Cevap: Septiklerde şüphe varılacak son nokta (amaç), Descartes'te ise doğru bilgiye ulaşmak için kullanılan bir araçtır (yöntemdir).</strong>",
+                    shortcut: "Bir soruda ideal, hayali, kusursuz ama gerçekte var olmayan bir devlet tasarımından bahsediliyorsa cevap <strong>'Ütopya'</strong>dır (Thomas More). Eğer bu hayali devlet karanlık, korkutucu ve baskıcı bir felaket senaryosu ise cevap <strong>'Distopya'</strong>dır (George Orwell - 1984, Aldous Huxley - Cesur Yeni Dünya)."
+                },
+                {
+                    title: "4. 18. Yüzyıl - 19. Yüzyıl Felsefesi (Aydınlanma Dönemi)",
+                    summary: "Aklın aydınlığı, Kant'ın kritisizmi, Hegel'in diyalektiği ve Fransız İhtilali.",
+                    description: "<p><strong>Aydınlanma Felsefesi (Akıl Çağı):</strong> Kant'ın 'Aklını kullanma cesareti göster!' sözü dönemin sloganıdır. Gelenekler, kilise dogmaları ve krallık otoritesi reddedilmiş; her şey 'Akıl Süzgecinden' geçirilmiştir. Eşitlik, adalet, hürriyet ve insan hakları dönemin temel kavramlarıdır.</p><p><strong>Siyaset ve Toplum:</strong> J. Locke ve J.J. Rousseau, kralların gücünü Tanrı'dan almadığını, insanların bir araya gelerek bir <strong>Toplum Sözleşmesi</strong> ile devleti kendi elleriyle (yapay olarak) kurduklarını savunurlar. Montesquieu, yasama, yürütme ve yargının tek kişide toplanmaması gerektiğini söyleyerek <strong>Güçler Ayrılığı</strong> ilkesini kurmuştur. Bu felsefi altyapı 1789 Fransız İhtilali'ni doğurmuştur.</p><p><strong>Kant (Kritisizm / Eleştiricilik):</strong> Bilgi felsefesinde devrim yapmıştır. Rasyonalizm (Akıl) ile Empirizmi (Deney) birleştirmiştir. <em>'Kavramsız görüler kör, görüsüz kavramlar boştur.'</em> diyerek, bilginin oluşması için hem duyulardan gelen malzemeye (deneye) hem de onu işleyecek bir zihne (akla) ihtiyaç olduğunu kanıtlamıştır. Ahlakta ise çıkarsız ve evrensel <strong>Ödev Ahlakı'nı</strong> savunur.</p><br><p><strong>Hegel ve Diyalektik İdealizm:</strong> Hegel'e göre tüm evren, Mutlak Akıl'ın (Geist) kendini aşama aşama gerçekleştirmesidir. Bu değişim üç aşamalı bir yasa ile olur: <strong>Diyalektik</strong>. <br>1. Tez (İddia/Çiçek) <br>2. Antitez (Zıttı-Çatışma/Çiçeğin çürüyüp meyve olması) <br>3. Sentez (Yeni durum/Meyvenin içindeki Tohum). Her sentez zamanla yeni bir teze dönüşür ve evren böyle ilerler.</p>",
+                    items: ["Aydınlanma Düşüncesinin Temeli (Aklı Kullanma Cesareti)", "Toplum Sözleşmesi (Locke ve Rousseau)", "Montesquieu ve Güçler Ayrılığı İlkesi", "Kant'ın Bilgi Anlayışı (Deney + Akıl Sentezi)", "Hegel'in Diyalektik Süreci (Tez - Antitez - Sentez)"],
+                    formula: "$$\\text{Tez (Varlık)} \\leftrightarrow \\text{Antitez (Yokluk)} \\implies \\text{Sentez (Oluş)}$$",
+                    question: "J.J. Rousseau, 'İnsan özgür doğar ama her yerde zincire vurulmuştur.' diyerek devletin kaynağını açıklarken hangi temel felsefi kurama (görüşe) dayanmaktadır?",
+                    solution: "Aydınlanma dönemi düşünürleri, devletin kaynağını açıklarken Orta Çağ'ın teokratik (Tanrısal) kökenini reddederler.<br>1. Rousseau'ya göre insanlar doğada başlangıçta tam bir eşitlik ve özgürlük içinde yaşıyorlardı (Doğal Durum).<br>2. Ancak özel mülkiyetin ('Bu tarla benim' düşüncesinin) ortaya çıkmasıyla çatışmalar, eşitsizlikler ve cinayetler başladı.<br>3. İnsanlar can ve mal güvenliklerini sağlamak için bir araya gelip, kendi özgürlüklerinin bir kısmından vazgeçerek haklarını üstün bir otoriteye (Devlete) devrettiler.<br>4. Devlet, insanların kendi aralarında imzaladıkları ortak bir aklaşmanın/sözleşmenin sonucudur.<br><br><strong>Cevap: Toplum Sözleşmesi (Sosyal Sözleşme) kuramına dayanmaktadır. Devlet yapay bir kurumdur.</strong>",
+                    shortcut: "Karl Marx, Hegel'in 'Diyalektik' yöntemini aynen almış ancak Hegel'in 'Geist (Soyut Akıl)' fikrini reddederek yerine 'Madde ve Ekonomiyi' koymuştur. Marx'ın sistemine <strong>Diyalektik Materyalizm</strong> denir (Sınıf çatışması/İşçi-Patron üzerinden tarihi açıklar)."
+                },
+                {
+                    title: "5. 20. Yüzyıl Felsefesi (Çağdaş Felsefe ve Akımlar)",
+                    summary: "Fenomenoloji, Varoluşçuluk, Mantıkçı Pozitivizm ve Paradigma.",
+                    description: "<p>Dünya Savaşları, teknolojik yıkımlar ve yalnızlaşan modern insanın anlam arayışı bu dönemi şekillendirmiştir.</p><p><strong>1. Fenomenoloji (Görüngübilim - Edmund Husserl):</strong> Doğru bilgi, varlıkların arkasındaki 'Öz'ü kavramaktır. Bir nesnenin (örneğin bir elmanın) rengini, kokusunu, şeklini ve hakkındaki tüm ön yargılarımızı <em>'Paranteze Alarak (Dışarıda Bırakarak)'</em>, geriye kalan saf bilincimize (özüne) ulaşma yöntemidir.</p><p><strong>2. Egzistansiyalizm (Varoluşçuluk - J.P. Sartre):</strong> Dönemin en popüler akımıdır. Sartre'a göre <em>'Varoluş, özden önce gelir.'</em> Bir masa üretilmeden önce zihinde tasarımı (özü) vardır, sonra masa olarak var olur. Ancak insan önce dünyaya fırlatılır (var olur), sonra kendi kararları ve seçimleriyle kendi özünü, kaderini kendisi yaratır. Bu yüzden insan tamamen <strong>Özgürdür</strong> ve yaptığı her eylemden sonuna kadar <strong>Sorumludur</strong> (Bu sorumluluk insanda 'Bunaltı/Angst' yaratır).</p><p><strong>3. Mantıkçı Pozitivizm (Analitik Felsefe):</strong> Wittgenstein öncüsüdür. Felsefenin görevi dünyayı anlamak değil, 'Dili' analiz etmektir. <em>'Dilimin sınırları dünyamın sınırlarıdır.'</em> Metafizik (Tanrı, ruh, ahlak) deneyle doğrulanamadığı için anlamsızdır ve felsefenin konusu olamaz. Sadece bilimsel, deneye dayalı önermeler felsefenin konusu olmalıdır.</p><p><strong>4. Bilim Felsefesi (Thomas Kuhn):</strong> Bilimin kesintisiz, kümülatif (birikerek) ilerlediği fikrini yıkar. Kuhn'a göre bilim, devrimsel sıçramalarla ilerler. Dönemin kabul gören bilimsel kurallar bütününe <strong>Paradigma</strong> denir. Bir paradigma sorunları çözemediğinde kriz çıkar, eski paradigma çöpe atılır ve 'Bilimsel Devrim' ile yepyeni bir paradigmaya geçilir (Batlamyus'tan Kopernik'e geçiş gibi).</p>",
+                    items: ["Husserl ve Fenomenoloji (Paranteze Alma Yöntemi)", "Sartre'ın Varoluşçuluğu (Özgürlük, Seçim ve Sorumluluk)", "Mantıkçı Pozitivizm (Wittgenstein ve Dil Analizi)", "Thomas Kuhn'un Paradigma Kavramı ve Bilimsel Devrimler", "Hermeneutik (Yorumbilim) ve Metin Analizi"],
+                    formula: null,
+                    question: "Jean-Paul Sartre'ın 'İnsan özgür olmaya mahkumdur' sözünden ne anlamamız gerekir?",
+                    solution: "Varoluşçuluğun (Egzistansiyalizmin) kalbine inelim:<br>1. İnsanın dünyaya gelirken elinde yazılı bir kader, bir senaryo veya önceden belirlenmiş bir öz yoktur.<br>2. İnsan her an yol ayrımlarında karar vermek zorundadır. Karar vermemek (hiçbir şey yapmamak) bile aslında bir karardır, bir seçimdir.<br>3. İnsan kaderini, kimliğini ve ahlakını kendi seçimleriyle yarattığı için bu özgürlükten kaçamaz ('Mahkumdur' kelimesi bu yüzden kullanılır).<br>4. Özgürlüğün bedeli de tüm seçimlerinin <strong>sorumluluğunu</strong> (bahanelere sığınmadan) tek başına üstlenmektir.<br><br><strong>Cevap: İnsanın önceden belirlenmiş bir kaderi olmadığı için kendi hayatını kendi seçimleriyle yaratmak zorunda olduğu ve bu özgürlükten (sorumluluktan) kaçamayacağı anlamına gelir.</strong>",
+                    shortcut: "Eğer bir felsefe paragrafında <strong>'Duygular (Korku, yalnızlık, bunaltı, yabancılaşma), Ölüm bilinci, İnsanın kendi varlığını anlamlandırması'</strong> gibi konular işleniyorsa o metin kesinlikle <strong>Varoluşçuluk (Egzistansiyalizm)</strong> akımına aittir. (Kafka, Dostoyevski, Camus gibi edebiyatçıları da çok etkilemiştir)."
+                }
+
+            ],
+            12: [
+                // 12. Sınıf konuları buraya gelecek
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">bu sınıfta bu ders yoktur.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
