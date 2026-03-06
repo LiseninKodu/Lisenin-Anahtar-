@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Tarih";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Tarih ve Zaman",
+                    summary: "Tarihin tanımı, kaynakların sınıflandırılması ve takvim sistemleri.",
+                    description: "<p><strong>Tarih Nedir?</strong> Geçmişte yaşamış insan topluluklarının faaliyetlerini; yer ve zaman göstererek, sebep-sonuç ilişkisi içerisinde, belgelere dayanarak objektif (tarafsız) bir biçimde inceleyen sosyal bir bilimdir.</p><p><strong>Kaynakların Sınıflandırılması:</strong><br>- 1. Elden Kaynaklar: Olayın geçtiği döneme ait (kitabe, para, arkeolojik buluntu).<br>- 2. Elden Kaynaklar: O döneme yakın kaynaklardan yararlanılarak hazırlananlar.</p><p><strong>Tarihe Yardımcı Bilimler:</strong> Coğrafya (yer), Arkeoloji (kazı), Kronoloji (zaman), Paleografya (eski yazılar), Epigrafya (kitabeler), Antropoloji (ırk/insan yapısı), Nümizmatik (paralar), Diplomasi (siyasi belgeler).</p><p><strong>Türklerin Kullandığı Takvimler:</strong> 12 Hayvanlı Türk Takvimi (Güneş esaslı, ilk takvim), Hicri Takvim (Ay esaslı, tek istisna), Celali Takvim (Selçuklu), Rumi Takvim (Osmanlı-mali), Miladi Takvim (Günümüz).</p>",
+                    items: ["Tarih Biliminin Yöntemi ve Kaynaklar", "Tarihe Yardımcı Bilim Dalları", "Zaman ve Takvim Sistemleri", "Tarih Yazıcılığı Türleri (Hikayeci, Öğretici, Araştırmacı)"],
+                    formula: null,
+                    question: "Tarih öncesi dönemlere ait bir kazı alanında bulunan; I. Kil tabletler, II. Taş baltalar, III. Tahıl fosilleri buluntularından hangileri bu dönemin aydınlatılmasında 'yazılı kaynak' olarak nitelendirilebilir?",
+                    solution: "Tarih biliminde bir buluntunun 'yazılı' sayılabilmesi için üzerinde yazı (hiyeroglif, çivi yazısı, alfabe vb.) bulunması gerekir.<br>1. Kil tabletler üzerinde yazı barındırdığı için yazılı kaynaktır.<br>2. Taş baltalar ve tahıl fosilleri fiziksel kalıntılardır, üzerinde yazı yoktur (Sözlü/Görsel olmayan maddi kaynaktır).<br>3. Ayrıca unutulmamalıdır ki; 'Tarih Öncesi' devirler yazıdan önceki dönemi kapsadığı için, eğer bir yerde Kil Tablet bulunmuşsa orası artık Tarih Öncesi dönemden çıkmış, Tarih Çağlarına girmiş demektir.<br><br><strong>Cevap: Yalnız I</strong>",
+                    shortcut: "Tarih öncesi dönemleri sırasıyla inceleyen bilim dalı <strong>Arkeoloji</strong>'dir. Yazının icadından önceki dönemlerde <strong>Paleografya (Yazı Bilimi)</strong> ve <strong>Epigrafya (Kitabe Bilimi)</strong> asla kullanılamaz."
+                },
+                {
+                    title: "2. İnsanlığın İlk Dönemleri",
+                    summary: "Tarih öncesi çağlar ve ilk uygarlıkların (Mezopotamya, Mısır, Anadolu) kuruluşu.",
+                    description: "<p><strong>Tarih Öncesi Çağlar:</strong> Yazının icadından önceki dönemdir. Kullanılan araç-gereçlere göre isimlendirilir: Taş Çağı (Paleolitik, Mezolitik, Neolitik) ve Maden Çağı (Bakır, Tunç, Demir).</p><p><strong>İlk Uygarlıklar:</strong><br>- <strong>Mezopotamya:</strong> Sümerler (Yazıyı ve tekerleği buldular), Babiller (Hammurabi kanunları - sert), Asurlar (Kütüphane ve Anadolu'ya yazıyı getirenler).<br>- <strong>Anadolu:</strong> Hititler (Anal yıllıklar - objektif tarih), Frigler (Tarım ve hayvancılık - Fibula), Lidyalılar (Para ve Kral Yolu), Urartular (Madencilik ve su kanalları), İyonlar (Özgür düşünce ve bilim - Heredot, Hipokrat).<br>- <strong>Mısır:</strong> Nil nehri etrafında kuruldu. Hiyeroglif yazı, Papirüs kağıdı, Mumyacılık (Tıp gelişti), Piramitler ve Güneş esaslı takvim.</p>",
+                    items: ["Paleolitik, Mezolitik ve Neolitik Dönem Özellikleri", "Mezopotamya Uygarlıkları (Sümer, Elam, Akad, Babil, Asur)", "Anadolu Uygarlıkları (Hitit, Frig, Lidya, Urartu, İyon)", "Mısır, Hint, Çin ve Doğu Akdeniz Uygarlıkları"],
+                    formula: null,
+                    question: "Anadolu'da kurulan Hitit uygarlığında kralların tanrılara hesap vermek amacıyla yazdıkları 'Anal' adı verilen yıllıklar, tarih yazıcılığında neden 'Objektif (Tarafsız) Tarih'in başlangıcı sayılır?",
+                    solution: "Hitit kralları, öldükten sonra tanrılara hesap vereceklerine inandıkları için bu yıllıklara sadece zaferlerini değil, yenilgilerini ve hatalarını da dürüstçe yazmışlardır. Kendi aleyhlerine olan durumları bile gizlemedikleri için bu yıllıklar tarafsız/objektif tarihi temsil eder.<br><br><strong>Cevap: Kralların tanrıya hesap verme korkusuyla yenilgilerini de yazmış olmaları.</strong>",
+                    shortcut: "Yazı ilk kez <strong>Mezopotamya'da (Sümerler)</strong> bulunmuş, Anadolu'ya ise ticaret amacıyla gelen <strong>Asurlu tüccarlar</strong> aracılığıyla taşınmıştır (Kültepe Tabletleri)."
+                },
+                {
+                    title: "3. Orta Çağ'da Dünya",
+                    summary: "Feodalizm, imparatorluklar ve hukuk sistemleri.",
+                    description: "<p>Kavimler Göçü (375) ile başlayıp İstanbul'un Fethi (1453) ile biten dönemdir. Bu dönemin en belirgin özelliği Avrupa'da görülen <strong>Feodalizm (Derebeylik)</strong> sistemidir. Siyasi birliğin olmadığı, halkın sınıflara ayrıldığı (Soylular, Rahipler, Burjuvalar, Köylüler) ve Kilisenin <strong>Skolastik Düşünce</strong> (deneye kapalı, dogmatik) ile toplumu yönettiği bir dönemdir.</p><p><strong>Ekonomi ve Ticaret:</strong> İpek Yolu (Çin-Avrupa), Baharat Yolu (Hindistan-Mısır) ve Kürk Yolu (Sibirya) dönemin can damarlarıdır. Ticaret merkezleri olarak Kervansaray, Ribat, Han, Arasta ve Bedestenler kullanılmıştır.</p><p><strong>Hukuk:</strong> Roma Hukuku (12 Levha Kanunları) bugünkü Avrupa hukukunun temelini oluşturur. Ayrıca Bizans İmparatoru Justinianus Kanunları, aile ve mülkiyet hukukunu düzenlemiştir.</p>",
+                    items: ["Feodalizm (Derebeylik) Sistemi ve Özellikleri", "Orta Çağ'ın Büyük İmparatorlukları (Bizans, Sasani, Moğol)", "Ticaret Yolları ve Ticari Mekanlar", "Roma Hukuku ve Justinianus Kanunları"],
+                    formula: null,
+                    question: "Orta Çağ Avrupa'sında kilisenin bilimsel çalışmaları yasaklaması ve her şeyin İncil'e göre açıklanması gerektiğini savunması hangi düşünce yapısının sonucudur?",
+                    solution: "Kilisenin eleştirilemez, tartışılamaz ve deneye kapalı olan baskıcı düşünce sistemine <strong>Skolastik Düşünce</strong> denir. Bu yapı Rönesans ve Reform hareketlerine kadar Avrupa'nın bilimde geri kalmasına neden olmuştur.<br><br><strong>Cevap: Skolastik Düşünce</strong>",
+                    shortcut: "Orta Çağ'da ticaretin güvenliğini sağlamak için sınır boylarına kurulan kale benzeri yapılara <strong>Ribat</strong> denir. Bu yapılar zamanla ticari konaklama yerleri olan Kervansaraylara dönüşmüştür."
+                },
+                {
+                    title: "4. İlk ve Orta Çağlarda Türk Dünyası",
+                    summary: "Orta Asya kültürü, Hun, Göktürk ve Uygur devletleri.",
+                    description: "<p>Türklerin ana yurdu Orta Asya'dır. Sert karasal iklim nedeniyle <strong>Konargöçer (Göçebe)</strong> bir yaşam tarzı benimsenmiştir. Bu durum Türklerde ordu-millet anlayışını, savaşçılığı ve hürriyet tutkusunu geliştirmiştir.</p><p><strong>Devletler:</strong><br>- <strong>Asya Hun Devleti:</strong> Bilinen ilk Türk devletidir. Teoman kurucusudur, Mete Han en parlak dönemidir (Onlu Sistem ve Islıklı Ok).<br>- <strong>I. ve II. Kök Türk Devletleri:</strong> Türk adını siyasi bir isim olarak kullanan ilk devlettir. Orhun Abideleri bu dönemden kalmadır (Yazılı edebiyatın ilk örneği).<br>- <strong>Uygurlar:</strong> Yerleşik hayata geçen ilk Türk devletidir. Maniheizm dinini benimsemişler, savaşçılıkları azalmış ancak bilim, sanat ve matbaada ilerlemişlerdir.</p><p><strong>Devlet Yönetimi:</strong> Hükümdara yönetme yetkisinin tanrı tarafından verildiğine inanılan <strong>Kut Anlayışı</strong> vardır. Meclise <em>Kurultay</em> denir. İkili Teşkilat (Doğu-Batı yönetimi) uygulanmıştır.</p>",
+                    items: ["Orta Asya Türk Kültür Merkezleri (Anav, Afanesyevo, Andronova)", "Asya Hun, I. ve II. Kök Türk, Uygur Devletleri", "Türklerde Devlet Yönetimi (Kut, Kurultay, Töre)", "Bozkır Kültürü ve Toplumsal Yapı"],
+                    formula: null,
+                    question: "Türk devletlerinde görülen 'Devlet, hanedan üyelerinin ortak malıdır' anlayışının en olumsuz sonucu nedir?",
+                    solution: "Bu anlayış, hükümdar öldüğünde tüm erkek hanedan üyelerinin (oğullar, kardeşler, amcalar) tahtta hak iddia etmesine yol açar. Bu da sık sık <strong>Taht Kavgaları</strong> çıkmasına ve Türk devletlerinin kısa sürede parçalanmasına neden olmuştur.<br><br><strong>Cevap: Taht kavgaları ve devletin kısa sürede parçalanması.</strong>",
+                    shortcut: "Uygurlar <strong>Yerleşik Hayata</strong> geçtikleri için; Türk tarihinde ilk kez kalıcı mimari eserler (saraylar, tapınaklar), kütüphaneler ve tarım kültürü onlarda görülür. Diğer Türk devletleri göçebedir."
+                },
+                {
+                    title: "5. İslam Medeniyetinin Doğuşu",
+                    summary: "Hz. Muhammed dönemi, Dört Halife ve Emevi/Abbasi devletleri.",
+                    description: "<p>İslamiyet öncesi Arabistan'da 'Cahiliye Dönemi' hakimdi (putperestlik, kan davaları). 610 yılında Hz. Muhammed'e vahiy gelmesiyle İslamiyet doğmuştur. 622 <strong>Hicret</strong> olayı ile Medine İslam Devleti kurulmuştur.</p><p><strong>Dört Halife Dönemi (Cumhuriyet Devri):</strong> Hz. Ebubekir (Yalancı peygamberler), Hz. Ömer (Devletleşme - Adalet), Hz. Osman (Kuran'ın çoğaltılması - İlk deniz savaşı), Hz. Ali (İç karışıklıklar - Hakem olayı).</p><p><strong>Emeviler:</strong> Halifeliği saltanata dönüştürdüler. <strong>Mevali</strong> (Arap olmayan Müslümanları ikinci sınıf görme) politikası nedeniyle Türklerin İslamiyet'e geçişi gecikmiştir. Endülüs (İspanya) medeniyetini kurmuşlardır.</p><p><strong>Abbasiler:</strong> Emevilerin aksine hoşgörü (Ümmetçi) politikası izlediler. Türkler için <em>Samerra</em> ordu şehirlerini kurdular. Beytü'l Hikme (Bilgelik Evi) ile bilimsel rönesans yaşattılar.</p>",
+                    items: ["İslamiyet Öncesi Arabistan ve Cahiliye Dönemi", "Hz. Muhammed Dönemi Savaşları (Bedir, Uhud, Hendek)", "Dört Halife Dönemi ve Devlet Teşkilatlanması", "Emeviler ve Abbasiler Dönemi Gelişmeleri"],
+                    formula: null,
+                    question: "Türklerin İslamiyet'i kitleler halinde kabul etmeye başlaması hangi olaydan sonra gerçekleşmiştir?",
+                    solution: "751 yılında yapılan <strong>Talas Savaşı</strong>'nda Türkler, Çinlilere karşı Müslüman Abbasilerin yanında yer almıştır. Savaşın kazanılmasından sonra Abbasilerin Türklerle kurduğu iyi ilişkiler ve hoşgörü politikası Türklerin İslamiyet'i kabulünü hızlandırmıştır.<br><br><strong>Cevap: Talas Savaşı (751)</strong>",
+                    shortcut: "İslam tarihinde Halifeliğin babadan oğula geçen bir <strong>Saltanat</strong> haline gelmesi <strong>Emeviler</strong> dönemiyle (Muaviye'nin oğlu Yezid'i halife tayin etmesi) başlamıştır."
+                },
+                {
+                    title: "6. Türklerin İslamiyet'i Kabulü ve İlk Türk İslam Devletleri",
+                    summary: "Karahanlılar, Gazneliler ve Büyük Selçuklu Devleti.",
+                    description: "<p>Talas Savaşı sonrası Türk-İslam sentezi başlamıştır. İlk Müslüman Türk devletleri şunlardır:</p><p><strong>Karahanlılar:</strong> Orta Asya'da kurulan ilk Müslüman Türk devletidir. Türkçeyi resmi dil ilan etmişler, <em>Ribat</em> adı verilen kervansaraylar yapmışlardır. Kutadgu Bilig gibi ilk eserler bu dönemdedir.</p><p><strong>Gazneliler:</strong> Afganistan'da kurulmuştur. Sultan Mahmut, Hindistan'a 17 sefer düzenleyerek İslamiyet'i oraya yaymıştır. İslam dünyasını korudukları için halifeden 'Sultan' unvanını alan ilk Türk hükümdarıdır.</p><p><strong>Büyük Selçuklu Devleti:</strong> Dandanakan Savaşı ile kurulmuşlardır. Tuğrul Bey döneminde İslam dünyasının siyasi lideri olmuşlardır. <strong>1071 Malazgirt Savaşı</strong> ile Anadolu'nun kapılarını Türklere açmışlardır. Nizamiye Medreseleri ile eğitimde çığır açmışlardır.</p>",
+                    items: ["Karahanlılar, Gazneliler ve Büyük Selçuklu Devleti", "Türk-İslam Edebiyatı (Kutadgu Bilig, Divan-ı Lügatit Türk)", "1071 Malazgirt Savaşı ve Anadolu'nun Türkleşmesi", "Büyük Selçuklu Devlet Yönetimi ve Atabeylik Sistemi"],
+                    formula: null,
+                    question: "1071 Malazgirt Savaşı'nın Türk tarihi açısından en önemli sonucu nedir?",
+                    solution: "Malazgirt Savaşı ile Bizans ordusu yenilmiş ve <strong>Anadolu'nun kapıları Türklere tamamen açılmıştır</strong>. Bu zaferden sonra Anadolu'da ilk Türk beylikleri kurulmaya başlanmış ve Anadolu'nun Türkleşme/İslamlaşma süreci başlamıştır.<br><br><strong>Cevap: Anadolu'nun kapılarının Türklere açılması ve Türkiye tarihinin başlaması.</strong>",
+                    shortcut: "Selçuklularda hükümdar çocuklarını (melikleri) eğitmekle görevli devlet adamlarına <strong>Atabey</strong> denir. Bu sistem Osmanlı'daki Lalahan/Şehzade eğitmeni (Lala) sisteminin temelidir."
+                }
+
+            ],
+            10: [
+                                {
+                    title: "1. Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi",
+                    summary: "Anadolu'nun Türkleşmesi, İlk Türk Beylikleri ve Haçlı Seferleri.",
+                    description: "<p><strong>Anadolu'ya İlk Akınlar ve Beylikler:</strong> 1071 Malazgirt Zaferi'nden sonra Anadolu'da <em>Birinci Türk Beylikleri Dönemi</em> başlamıştır (Danişmentliler, Saltuklular, Mengücekler, Artuklular ve Çaka Beyliği). Bu beylikler Anadolu'yu bayındır hale getirmiş (cami, medrese, kervansaray) ve Haçlılara/Bizans'a karşı korumuşlardır.</p><p><strong>Türkiye (Anadolu) Selçuklu Devleti:</strong> Kutalmışoğlu Süleyman Şah tarafından İznik merkezli kurulmuştur. En büyük mücadeleleri Haçlı Seferleri ve Bizans (Miryokefalon Savaşı - Anadolu'nun kesin Türk yurdu olması) ile olmuştur.</p><p><strong>Haçlı Seferleri ve Kösedağ Savaşı:</strong> Hristiyan Avrupa'nın Kudüs'ü almak ve Türkleri Anadolu'dan atmak için başlattığı seferlerdir (Papalığın kışkırtması, ekonomik hedefler). 1243 Kösedağ Savaşı'nda Türkiye Selçuklu Devleti, İlhanlı (Moğol) ordusuna yenilerek dağılma sürecine girmiş ve Anadolu'da <em>İkinci Türk Beylikleri Dönemi</em> (Osmanlı, Karaman, Candar vb.) başlamıştır.</p>",
+                    items: ["Malazgirt Sonrası Kurulan İlk Türk Beylikleri", "Türkiye Selçuklu Devleti'nin Yükselişi", "Miryokefalon Savaşı (1176)", "Haçlı Seferlerinin Nedenleri ve Sonuçları", "Kösedağ Savaşı (1243) ve Moğol İstilası"],
+                    formula: null,
+                    question: "1176 Miryokefalon Savaşı'nın Anadolu'nun Türkleşme süreci açısından en büyük önemi nedir?",
+                    solution: "Miryokefalon Savaşı'nda Türkiye Selçuklu Sultanı II. Kılıçarslan, Bizans ordusunu ağır bir yenilgiye uğratmıştır.<br>Bu savaşın en önemli sonucu: <strong>Anadolu'nun kesin olarak bir Türk yurdu olduğunun kanıtlanmasıdır.</strong> Bu savaştan sonra Bizans, Türkleri Anadolu'dan atma ümidini tamamen kaybetmiş ve savunmaya çekilmiştir (Anadolu'nun tapusu alınmıştır).<br><br><strong>Cevap: Anadolu'nun kesin Türk yurdu haline gelmesi.</strong>",
+                    shortcut: "Kronolojik şifre: Malazgirt (1071) Anadolu'nun KAPISINI açtı, Miryokefalon (1176) TAPUSUNU aldı, Kösedağ (1243) ise siyasi BİRLİĞİ bozdu."
+                },
+                {
+                    title: "2. Beylikten Devlete Osmanlı Siyaseti (Kuruluş)",
+                    summary: "Kayı boyu, kısa sürede büyüme nedenleri ve iskan politikası.",
+                    description: "<p><strong>Osmanlı'nın Kısa Sürede Büyüme Nedenleri:</strong><br>- Coğrafi konumunun avantajı (Zayıflamış Bizans sınırında, Uç beyliği olması).<br>- Yetenekli padişahların peş peşe başa geçmesi.<br>- Anadolu beylikleriyle ilk başlarda savaşmayıp evlilik ve satın alma yoluyla toprak büyütmesi.<br>- <strong>Gaza ve Cihat</strong> anlayışıyla Hristiyanlar üzerine seferler yapması (Alperenler ve Ahilerin desteği).</p><p><strong>Uygulanan Temel Politikalar:</strong><br>- <strong>İskan Politikası (Yerleştirme):</strong> Rumeli ve Balkanlarda fethedilen bölgelere Anadolu'dan getirilen göçebe Türkmenlerin yerleştirilmesidir. Amaç bölgeyi Türkleştirip kalıcı olmaktır.<br>- <strong>İstimalet Politikası (Hoşgörü):</strong> Fethedilen yerlerdeki gayrimüslim halkın dinine, diline ve kültürüne karışmayarak devlete bağlılıklarını sağlamaktır.</p><p><strong>Önemli Olaylar:</strong> Bursa'nın fethi (Başkent olması), Çimpe Kalesi'nin alınması (Rumeli'ye ilk geçiş), I. Kosova (İlk kez top kullanıldı), 1402 Ankara Savaşı (Yıldırım Bayezid'in Timur'a yenilmesi ve 11 yıllık <strong>Fetret Devri</strong> - kardeş kavgaları).</p>",
+                    items: ["Osmanlı Devleti'nin Kuruluşu ve Büyüme Nedenleri", "İskan ve İstimalet Politikalarının Amaçları", "Rumeli'ye Geçiş ve Balkan Fetihleri", "1402 Ankara Savaşı ve Fetret Devri", "Anadolu Türk Siyasi Birliğini Sağlama Faaliyetleri"],
+                    formula: null,
+                    question: "Osmanlı Devleti'nin iskan siyasetini uygularken özellikle aralarında kan davası olan veya konargöçer (göçebe) aileleri seçerek Rumeli'ye yerleştirmesinin temel amacı nedir?",
+                    solution: "Osmanlı Devleti, iskan politikasını çok planlı uygulamıştır.<br>1. Kan davalı aileleri birbirinden uzaklaştırarak Anadolu'daki iç barışı (asayişi) sağlamak.<br>2. Göçebe (konargöçer) yaşayan Türkmenleri yerleşik hayata geçirmeye zorlayarak onları tarımsal üretime katmak ve onlardan düzenli <strong>vergi alabilmek</strong>.<br><br><strong>Cevap: Asayişi sağlamak ve göçebeleri yerleşik hayata geçirip tarımsal üretim ile vergi gelirlerini düzenlemek.</strong>",
+                    shortcut: "Osmanlı padişahı I. Mehmet (Çelebi Mehmet), 11 yıl süren ve devleti yıkılmanın eşiğine getiren Fetret Devri'ne son verip devleti toparladığı için Osmanlı'nın <strong>İkinci Kurucusu</strong> kabul edilir."
+                },
+                {
+                    title: "3. Devletleşme Sürecinde Savaşçılar ve Askerler",
+                    summary: "Kapıkulu ve Eyalet askerleri, Yeniçeri ocağı ve Tımar sistemi.",
+                    description: "<p>Osmanlı Ordu Teşkilatı iki temel çarka ayrılır: Kapıkulu Askerleri (Merkez-Maaşlı) ve Eyalet Askerleri (Taşra-Tımarlı).</p><p><strong>Devşirme Sistemi ve Kapıkulu Ocakları:</strong> Fethedilen Hristiyan bölgelerindeki çocukların (Pençik/Devşirme kanunu ile) alınıp Türk-İslam kültürüyle yetiştirilmesidir. Güçlü olanlar <strong>Yeniçeri Ocağı'na</strong> (Padişahın merkezdeki daimi piyade ordusu, 3 ayda bir <em>Ulufe</em> maaşı alırlar) katılırken, zeki olanlar <em>Enderun</em> mektebine (Saray okuluna) alınıp sadrazamlığa kadar yükselebilecek devlet adamı olurlardı.</p><p><strong>Tımar (Dirlik) Sistemi ve Sipahiler:</strong> Devlet, fethedilen tarım arazilerinin mülkiyetini elinde tutar, ancak vergi toplama hakkını yararlılık gösteren devlet adamlarına/askerlere bırakırdı. Bu kişiler topladıkları vergilerle kendi geçimlerini sağlar ve devlete atlı asker (<strong>Cebelü</strong>) yetiştirirlerdi. <br><em>Faydaları:</em> Hazineye yük olmadan büyük bir ordu kurulmuş, toprağın boş kalması engellenmiş, üretimde süreklilik sağlanmış ve taşrada devletin güvenliği/otoritesi tesis edilmiştir.</p>",
+                    items: ["Pençik ve Devşirme Sistemi", "Kapıkulu Askerleri (Yeniçeriler) ve Ulufe", "Tımar (Dirlik) Sisteminin Askeri ve Ekonomik Faydaları", "Tımarlı Sipahiler (Eyalet Ordusu)"],
+                    formula: null,
+                    question: "Osmanlı Devleti'nde Tımar Sisteminin bozulmasının askeri ve ekonomik sonuçları nelerdir?",
+                    solution: "Tımar sistemi, Osmanlı'nın hem ekonomisinin hem de ordusunun belkemiğidir.<br>1. <strong>Askeri Sonuç:</strong> Tımar sistemi bozulunca topraklardan asker (Cebelü) yetişmemeye başladı. Eyalet ordusu (Tımarlı sipahiler) azaldığı için, devlet savaşlarda Merkez ordusunun (Yeniçerilerin) sayısını artırmak zorunda kaldı.<br>2. <strong>Ekonomik Sonuç:</strong> Yeniçeri sayısının artması, hazineden çıkan maaş (ulufe) yükünü kat kat artırdı. Ayrıca tımar toprakları liyakatsiz kişilere (mültezimlere) verildiği için köylü ağır vergiler yüzünden toprağını terk edip şehirlere göçtü (Büyük Kaçgun). Tarımsal üretim durdu.<br><br><strong>Cevap: Üretim azaldı, Tımarlı asker azaldı, maaşlı Yeniçeri sayısı artınca Hazine iflasın eşiğine geldi.</strong>",
+                    shortcut: "Yeniçeriler Padişahın özel muhafızlarıdır ve devlete 'tam sadakat' için evlenmeleri, ticaretle uğraşmaları yasaktır. Emekli olana kadar kışlada yaşamak zorundadırlar."
+                },
+                {
+                    title: "4. Beylikten Devlete Osmanlı Medeniyeti",
+                    summary: "Toplum yapısı, ilmiye sınıfı, ahilik ve tasavvuf.",
+                    description: "<p><strong>Toplumsal Yapı:</strong> Osmanlı toplumu ırka göre değil, inanca göre ayrılırdı (<strong>Millet Sistemi</strong>). Müslümanlar ve Gayrimüslimler (Zimmiler) olarak yönetilirlerdi. Ayrıca halk iki ana sınıftı: Yönetenler (Askeriler - vergi vermezler) ve Yönetilenler (Reaya - vergi veren tüccar, esnaf, köylü).</p><p><strong>Yöneten Sınıflar (Askeriler):</strong><br>- <strong>Seyfiye (Kılıç Ehli):</strong> Askeri ve idari yöneticiler (Sadrazam, Vezir, Beylerbeyi, Sancakbeyi).<br>- <strong>İlmiye (İlim Ehli):</strong> Din, adalet ve eğitim işlerine bakanlar. (Şeyhülislam, Kadı, Müderris). Medrese çıkışlı ve doğuştan Müslüman olmaları şarttır.<br>- <strong>Kalemiye (Kalem Ehli):</strong> Bürokrasi, yazışma ve maliye işlerine bakan memurlar. (Defterdar, Nişancı).</p><p><strong>Eğitim ve Sufiler:</strong> Medreseler eğitimin temelidir. Ayrıca Anadolu'nun Türkleşip İslamlaşmasında mutasavvıfların (Mevlana, Yunus Emre, Hacı Bektaş Veli) ve Ahilik (Esnaf dayanışma ve ahlak teşkilatı) sisteminin büyük rolü vardır.</p>",
+                    items: ["Millet Sistemi (İnanç Temelli Toplum)", "Yönetenler Sınıfı: Seyfiye, İlmiye, Kalemiye", "Reaya (Yönetilen, Vergi Veren Halk)", "Ahilik Teşkilatı ve Loncalar", "Anadolu'nun İslamlaşmasında Sufilerin Rolü"],
+                    formula: null,
+                    question: "Osmanlı Devleti'nde bir devşirmenin (sonradan Müslüman olan Hristiyan bir çocuğun) Veziriazam (Sadrazam) olmasına izin verilirken, Şeyhülislam veya Kadı olmasına izin verilmemesinin nedeni nedir?",
+                    solution: "Osmanlı'da görev dağılımı sınıflara göre yapılır.<br>1. Sadrazam (Veziriazam), Seyfiye (Askeri/İdari) sınıfının başıdır. Devşirmeler Enderun'da yetiştirilip sadrazamlığa kadar yükselebilirler.<br>2. Şeyhülislam ve Kadı ise <strong>İlmiye (Din, Adalet, Eğitim)</strong> sınıfının üyeleridir.<br>3. Osmanlı kanunlarına göre İlmiye sınıfına girebilmenin temel şartı, Medrese eğitimi almak ve <strong>'Doğuştan Müslüman/Türk (Türkmen)'</strong> olmaktır. Devşirmeler medreseye alınmaz, Enderun'a veya Yeniçeri Ocağı'na alınırdı.<br><br><strong>Cevap: İlmiye sınıfında görev alabilmek için doğuştan Müslüman (Türk) olma şartının bulunması.</strong>",
+                    shortcut: "Bir yerin fethi sadece kılıçla olmaz. Gönüllerin fethini (İstimalet) sağlayanlar Dervişler/Erenler, ekonomik düzeni kuranlar Ahiler'dir."
+                },
+                {
+                    title: "5. Dünya Gücü Osmanlı (Yükselme Dönemi)",
+                    summary: "Fatih, Yavuz, Kanuni dönemleri ve Coğrafi Keşiflerin etkisi.",
+                    description: "<p><strong>Fatih Sultan Mehmet Dönemi (1451-1481):</strong> 1453 İstanbul'un Fethi ile Kuruluş biter, Yükselme başlar. Bizans İmparatorluğu yıkılır, Orta Çağ kapanıp Yeni Çağ açılır. Anadolu-Rumeli toprak bütünlüğü sağlanır. İpek Yolu'nun Karadeniz ayağı Osmanlı kontrolüne geçer.</p><p><strong>Yavuz Sultan Selim Dönemi (1512-1520):</strong> Tamamen Doğu'ya (İran ve Mısır) sefer yapmıştır. Çaldıran Savaşı ile Safevi tehlikesi önlenmiş, Mercidabık ve Ridaniye savaşlarıyla Memlük Devleti yıkılmıştır. <strong>Sonuçları:</strong> Halifelik Osmanlı'ya geçmiş (Teokratik yapı güçlendi), Kutsal emanetler İstanbul'a gelmiş, Baharat Yolu kontrol altına alınmış ve hazine ağzına kadar dolmuştur.</p><p><strong>Kanuni Sultan Süleyman Dönemi (1520-1566):</strong> En uzun süre tahtta kalan padişahtır. Batı'ya yönelmiş; Belgrat ve Rodos'u almış, 1526 Mohaç Meydan Muharebesi ile Macaristan'ı fethetmiştir. Preveze Deniz Zaferi (1538) ile Akdeniz bir Türk gölü haline gelmiştir.</p><br><p><strong>Coğrafi Keşiflerin Etkisi:</strong> Avrupalıların İspanyol ve Portekizli denizcilerle Hindistan'a ulaşan yeni okyanus yollarını (Ümit Burnu) ve Amerika kıtasını bulmasıdır. İpek ve Baharat yolları Osmanlı'nın elindeyken önemini yitirmiş, Osmanlı gümrük gelirleri düşmüş ve Avrupa zenginleşmiştir.</p>",
+                    items: ["İstanbul'un Fethi'nin Sebepleri ve Evrensel Sonuçları", "Yavuz Sultan Selim'in Mısır Seferi ve Halifelik", "Kanuni Sultan Süleyman Dönemi ve Mohaç Savaşı", "Preveze Deniz Zaferi ve Akdeniz Hakimiyeti", "Coğrafi Keşiflerin Osmanlı Ekonomisine Yıkıcı Etkileri"],
+                    formula: null,
+                    question: "Avrupalıların gerçekleştirdiği Coğrafi Keşifler sonucunda Osmanlı Devleti'nin 'İpek ve Baharat yollarından beklediği ekonomik geliri elde edememesine' karşı aldığı temel önlem ne olmuştur?",
+                    solution: "Coğrafi Keşifler sonucunda Akdeniz limanları önemini yitirmiş, ticaret Atlas Okyanusu limanlarına kaymıştır.<br>Osmanlı Devleti, Akdeniz ticaretini yeniden canlandırmak ve Avrupalı tüccarları kendi ülkesine çekebilmek için <strong>Kapitülasyonlar (Ticari Ayrıcalıklar)</strong> vermek zorunda kalmıştır. (Örneğin Kanuni döneminde Fransızlara verilen geniş çaplı kapitülasyonlar). Bu durum kısa vadede ticareti hareketlendirse de uzun vadede Osmanlı ekonomisini sömürge haline getirmiştir.<br><br><strong>Cevap: Avrupalı devletlere ticari ayrıcalıklar (Kapitülasyonlar) vermek.</strong>",
+                    shortcut: "Osmanlı padişahlarının en şanssızı aslında Fatih, Yavuz ve Kanuni'dir. Çünkü onlar İpek ve Baharat yollarını tamamen ele geçirdiği anda, Avrupalılar Coğrafi Keşifler ile okyanuslara açılmış ve yolların değerini sıfırlamışlardır."
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti (1595-1774)",
+                    summary: "Duraklama ve Gerileme dönemleri, Avrupa'nın üstünlüğünü kabul etme süreci.",
+                    description: "<p><strong>Duraklama (XVII. Yüzyıl):</strong> Osmanlı'nın doğal sınırlarına ulaşması, padişahların ordunun başında sefere çıkmaması (Kafes Usulü ile tecrübesiz yetişmeleri), tımar sisteminin bozulması ve rüşvet/iltizam ağının yaygınlaşmasıyla iç isyanların (Celali, Yeniçeri) artmasıdır. Bu dönemde Avrupa'daki gelişmeler (Rönesans, Reform) takip edilememiştir.</p><p><strong>Avrupa ile Mücadeleler:</strong><br>- <strong>Zitvatorok Antlaşması (1606):</strong> Avusturya arşidükü, Osmanlı padişahına denk sayıldı. Osmanlı'nın Avrupa'daki <em>siyasi üstünlüğü sona erdi</em>.<br>- <strong>Kasr-ı Şirin (1639):</strong> İran ile yapıldı, bugünkü Türkiye-İran sınırı büyük ölçüde çizildi.<br>- <strong>II. Viyana Kuşatması (1683):</strong> Merzifonlu Kara Mustafa Paşa'nın başarısız olmasıyla Avrupa (Kutsal İttifak) saldırıya geçti.</p><p><strong>Karlofça Antlaşması (1699):</strong> Osmanlı Devleti'nin Batı'da ilk defa büyük çapta toprak kaybettiği ve Avrupa'nın savunmadan saldırıya geçtiği dönüm noktasıdır. <em>Gerileme Dönemi</em> başlar.</p>",
+                    items: ["Osmanlı'nın Duraklama Nedenleri (İç ve Dış Etkenler)", "XVII. Yüzyıl İsyanları (Celali ve İstanbul/Yeniçeri)", "Avusturya ve İran ile İlişkiler (Zitvatorok, Kasr-ı Şirin)", "II. Viyana Kuşatması ve Kutsal İttifak Savaşları", "Karlofça Antlaşması (1699) ve Sonuçları"],
+                    formula: null,
+                    question: "1606 yılında Avusturya ile imzalanan Zitvatorok Antlaşması'nda yer alan 'Avusturya arşidükü (kralı), protokol bakımından Osmanlı padişahına denk sayılacaktır' maddesi, Osmanlı Devleti açısından ne anlama gelmektedir?",
+                    solution: "1. 1533 tarihli İstanbul Antlaşması'nda Avusturya kralı, Osmanlı'nın Sadrazamına (Padişahın bir altındaki görevliye) denk sayılıyordu. Bu durum Osmanlı'nın Avrupa'da tartışmasız siyasi üstünlüğüydü.<br>2. Ancak 1606 Zitvatorok Antlaşması ile Kral = Padişah eşitliği gelmiştir.<br>3. Bu durum, Osmanlı Devleti'nin Kanuni döneminde elde ettiği <strong>Avrupa'daki siyasi üstünlüğünü (mütekabiliyet ilkesine göre) kaybettiğini</strong> ve artık Avusturya ile eşit şartlara geldiğini gösterir.<br><br><strong>Cevap: Osmanlı'nın Orta Avrupa'daki siyasi üstünlüğünü kaybetmesi.</strong>",
+                    shortcut: "Duraklama döneminde (17. yy) yapılan ıslahatlar kişilere bağlı kalmış, devlet politikası olamamıştır. Şiddet ve baskı uygulanmış (Kuyucu Murat Paşa, IV. Murat), sorunların kökenine inilmemiş, sadece günü kurtarmaya çalışılmıştır."
+                },
+                {
+                    title: "2. Değişim Çağında Avrupa ve Osmanlı",
+                    summary: "Rönesans, Reform, Westphalia Barışı ve Avrupa'nın yükselişi.",
+                    description: "<p><strong>Avrupa'da Uyanış:</strong><br>- <strong>Rönesans:</strong> İtalya'da başlayan bilim, sanat ve edebiyatta yeniden doğuş. Skolastik düşünce zayıfladı, akılcı (Pozitif) düşünce güçlendi.<br>- <strong>Reform:</strong> Almanya'da Martin Luther'in Katolik Kilisesi'ne karşı başlattığı dini yenilenme hareketidir. Kilisenin toprakları elinden alındı, yeni mezhepler (Protestanlık vb.) doğdu ve Avrupa'da mezhep savaşları başladı (Otuz Yıl Savaşları).</p><p><strong>Westphalia (Vestfalya) Barışı (1648):</strong> Otuz Yıl Savaşlarını bitiren antlaşmadır. Modern devletler hukukunun temeli atılmış, Papa'nın otoritesi kırılmış ve devletlerin (seküler) ulusal egemenlikleri tanınmıştır.</p><p><strong>Osmanlı'da Değişim (Lale Devri 1718-1730):</strong> Pasarofça Antlaşması ile başlar, Patrona Halil İsyanı ile biter. Osmanlı, <em>ilk kez Avrupa'nın üstünlüğünü kabul edip</em> Batı'yı örnek alarak yenilikler yapmıştır (İlk Türk matbaası İbrahim Müteferrika, çiçek aşısı, Avrupa'ya ilk geçici elçilikler, mimaride barok/rokoko tarzı).</p>",
+                    items: ["Rönesans (Bilim/Sanat) ve Reform (Din) Hareketleri", "Avrupa'da Mezhep Savaşları ve Westphalia Barışı", "Aydınlanma Çağı (Akıl ve Bilim)", "Osmanlı'da Lale Devri ve Batılılaşma Hareketleri", "Matbaanın Osmanlı'ya Gelişi ve Etkileri"],
+                    formula: null,
+                    question: "Lale Devri'nde Avrupa'nın önemli başkentlerine (Paris, Viyana, Londra) ilk defa 'Geçici Elçiler' gönderilmesinin Osmanlı Devleti açısından temel amacı nedir?",
+                    solution: "Lale Devri'ne kadar Osmanlı, kendini Avrupa'dan üstün gördüğü için oralara elçi göndermeye tenezzül etmezdi.<br>1. Karlofça ve Pasarofça antlaşmalarıyla alınan yenilgiler, Osmanlı'ya Avrupa'nın artık daha güçlü olduğunu kabul ettirmiştir.<br>2. Avrupa başkentlerine elçi gönderilmesinin temel amacı, <strong>Avrupa'daki askeri, teknik, siyasi ve kültürel gelişmeleri (diplomasiyi) yakından takip etmektir</strong>.<br><br><strong>Cevap: Avrupa'daki gelişmeleri yakından takip etmek ve Avrupa diplomasisine dahil olmak.</strong>",
+                    shortcut: "Avrupa'da Reform hareketleri (dini bölünmeler) yaşanırken, Osmanlı Devleti bu durumdan olumsuz etkilenmemiştir. Hatta Osmanlı, Hristiyan birliğini parçalamak için Protestanları el altından desteklemiştir."
+                },
+                {
+                    title: "3. Uluslararası İlişkilerde Denge Stratejisi (1774-1914)",
+                    summary: "Dağılma dönemi, Küçük Kaynarca, Fransız İhtilali ve Denge politikası.",
+                    description: "<p><strong>Küçük Kaynarca Antlaşması (1774):</strong> Rusya ile yapıldı. Kırım bağımsız oldu (Halkı Müslüman olan ilk toprak kaybı). Rusya, Osmanlı içindeki Ortodoksların koruyuculuğunu aldı (iç işlere müdahale hakkı) ve Osmanlı ilk kez savaş tazminatı ödedi.</p><p><strong>Fransız İhtilali (1789) ve Sanayi İnkılabı:</strong><br>- <em>Fransız İhtilali:</em> Hürriyet, eşitlik, adalet ve en önemlisi <strong>Milliyetçilik</strong> akımını yaydı. Çok uluslu bir imparatorluk olan Osmanlı'da Sırp, Yunan, Bulgar isyanlarına (parçalanmaya) sebep oldu.<br>- <em>Sanayi İnkılabı:</em> İngiltere'de makineleşme ile seri üretim başladı. Osmanlı'nın el tezgahları çöktü, ülke Avrupalıların ucuz malları için bir 'açık pazar' (sömürge) haline geldi.</p><br><p><strong>Denge Politikası:</strong> Osmanlı Devleti'nin 19. yüzyılda (Dağılma Dönemi) hayatta kalabilmek için, kendi gücü yetmediğinden büyük devletlerin (İngiltere, Fransa, Rusya) çıkar çatışmalarından yararlanarak birini diğerine karşı kullanma siyasetidir. (Örn: Rusya Boğazlara inmek isteyince İngiltere'den yardım istemek - Kırım Savaşı).</p>",
+                    items: ["Küçük Kaynarca Antlaşması ve Kırım'ın Kaybı", "Fransız İhtilali'nin Milliyetçilik Akımı ve İsyanlar", "Sanayi İnkılabı ve Osmanlı Ekonomisinin Çöküşü", "Şark Meselesi (Doğu Sorunu) ve Denge Politikası", "Kırım Savaşı (1853-1856) ve Paris Antlaşması"],
+                    formula: null,
+                    question: "1789 Fransız İhtilali ile yayılan 'Milliyetçilik (Her millete kendi bağımsız devleti)' akımından en çok zarar gören devletlerin Osmanlı ve Avusturya-Macaristan İmparatorluğu olmasının temel nedeni nedir?",
+                    solution: "1. Milliyetçilik akımı, sınırları içinde farklı dil, din ve ırktan milletleri barındıran devletleri (İmparatorlukları) parçalamaya yöneliktir.<br>2. Hem Osmanlı Devleti (Sırp, Yunan, Arap, Ermeni, Bulgar vb.) hem de Avusturya-Macaristan, <strong>Çok Uluslu (Farklı milletleri barındıran)</strong> bir yapıya sahipti.<br>3. Bu durum, içlerindeki azınlıkların bağımsızlık isyanları başlatmasına ve imparatorlukların parçalanmasına neden olmuştur.<br><br><strong>Cevap: Çok uluslu (İmparatorluk) bir yapıya sahip olmaları.</strong>",
+                    shortcut: "Osmanlı Devleti dış borcu ilk defa (1854 Kırım Savaşı sırasında) İngiltere'den almıştır. Ödeyemeyince 1881'de <strong>Düyun-u Umumiye (Genel Borçlar İdaresi)</strong> kurularak Avrupalılar Osmanlı'nın gelir kaynaklarına doğrudan el koymuş, ekonomik bağımsızlık bitmiştir."
+                },
+                {
+                    title: "4. Devrimler Çağında Değişen Devlet-Toplum İlişkileri",
+                    summary: "XIX. Yüzyıl ıslahatları, Tanzimat, Islahat Fermanları ve Meşrutiyet.",
+                    description: "<p>Dağılmayı (milliyetçilik isyanlarını) önlemek için yapılan hukuki ve demokratikleşme adımlarıdır. Islahatlar artık yüzeysel değil, köklüdür ve Batı modeli tamamen benimsenmiştir.</p><p><strong>Demokratikleşme Adımları:</strong><br>- <strong>Sened-i İttifak (1808):</strong> II. Mahmut ile Ayanlar (yerel güçler) arasında imzalandı. Padişahın yetkileri ilk kez sınırlandırıldı (İngiltere'deki Magna Carta'ya benzer).<br>- <strong>Tanzimat Fermanı (1839):</strong> Kanun üstünlüğü kabul edildi. Müslüman-Gayrimüslim herkes kanun önünde eşit sayıldı (Osmanlıcılık akımı). Padişah kendi gücünün üstünde kanun gücünü tanıdı.<br>- <strong>Islahat Fermanı (1856):</strong> Avrupa'nın baskısıyla ilan edildi. Sadece Gayrimüslimlere (Azınlıklara) çok geniş siyasi, sosyal haklar verildi (Kilise yapma, memur olma, bedelli askerlik). Amacı Avrupa'nın iç işlerimize karışmasını engellemekti, ama ters tepti.<br>- <strong>I. Meşrutiyet (1876):</strong> Genç Osmanlıların (Jön Türkler) baskısıyla II. Abdülhamit ilan etti. İlk Türk anayasası <strong>Kanun-i Esasi</strong> yürürlüğe girdi. Halk ilk defa padişahın yanında Mebusan Meclisi'ne (yönetime) katıldı.</p><p><strong>Düşünce Akımları:</strong> Dağılmayı önleme fikirleridir. <em>Osmanlıcılık</em> (Herkes eşit), <em>İslamcılık</em> (Ümmet birliği - II. Abdülhamit), <em>Türkçülük</em> (Turancılık - İttihat ve Terakki), <em>Batıcılık</em>.</p>",
+                    items: ["II. Mahmut Dönemi Islahatları (Yeniçeri Ocağının Kaldırılması)", "Sened-i İttifak (1808) ve Padişah Yetkilerinin Sınırlandırılması", "Tanzimat (1839) ve Islahat (1856) Fermanları", "I. ve II. Meşrutiyet Dönemleri (Kanun-i Esasi)", "Osmanlı'yı Kurtarma Fikir Akımları (Osmanlıcılık, İslamcılık, Türkçülük)"],
+                    formula: null,
+                    question: "1839'da ilan edilen Tanzimat Fermanı'nda yer alan 'Hiç kimse yargılanmadan cezalandırılmayacak, herkesin mal, can ve namus güvenliği devlet garantisinde olacaktır' maddesi, Osmanlı'da hangi yeni anlayışın başladığını gösterir?",
+                    solution: "Tanzimat Fermanı'ndan önce Padişahın sözü mutlak kanundu. Yargılamadan ceza verebilir veya kişinin malına el koyabilirdi (Müsadere).<br>1. Bu madde ile Padişah bile yasalara (kanunlara) uymak zorunda kalmıştır.<br>2. Kişilerin temel hakları devlet güvencesine alınmış, modern bir hukuk devletinin temelleri atılmıştır.<br><br><strong>Cevap: Kanun Üstünlüğü (Hukuk Devleti) anlayışının başladığını gösterir.</strong>",
+                    shortcut: "Osmanlı'nın gerileme/dağılma döneminde yaptığı tüm yeniliklerin, fermanların ve Meşrutiyetin ilanının TEK BİR ANA AMACI vardır: <strong>İmparatorluğun dağılmasını önlemek ve azınlıkların devlete bağlılığını artırarak isyan etmelerini engellemek.</strong>"
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya",
+                    summary: "Trablusgarp, Balkan Savaşları ve I. Dünya Savaşı.",
+                    description: "<p><strong>Trablusgarp Savaşı (1911-1912):</strong> İtalya'nın sömürge arayışıyla Kuzey Afrika'daki son toprağımıza saldırmasıdır. Osmanlı donanması çürük olduğu için karadan gizlice gönüllü subaylar (Mustafa Kemal - Derne/Tobruk, Enver Paşa - Bingazi) gönderilir. Yerel halkı örgütleyerek İtalyanları durdururlar ancak Balkan Savaşı çıkınca <strong>Uşi Antlaşması</strong> ile Trablusgarp ve On İki Ada kaybedilir.</p><p><strong>Balkan Savaşları (1912-1913):</strong> Milliyetçilik akımıyla Yunanistan, Bulgaristan, Sırbistan ve Karadağ birleşip Osmanlı'ya saldırır. I. Balkan Savaşı'nda (Orduya siyaset karıştığı için) ağır yenilgi alınır, Edirne dahil Midye-Enez hattının batısı kaybedilir. II. Balkan Savaşı'nda Balkan devletleri kendi aralarında kavgaya düşünce Edirne (Enver Paşa tarafından) geri alınır.</p><br><p><strong>I. Dünya Savaşı (1914-1918):</strong> Nedenleri: Sömürgecilik yarışı (İngiltere-Almanya) ve Milliyetçilik (Fransız İhtilali). Bloklar: İtilaf (İngiltere, Fransa, Rusya) ve İttifak (Almanya, Avusturya-Macaristan, Osmanlı). Osmanlı'nın savaşa girme nedeni: Kaybettiği toprakları geri alma ümidi ve İttihat Terakki'nin Alman hayranlığıdır (Goben ve Breslav gemilerinin Rus limanlarını bombalaması).</p>",
+                    items: ["Trablusgarp Savaşı ve Uşi Antlaşması", "Balkan Savaşları ve Osmanlı'nın Avrupa'dan Çekilmesi", "I. Dünya Savaşı'nın Genel ve Özel Nedenleri", "Osmanlı'nın Savaştığı Cepheler (Kafkas, Çanakkale, Kanal vb.)", "Gizli Antlaşmalar ve Wilson İlkeleri"],
+                    formula: null,
+                    question: "I. Dünya Savaşı sırasında İtilaf Devletlerinin Çanakkale Cephesi'ni açmalarının (Boğazlara saldırmalarının) en önemli askeri ve siyasi amacı nedir?",
+                    solution: "Çanakkale Cephesi, I. Dünya Savaşı'nın seyrini değiştiren tek cephedir.<br>1. İtilaf Devletleri (Özellikle İngiltere ve Fransa), müttefikleri olan <strong>Çarlık Rusyası'na</strong> silah ve ekonomik <strong>yardım göndermek</strong> zorundaydılar (Rusya'da Bolşevik ihtilali tehlikesi vardı).<br>2. Ayrıca İstanbul'u (Başkenti) işgal ederek <strong>Osmanlı Devleti'ni savaş dışı bırakmak</strong> (savaşı kısa sürede bitirmek) ve kararsız Balkan devletlerini kendi yanlarında savaşa sokmak istiyorlardı.<br><br><strong>Cevap: Rusya'ya yardım götürmek ve İstanbul'u alarak Osmanlı'yı saf dışı bırakmak.</strong>",
+                    shortcut: "Mustafa Kemal'in askerlik hayatındaki ilk görev yeri <strong>Şam 5. Ordu</strong> (Vatan ve Hürriyet Cemiyeti), ilk askeri başarısı ve sömürgeciliğe karşı ilk mücadelesi ise <strong>Trablusgarp Savaşı'dır</strong>."
+                },
+                {
+                    title: "2. Milli Mücadele'nin Hazırlık Dönemi",
+                    summary: "Mondros, Cemiyetler, Amasya, Erzurum ve Sivas Kongreleri.",
+                    description: "<p><strong>Mondros Ateşkes Antlaşması (30 Ekim 1918):</strong> Osmanlı'nın fiilen bittiği belgedir. En tehlikeli maddesi <strong>7. Madde:</strong> 'İtilaf devletleri güvenliklerini tehdit eden herhangi bir stratejik noktayı işgal edebilir' (İşgallere hukuki kılıf uydurulmuştur). Ordu terhis edilmiş, silahlar toplanmış ve donanmaya el konmuştur.</p><p><strong>Cemiyetler ve Kuva-yı Milliye:</strong> İşgallere karşı halkın kendiliğinden kurduğu silahlı direniş örgütlerine Kuva-yı Milliye denir. Milli Cemiyetler (Müdafaa-i Hukuk, Kilikyalılar vb.) bölgesel kurtuluşu amaçlarken; Zararlı Cemiyetler (Mavri Mira, Pontus Rum vb.) devletin parçalanmasını istemiştir.</p><br><p><strong>Hazırlık Aşaması (1919):</strong><br>- <em>19 Mayıs Samsun'a Çıkış:</em> Kurtuluş Savaşı'nın fiilen başlamasıdır.<br>- <em>Havza Genelgesi:</em> İşgallere karşı mitingler (protestolar) yapılması istenmiş, <strong>Milli Bilinç uyandırılmıştır</strong>.<br>- <em>Amasya Genelgesi:</em> Kurtuluş Savaşı'nın <strong>Amacı, Gerekçesi ve Yöntemi</strong> (Milletin istiklalini yine milletin azim ve kararı kurtaracaktır) belirtilmiştir. Üstü kapalı ilk kez Milli Egemenlikten (Cumhuriyetten) bahsedilmiştir.<br>- <em>Erzurum Kongresi:</em> Toplanış amacı bölgesel, aldığı kararlar <strong>Ulusal (Tüm yurdu kapsayan)</strong> bir kongredir. İlk kez 'Milli Sınırlar' (Misak-ı Milli) çizilmiştir.<br>- <em>Sivas Kongresi:</em> Her yönüyle Ulusal bir kongredir. Tüm yararlı cemiyetler <strong>Anadolu ve Rumeli Müdafaa-i Hukuk Cemiyeti</strong> adı altında tek çatıda birleştirilmiş, Kurtuluş Savaşı tek merkezden yönetilmeye başlanmıştır.</p>",
+                    items: ["Mondros Ateşkesi'nin 7. ve 24. Maddeleri", "Yararlı ve Zararlı Cemiyetler", "Havza ve Amasya Genelgelerinin Önemi", "Erzurum ve Sivas Kongreleri Kararları", "Misak-ı Milli (Milli Ant) Kararları"],
+                    formula: null,
+                    question: "Erzurum Kongresi'nde alınan 'Manda ve Himaye (Büyük bir devletin korumasına girme) kabul olunamaz' kararının Milli Mücadele açısından anlamı nedir?",
+                    solution: "Kongre dönemlerinde bazı aydınlar, Osmanlı'nın tek başına kurtulamayacağını, Amerika (ABD) veya İngiltere mandasına girmenin tek çare olduğunu savunuyordu.<br>Mustafa Kemal ve arkadaşları ise Erzurum Kongresi'nde bu fikri kesin bir dille reddetmiştir.<br>Bu karar, Milli Mücadele'nin temel ilkesinin <strong>'Tam Bağımsızlık' (Ya İstiklal Ya Ölüm)</strong> olduğunu tüm dünyaya ve Türk milletine ilan etmiştir.<br><br><strong>Cevap: Tam Bağımsızlık (Koşulsuz Egemenlik) ilkesinin benimsenmesi.</strong>",
+                    shortcut: "Eğer bir soruda 'Vatanın Bütünlüğü' vurgulanıyorsa cevap <strong>Milli Bağımsızlık</strong> (Düşmanı yurttan atma), eğer 'Halkın Kararı, Milletin İradesi' vurgulanıyorsa cevap <strong>Milli Egemenlik</strong>'tir (Cumhuriyet/Meclis yönetimi)."
+                },
+                {
+                    title: "3. Kurtuluş Savaşı'nda Cepheler",
+                    summary: "Doğu, Güney ve Batı cephelerindeki askeri mücadeleler ve antlaşmalar.",
+                    description: "<p><strong>Doğu Cephesi:</strong> Ermenilere karşı savaşılmıştır. Osmanlı'dan kalan düzenli ordu (Kazım Karabekir - 15. Kolordu) görev yapmıştır. Savaş, TBMM'nin ilk siyasi başarısı olan <strong>Gümrü Antlaşması (1920)</strong> ile kapanmıştır. (Sevr'i reddeden ilk antlaşmadır).</p><p><strong>Güney Cephesi:</strong> Fransızlar ve Ermeni çetelerine karşı savaşılmıştır. Düzenli ordu yoktur, tamamen <strong>Kuva-yı Milliye (Halk direnişi)</strong> ile destan yazılmıştır. (Maraş'ta Sütçü İmam, Antep'te Şahin Bey, Urfa'da Ali Saip Bey). Sakarya Savaşı'ndan sonra imzalanan <strong>Ankara Antlaşması (1921)</strong> ile Fransızlar çekilmiş, cephe kapanmıştır (Hatay hariç bugünkü Suriye sınırımız çizilmiştir).</p><p><strong>Batı Cephesi (En Zorlu Cephe):</strong> Yunanlılara karşı savaşılmıştır. Kuva-yı Milliye yetersiz kalınca TBMM tarafından <strong>Düzenli Ordu</strong> kurulmuştur. Sırasıyla şu savaşlar yapılmıştır:<br>- <em>I. İnönü (Savunma):</em> Düzenli ordunun ilk zaferidir. Milat (Moskova, İstiklal Marşı, Londra Konf, Afganistan Dostluk, Teşkilat-ı Esasiye) yaşanmıştır.<br>- <em>II. İnönü (Savunma):</em> 'Siz orada sadece düşmanı değil, milletin makus talihini de yendiniz' (M. Kemal).<br>- <em>Kütahya-Eskişehir (Yenilgi):</em> Ordunun tek yenilgisidir, Sakarya nehrinin doğusuna çekilmiştir. M. Kemal 'Başkomutan' olmuş ve ordunun ihtiyacı için <strong>Tekalif-i Milliye</strong> emirlerini çıkarmıştır.<br>- <em>Sakarya Meydan Muharebesi (Son Savunma):</em> Türk ordusunun 1683 Viyana'dan beri süren geri çekilişi durmuş, 22 gün 22 gece süren 'Subaylar Savaşı' kazanılmıştır.<br>- <em>Büyük Taarruz ve Başkomutanlık Meydan Muharebesi (Taarruz):</em> 30 Ağustos'ta Yunan ordusu denize dökülmüş, <strong>Mudanya Ateşkesi (1922)</strong> ile savaş dönemi (askeri safha) bitmiş, diplomatik safha başlamıştır.</p>",
+                    items: ["Doğu Cephesi ve Gümrü Antlaşması", "Güney Cephesi (Kuva-yı Milliye Direnişi)", "Batı Cephesi Savaşları (I-II. İnönü, Kütahya-Eskişehir)", "Sakarya Savaşı ve Tekalif-i Milliye Emirleri", "Büyük Taarruz ve Mudanya Ateşkes Antlaşması"],
+                    formula: null,
+                    question: "Kurtuluş Savaşı sırasında Yunanlılarla yapılan I. İnönü Savaşı kazanıldıktan hemen sonra İtilaf Devletleri tarafından 'Londra Konferansı' düzenlenmiş ve hem İstanbul Hükümeti hem de TBMM Hükümeti birlikte davet edilmiştir. İtilaf Devletlerinin bu tutumunun (ikisini birden çağırmasının) asıl amacı nedir?",
+                    solution: "İtilaf Devletleri, Osmanlı (İstanbul) ve TBMM hükümetleri arasında fikir ayrılıkları olduğunu çok iyi biliyordu.<br>Amaçları her iki hükümeti de konferansa davet edip aralarındaki <strong>görüş ayrılıklarından (ikilikten) yararlanarak</strong> Sevr Antlaşması'nı ufak değişikliklerle Türklere kabul ettirmekti.<br>Ancak İstanbul Hükümeti delegesi Tevfik Paşa söz hakkını TBMM delegesine vererek bu oyunu bozmuştur.<br><br><strong>Cevap: İki hükümet arasında ikilik çıkararak Sevr Antlaşması'nı kabul ettirmek.</strong>",
+                    shortcut: "TBMM'yi tanıyan ilk devlet Ermenistan (Gümrü), ilk İslam devleti Afganistan, ilk büyük Avrupalı devlet ise Sovyet Rusya'dır (Moskova Antlaşması). İtilaf devletlerinden TBMM'yi tanıyan ve Anadolu'yu terk eden ilk devlet ise Fransa'dır (Ankara Antlaşması)."
+                },
+                {
+                    title: "4. Atatürk İnkılapları ve Cumhuriyet Dönemi",
+                    summary: "Siyasi, Hukuki, Eğitim ve Toplumsal alanda yapılan devrimler.",
+                    description: "<p><strong>Siyasi İnkılaplar:</strong><br>- <em>Saltanatın Kaldırılması (1 Kasım 1922):</em> Lozan'a ikilik çıkmaması için kaldırıldı (Milli Egemenliğin önündeki en büyük engel yıkıldı).<br>- <em>Cumhuriyetin İlanı (29 Ekim 1923):</em> Devletin rejimi, başkanlık sorunu (Cumhurbaşkanı seçildi) ve hükümet kurma sistemi (Kabine sistemine geçiş) çözüldü.<br>- <em>Halifeliğin Kaldırılması (3 Mart 1924):</em> Laik devlet düzenine geçişin en büyük adımıdır (Aynı gün Şeriye ve Evkaf Vekaleti ile Tevhid-i Tedrisat kanunu da çıkarıldı).</p><p><strong>Hukuk ve Eğitim İnkılapları:</strong> İsviçre'den <strong>Türk Medeni Kanunu (1926)</strong> alınarak kadın-erkek eşitliği sağlandı (Resmi nikah, mirasta eşitlik - NOT: Medeni kanunda kadına SİYASİ hak yani seçme-seçilme hakkı yoktur, o 1934'te verilmiştir). <strong>Tevhid-i Tedrisat (1924)</strong> ile tüm okullar MEB'e bağlanarak eğitimde birlik ve laiklik sağlandı. 1928'de Yeni Türk Harfleri kabul edildi.</p><br><p><strong>Toplumsal ve Ekonomik İnkılaplar:</strong> Şapka Kanunu, Tekke ve Zaviyelerin Kapatılması, Soyadı Kanunu (1934) ile sınıf/unvan ayrımcılığı bitti. Ekonomide <strong>İzmir İktisat Kongresi (1923)</strong> ile yerli malı (Misak-ı İktisadi) benimsendi, Aşar Vergisi kaldırılarak çiftçi rahatlatıldı.</p>",
+                    items: ["Saltanatın Kaldırılması (1922)", "Lozan Barış Antlaşması (1923)", "Cumhuriyetin İlanı ve Halifeliğin Kaldırılması", "Tevhid-i Tedrisat ve Türk Medeni Kanunu", "Toplumsal Alandaki Yenilikler (Soyadı, Kılık-Kıyafet)"],
+                    formula: null,
+                    question: "1926 yılında kabul edilen Türk Medeni Kanunu ile kadınlara; I. Kendi soyadını kullanma, II. İstediği mesleğe girebilme, III. Milletvekili seçilebilme haklarından hangileri verilmiştir?",
+                    solution: "ÖSYM bu ayrımı çok sık sorar!<br>1. 1926 Medeni Kanun, İsviçre'den alınmış sosyal ve hukuki bir kanundur. Kadınlara; resmi nikah, tek eşlilik, mahkemede şahitlikte eşitlik, mirastan eşit pay alma, boşanma hakkı ve <strong>istediği mesleğe girme</strong> hakkı verilmiştir. (II doğru)<br>2. Kendi soyadını kullanma hakkı çok daha sonra (2000'li yıllarda) verilen bir haktır. (I yanlış)<br>3. <strong>SİYASİ HAKLAR (Seçme ve Seçilme hakkı)</strong> Medeni Kanun'da KESİNLİKLE YOKTUR. Kadınlara siyasi haklar 1930 (Belediye), 1933 (Muhtarlık) ve 1934 (Milletvekilliği - BMW şifresi) yıllarında anayasa değişikliği ile verilmiştir. (III yanlış)<br><br><strong>Cevap: Yalnız II (İstediği mesleğe girebilme)</strong>",
+                    shortcut: "Eğer bir devrim Din ve Devlet işlerini birbirinden ayırıyorsa (Halifeliğin kaldırılması, Tekke ve Zaviyelerin kapanması) kesinlikle <strong>Laiklik</strong> ilkesidir. Eğer bir devrim Toplumda 'Eşitlik' sağlıyorsa (Soyadı Kanunu, Aşar vergisinin kalkması) kesinlikle <strong>Halkçılık</strong> ilkesidir."
+                },
+                {
+                    title: "5. Atatürk İlkeleri ve Dış Politika",
+                    summary: "Atatürk'ün 6 temel ilkesi ve Cumhuriyet dönemi dış meseleleri.",
+                    description: "<p><strong>Atatürk İlkeleri (Oklar):</strong><br>- <em>Cumhuriyetçilik:</em> Milli egemenlik, meclis, seçim, çok partili hayatı hedefler.<br>- <em>Milliyetçilik:</em> Irkçılık yapmayan, birleştirici (Türk kültürünü, Türk dilini, Türk Tarih Kurumu'nu savunan) ve tam bağımsızlığı hedefleyen ilkedir.<br>- <em>Halkçılık:</em> Sınıf ayrımını reddeden, eşitlik (kadın-erkek eşitliği, sosyal devlet, soyadı kanunu) ilkesidir.<br>- <em>Laiklik:</em> Aklın ve bilimin rehberliği, din ve vicdan özgürlüğü, batıl inançların (falcı, büyücü vb.) yasaklanmasıdır.<br>- <em>Devletçilik:</em> Özel sektörün yapamadığı (sermayesi yetmeyen) büyük yatırımların (fabrika, demiryolu) devlet eliyle yapılmasıdır. Zorunluluktan doğmuş ekonomik bir ilkedir.<br>- <em>İnkılapçılık:</em> Durmaksızın yenilenmek, çağdaş (muasır) medeniyetler seviyesine ulaşmaktır (Takvim, saat, ölçü, harf değişiklikleri).</p><p><strong>Atatürk Dönemi Dış Politika:</strong> 'Yurtta Sulh Cihanda Sulh' ilkesi esastır. Lozan'dan kalan pürüzler çözülmeye çalışılmıştır: Nüfus Mübadelesi (Yunanistan'la yer değişimi), Yabancı Okullar (Fransa'yla), Musul Sorunu (İngiltere'yle, aleyhimize çözüldü) ve Boğazlar (1936 Montrö Boğazlar Sözleşmesi ile tam egemenlik sağlandı).</p>",
+                    items: ["Cumhuriyetçilik ve Milliyetçilik İlkeleri", "Halkçılık (Eşitlik) ve Devletçilik (Ekonomi) İlkeleri", "Laiklik (Akıl/Bilim) ve İnkılapçılık (Çağdaşlaşma)", "Lozan Sonrası Dış Politika (Musul, Mübadele)", "Montrö Boğazlar Sözleşmesi ve Hatay'ın Anavatana Katılması"],
+                    formula: null,
+                    question: "1936 yılında imzalanan Montrö Boğazlar Sözleşmesi ile Türkiye'nin Boğazlar (İstanbul ve Çanakkale) üzerindeki tam egemenliğini sağlaması, öncelikle hangi Atatürk ilkesiyle doğrudan ilgilidir?",
+                    solution: "Montrö sözleşmesinden önce (Lozan'a göre) Boğazların yönetimi başkanı Türk olan Uluslararası bir Komisyona aitti ve Türkiye Boğazların iki yakasında asker bulunduramıyordu (Bu durum bağımsızlığımıza aykırıydı).<br>Montrö ile Komisyon kaldırıldı ve Boğazların tüm askeri/siyasi yönetimi tamamen Türkiye'ye (Türk milletine) geçti.<br>Bu durum, devletin Tam Bağımsızlığını ve Ulusal Çıkarlarını koruma altına aldığı için <strong>Milliyetçilik</strong> ilkesiyle doğrudan ilişkilidir.<br><br><strong>Cevap: Milliyetçilik (ve Tam Bağımsızlık)</strong>",
+                    shortcut: "Atatürk'ün Devletçilik ilkesi sadece EKONOMİ (Fabrika kurma, sanayi planı, Sümerbank, Etibank vb.) ile ilgilidir. Siyasi, askeri veya hukuki konulardaki 'Devlet otoritesi' kelimesiyle sakın karıştırma."
+                }
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
