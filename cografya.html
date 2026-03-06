@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Coğrafya";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Doğa, İnsan ve Coğrafya",
+                    summary: "Muhteşem dörtlü (Atmosfer, Litosfer, Hidrosfer, Biyosfer) ve coğrafyanın bölümleri.",
+                    description: "<p><strong>İnsan ve Doğa Etkileşimi:</strong> İnsan ihtiyaçlarını karşılarken doğayı etkiler (Örn: Baraj, tünel, köprü yapımı), doğa da insanın yaşantısını şekillendirir (Örn: Soğuk iklimde kalın giyinme, Ekvator'da ince giyinme, deprem/sel olayları). Bu etkileşimi inceleyen bilim dalı Coğrafyadır.</p><p><strong>Muhteşem Dörtlü (Doğal Ortamlar):</strong><br>- <em>Litosfer (Taş Küre):</em> Yerkabuğu, dağlar, ovalar (Jeomorfoloji inceler).<br>- <em>Atmosfer (Hava Küre):</em> Gaz tabakası, iklim olayları (Klimatoloji inceler).<br>- <em>Hidrosfer (Su Küre):</em> Okyanus, deniz, göl, yeraltı suları (Hidrografya inceler).<br>- <em>Biyosfer (Canlı Küre):</em> İnsan, bitki ve hayvanların yaşadığı alan (Biyocoğrafya inceler).</p><p><strong>Coğrafyanın Bölümleri:</strong> Fiziki Coğrafya (Doğal olayları inceler: Klimatoloji, Jeomorfoloji vb.) ve Beşeri Coğrafya (İnsanın faaliyetlerini inceler: Nüfus, Yerleşme, Tarım, Ulaşım, Siyasi Coğrafya vb.) olarak ikiye ayrılır.</p>",
+                    items: ["İnsan-Doğa Etkileşimi Örnekleri", "Litosfer, Atmosfer, Hidrosfer ve Biyosfer", "Fiziki Coğrafyanın Alt Dalları", "Beşeri Coğrafyanın Alt Dalları", "Coğrafyanın İlkeleri (Nedensellik, Dağılış, Karşılıklı İlgi)"],
+                    formula: null,
+                    question: "Aşağıdaki olaylardan hangisinde insanın doğaya (çevreye) etkisi, doğanın insana etkisinden daha belirgindir?<br>A) Karadeniz'de evlerin ahşaptan yapılması.<br>B) İzlanda'da jeotermal kaynaklarla evlerin ısıtılması.<br>C) Hollanda'da denizin doldurularak tarım alanı (Polder) elde edilmesi.<br>D) Erzurum'da kış aylarında karayolu ulaşımının aksaması.",
+                    solution: "Seçenekleri inceleyelim:<br>1. A, B ve D seçeneklerinde doğadaki mevcut şartlar (orman varlığı, sıcak su kaynağı, kar yağışı) insanların yaşam şeklini, barınmasını ve ulaşımını belirlemiştir (Doğanın insana etkisi).<br>2. C seçeneğinde ise Hollandalılar, denizi (doğal ortamı) toprak dökerek kurutmuş ve kendi ihtiyaçları için yeni bir kara parçası (Polder) yaratmışlardır. Burada insan, doğayı kendi isteğine göre <strong>değiştirmiş ve şekillendirmiştir</strong>.<br><br><strong>Cevap: C seçeneği (Denizin doldurulması insanın doğaya etkisidir).</strong>",
+                    shortcut: "Coğrafyanın en önemli ve onu diğer bilimlerden ayıran tek ilkesi <strong>'Dağılış (Nerede?)'</strong> ilkesidir. Bir cümlede '...bölgesinde görülür, ...ülkesinde yetişir' gibi yer/mekan bildiriyorsa orada Dağılış ilkesi vardır."
+                },
+                {
+                    title: "2. Dünya'nın Şekli, Hareketleri ve Sonuçları",
+                    summary: "Geoit şekil, günlük (eksen) hareket, yıllık (yörünge) hareket ve mevsimler.",
+                    description: "<p><strong>Dünya'nın Şekli (Geoit):</strong> Kutuplardan basık, Ekvator'dan şişkin kendine has şeklidir. <em>Geoit Olmasının Sonuçları:</em> Ekvator'un uzunluğu tam bir meridyen dairesinden daha uzundur. Yerçekimi Ekvator'da az, kutuplarda (merkeze daha yakın olduğu için) daha fazladır.</p><p><strong>Günlük (Eksen) Hareketi:</strong> Dünya, batıdan doğuya doğru 24 saatte döner. <em>Sonuçları:</em> Gece-gündüz ardalanır (birbirini takip eder). Yerel saat farkları oluşur (Doğuda güneş erken doğar). Günlük sıcaklık/basınç farkları ve <strong>Meltem Rüzgarları</strong> oluşur. Okyanus akıntılarında ve rüzgarlarda <strong>sapmalar</strong> (Kuzey Yarı Küre'de sağa, Güney Yarı Küre'de sola) meydana gelir.</p><br><p><strong>Yıllık Hareket ve Eksen Eğikliği ($23^\\circ 27'$):</strong> Dünya'nın Güneş etrafındaki elips yörüngesinde (365 gün 6 saatte) dolanması ve ekseninin eğik olmasıdır. <em>Sonuçları:</em> <strong>Mevsimler</strong> oluşur. Yıl içinde Güneş ışınlarının geliş açısı, sıcaklıklar ve gölge boyları değişir. Gece-gündüz süreleri yıl içinde uzar/kısalır (Ekvator hariç). Yıllık basınç farkları ve <strong>Muson Rüzgarları</strong> oluşur.</p><p><strong>Özel Tarihler:</strong><br>- <em>21 Haziran (Yaz Solstisi):</em> Yengeç Dönencesine ($23^\\circ 27'$ Kuzey) dik gelir. KYK'de en uzun gündüz, yaz başlar.<br>- <em>21 Aralık (Kış Solstisi):</em> Oğlak Dönencesine ($23^\\circ 27'$ Güney) dik gelir. GYK'de en uzun gündüz, KYK'de kış başlar.<br>- <em>21 Mart ve 23 Eylül (Ekinoks):</em> Ekvatora dik gelir. Tüm dünyada gece-gündüz eşitliği (12 saat) yaşanır.</p>",
+                    items: ["Geoit Şeklin Sonuçları (Yerçekimi ve Yarıçap Farkı)", "Dünya'nın Günlük Hareketi (Meltem Rüzgarları ve Sapmalar)", "Eksen Eğikliğinin Sonuçları (Mevsimler ve Muson Rüzgarları)", "Aydınlanma Çemberi ve Gece-Gündüz Süreleri", "Özel Tarihler (21 Haziran, 21 Aralık, 21 Mart, 23 Eylül)"],
+                    formula: null,
+                    question: "Aşağıdakilerden hangisi Dünya'nın günlük hareketinin sonuçlarından biri DEĞİLDİR?<br>A) Meltem rüzgarlarının oluşması<br>B) Dinamik basınç kuşaklarının (30° ve 60° enlemlerinde) oluşması<br>C) Muson rüzgarlarının oluşması<br>D) Sürekli rüzgarların yönlerinde sapmalar olması",
+                    solution: "Olayların günlük mü yıllık mı olduğunu anlamak için ismindeki zamana bakmalıyız.<br>1. Meltem rüzgarları (A) gün içindeki kara-deniz ve dağ-vadi ısınma farkından (GÜNLÜK) oluşur.<br>2. Dinamik basınç merkezleri (B) Dünya'nın kendi etrafında dönmesi (GÜNLÜK) sonucu savrulmayla oluşur.<br>3. Sürekli rüzgarların sapması (D) Coriolis kuvveti dediğimiz, yine kendi etrafında dönüşten (GÜNLÜK) kaynaklanır.<br>4. Muson rüzgarları (C) ise devasa Asya kıtası ile Hint Okyanusu'nun YAZ ve KIŞ aylarındaki (YILLIK) ısınma farkından oluşur. (Mevsimlik rüzgarlardır).<br><br><strong>Cevap: C seçeneği (Muson rüzgarları Yıllık Hareketin sonucudur).</strong>",
+                    shortcut: "Sorularda 'Gün içinde' veya 'Günlük' kelimesi geçiyorsa cevap %99 <strong>Günlük (Eksen) Hareket</strong>, 'Yıl içinde', 'Yıllık' veya 'Mevsimlik' kelimesi geçiyorsa cevap %99 <strong>Yıllık Hareket (Eksen Eğikliği)</strong>'dir."
+                },
+                {
+                    title: "3. Harita Bilgisi ve Koordinat Sistemi (Paralel/Meridyen)",
+                    summary: "Harita elemanları, ölçek hesaplamaları ve izohips (eş yükselti) eğrileri.",
+                    description: "<p><strong>Koordinat Sistemi:</strong><br>- <em>Paraleller (Enlemler):</em> Ekvatora paralel çizilen hayali çemberlerdir (90 Kuzey + 90 Güney = 180 adet). Aralarındaki kuş uçuşu uzaklık her yerde sabittir (<strong>$111\\text{ km}$</strong>). Kutuplara gidildikçe boyları kısalır.<br>- <em>Meridyenler (Boylamlar):</em> Kutupları birleştiren yarım çemberlerdir (180 Doğu + 180 Batı = 360 adet). Başlangıç meridyeni Greenwich'tir. Aralarındaki yerel saat farkı her yerde sabittir (<strong>$4\\text{ dakika}$</strong>). Kutuplara gidildikçe aralarındaki mesafe daralır (111 km sadece Ekvator'da geçerlidir).</p><p><strong>Harita Özellikleri:</strong> Bir çizimin harita olabilmesi için; <em>Kuşbakışı</em> çizilmiş olması, <em>Belli bir oranda küçültülmüş (Ölçek)</em> olması ve <em>Bir düzleme (Kağıda vs.) aktarılmış</em> olması şarttır. Dünya yuvarlak olduğu için haritalarda mutlaka bozulmalar (hata) olur. Hataları azaltmak için <em>Projeksiyon (İzdüşüm)</em> yöntemleri (Silindirik: Ekvator çevresi için, Konik: Orta kuşak için, Düzlem: Kutuplar için) kullanılır.</p><br><p><strong>İzohipsler (Eş Yükselti Eğrileri):</strong> Deniz seviyesinden itibaren aynı yüksekliğe sahip noktaların birleştirilmesiyle çizilir (Deniz seviyesi daima $0\\text{ metre}$'dir). Birbirini kesmezler. İzohipslerin sıklaştığı yerlerde <strong>Eğim fazladır</strong> (Akarsu hızlı akar, çığ/heyelan riski artar, yol yapım maliyeti artar). 'V' şeklinin ucu yüksek yerleri gösteriyorsa <em>Vadi</em>, alçak yerleri gösteriyorsa <em>Sırt</em>tır.</p>",
+                    items: ["Paralel (Enlem) ve Meridyen (Boylam) Özellikleri", "Enlem Etkisi (Sıcaklık, Çizgisel Hız Değişimi)", "Yerel Saat ve Ulusal Saat Hesaplamaları ($1^\\circ = 4\\text{ dakika}$)", "Büyük ve Küçük Ölçekli Haritaların Karşılaştırılması", "İzohips Eğrileriyle Yer Şekillerini (Vadi, Tepe, Falez) Tanıma"],
+                    formula: "$$\\text{Gerçek Uzaklık} = \\text{Harita Uzunluğu} \\times \\text{Ölçeğin Paydası}$$ $$\\text{Zaman Farkı} = \\text{Meridyen Farkı} \\times 4 \\text{ dakika}$$",
+                    question: "$45^\\circ$ Doğu meridyeninde yer alan Iğdır'da yerel saat $12:00$ iken, $30^\\circ$ Doğu meridyeninde yer alan İzmit'te yerel saat kaçtır?",
+                    solution: "Yerel saat hesaplamalarında doğu/batı yönü ve aradaki meridyen farkı önemlidir.<br>1. İkisi de Doğu yarım kürede. Aralarındaki meridyen farkını bulalım: $45 - 30 = 15$ meridyen fark var.<br>2. İki meridyen arası zaman farkı her yerde 4 dakikadır. Toplam zaman farkı: $15 \\times 4 = 60\\text{ dakika}$ (Yani tam $1\\text{ saat}$).<br>3. Dünya batıdan doğuya döndüğü için, DAİMA doğudaki yerlerde güneş erken doğar, yerel saat daha ileridedir.<br>4. Iğdır ($45^\\circ$ Doğu) daha doğudadır ve saati 12:00'dir. İzmit ($30^\\circ$ Doğu) daha batıda olduğu için saati daha geride (erken) olmalıdır.<br>5. $12:00 - 1\\text{ saat} = 11:00$<br><br><strong>Cevap: İzmit'te yerel saat 11:00'dir.</strong>",
+                    shortcut: "Küçük Ölçekli Haritalar (Örn: Dünya haritası) çok fazla küçültüldüğü için detay gösterme gücü azdır, hata payı çoktur ve ölçeğin paydası ÇOK BÜYÜK bir sayıdır (1/10.000.000). Büyük Ölçekli Haritalar (Örn: Bolu Şehir Planı) ise detaylıdır, hata azdır ve paydası KÜÇÜK bir sayıdır (1/50.000)."
+                },
+                {
+                    title: "4. Doğal Sistemler: İklim ve Atmosfer",
+                    summary: "Atmosferin katmanları, sıcaklık, basınç, rüzgarlar ve nemlilik.",
+                    description: "<p><strong>Atmosferin Katmanları:</strong><br>- <em>Troposfer:</em> En alt katmandır. Gazların %75'i ve <strong>Su buharının %100'ü</strong> buradadır. Sadece bu katmanda <em>İklim (Hava) olayları</em> (yağmur, kar) görülür. Yerden yansıyan ışınlarla ısındığı için yükseldikçe her $200\\text{ metrede}$ sıcaklık $1^\\circ\\text{C}$ düşer.<br>- <em>Stratosfer:</em> Yatay hava hareketleri vardır (Uçaklar burayı tercih eder). Üst kısmında <strong>Ozon Tabakası</strong> bulunur (Güneşin zararlı UV ışınlarını tutar).</p><p><strong>İklim Elemanları:</strong><br>- <em>Sıcaklık:</em> Enlemin (Ekvator'dan Kutuplara), yükseltinin, denizelliğin/karasallığın ve okyanus akıntılarının (Örn: Gulf Stream ısıtır, Labrador soğutur) etkisiyle değişir.<br>- <em>Basınç ve Rüzgarlar:</em> Rüzgar her zaman <strong>Yüksek Basınçtan (Soğuk/Ağır hava) $\\rightarrow$ Alçak Basınca (Sıcak/Hafif hava)</strong> doğru eser. Sürekli rüzgarlar (Alizeler, Batı, Kutup), Muson rüzgarları (Yaz musonu yağış getirir) ve Yerel rüzgarlar (Föhn, Sirokko) işlenir.<br>- <em>Nem ve Yağış:</em> Mutlak Nem (havadaki mevcut nem), Maksimum Nem (havanın taşıma kapasitesi, sıcaklıkla doğru orantılıdır) ve Bağıl Nem (Yağış ihtimali, soğuk havada artar). Yamaç (Orografik), Konveksiyonel (Yükselim) ve Cephe yağışları görülür.</p>",
+                    items: ["Atmosferin Katmanları (Troposfer, Stratosfer, Mezosfer, Termosfer)", "Sıcaklığın Dağılışını Etkileyen Faktörler (Enlem, Yükselti, Bakı)", "İzoterm (Eş Sıcaklık) Haritaları", "Basınç Merkezleri Özellikleri (YB, AB) ve Rüzgar Yönleri", "Mutlak, Maksimum ve Bağıl Nem Kavramları (Yağış Çeşitleri)"],
+                    formula: "$$\\text{Bağıl Nem (\\%)} = \\frac{\\text{Mutlak Nem}}{\\text{Maksimum Nem}} \\times 100$$",
+                    question: "Bir dağın yamacı boyunca yükselen nemli hava kütlesinin yağış bırakma ihtimali (Bağıl nemi) neden sürekli artar?",
+                    solution: "Nem ve yağış mekanizmasını anlayalım.<br>1. Hava kütlesi dağ yamacı boyunca yükseldikçe her 200 metrede $1^\\circ\\text{C}$ <strong>soğur</strong> (sıcaklığı düşer).<br>2. Havanın sıcaklığı düştükçe, havanın nem taşıma kapasitesi (Maksimum Nem - Havanın hacmi) de düşer, yani hava büzüşür.<br>3. İçindeki mevcut nem (Mutlak Nem) sabit kalıp, kap (Maksimum Nem) daraldığı için, içerideki nem kabı zorlamaya başlar.<br>4. Sonuçta doluluk oranı (Bağıl Nem) %100'ü geçince, fazlalık nem dışarıya <strong>Yağış (Yamaç/Orografik yağış)</strong> olarak düşer.<br><br><strong>Cevap: Hava yükseldikçe soğur, havanın nem taşıma kapasitesi (Maksimum nem) daralır ve doluluk oranı (Bağıl nem) artarak yağışa dönüşür.</strong>",
+                    shortcut: "Eğer bir harita sorusunda 'Föhn Rüzgarı' diyorsa, bu dağ yamacından aşağıya inen ve DÜŞTÜKÇE ISINAN (Her 100 metrede $1^\\circ\\text{C}$ artar, sürtünmeden dolayı) kurutucu bir rüzgardır. Türkiye'de en çok Doğu Karadeniz (Rize-Mandalina yetiştirilmesi) ve Toroslarda etkilidir."
+                },
+                {
+                    title: "5. Dünya'daki ve Türkiye'deki İklim Tipleri",
+                    summary: "Makroklima iklimler, sıcaklık-yağış grafikleri ve bitki örtüleri.",
+                    description: "<p><strong>Dünya'nın Büyük İklim Tipleri (Makroklima):</strong><br>- <em>Sıcak İklimler:</em> <strong>Ekvatoral İklim</strong> (Her mevsim yağışlı ve sıcak, Amazon/Kongo havzası, Yağmur ormanları). <strong>Savan İklimi</strong> (Yazlar yağışlı kışlar kurak, uzun boylu otlar). <strong>Çöl İklimi</strong> (Günlük sıcaklık farkı en yüksek, mekanik çözülme çok, kaktüs). <strong>Muson İklimi</strong> (Yazları dünyanın en çok yağış alan yeri, kışları kurak, Güneydoğu Asya/Hindistan, Teak ormanı).<br>- <em>Ilıman İklimler:</em> <strong>Akdeniz İklimi</strong> (Yazlar sıcak-kurak, kışlar ılık-yağışlı. Bitki örtüsü kısa bodur ağaççık olan <em>Maki</em>'dir). <strong>Okyanusal İklim</strong> (Her mevsim yağışlı, ılıman, Karadeniz iklimine benzer, Batı Avrupa'da görülür, Orman). <strong>Ilıman Karasal/Step</strong> (Kışlar soğuk/kar yağışlı, ilkbahar yağışlı. Bitki örtüsü <em>Bozkır/Step</em>'tir).<br>- <em>Soğuk İklimler:</em> <strong>Tundra İklimi</strong> (10 ay toprak donuk, 2 ay bataklık, bitkiler yosun/likendir). <strong>Kutup İklimi</strong> (Sıcaklık hep 0'ın altında, bitki örtüsü ve toprak yoktur).</p><br><p><strong>Türkiye'nin İklimleri:</strong> Orta kuşakta yer aldığı için genellikle ılıman iklimler görülür. Deniz etkisine kapalı iç kesimlerde ve Doğu Anadolu'da <em>Karasal/Sert Karasal (Bozkır/Çayır)</em>, kıyılarda ise <em>Akdeniz (Maki)</em> ve <em>Karadeniz (Orman)</em> iklimleri hakimdir. (Karasal iklim Türkiye'nin %70'ini kaplar).</p>",
+                    items: ["Sıcak İklimler (Ekvatoral, Savan, Muson, Çöl) ve Bitki Örtüleri", "Ilıman İklimler (Akdeniz, Okyanusal, Karasal) Özellikleri", "Soğuk İklimler (Tundra, Tayga, Kutup)", "Sıcaklık ve Yağış Grafiklerini Yorumlama", "Türkiye'de Görülen İklim Tipleri ve Etkileyen Faktörler"],
+                    formula: null,
+                    question: "Sıcaklık ve yağış grafiği incelenen bir merkezin; yaz aylarında (Haziran, Temmuz, Ağustos) yağış miktarının neredeyse sıfıra indiği ve sıcaklığın $30^\\circ\\text{C}$ civarında olduğu, kış aylarında (Aralık, Ocak) ise sıcaklığın $10^\\circ\\text{C}$ civarında seyrettiği ve en yüksek yağışların bu aylarda düştüğü görülmüştür. Bu merkez hangi iklim bölgesinde yer almaktadır ve doğal bitki örtüsü nedir?",
+                    solution: "Grafikteki bilgileri analiz edelim:<br>1. Yaz ayları kurak (yağış sıfır) ve sıcak geçiyor.<br>2. Kış ayları ise ılık ($10^\\circ\\text{C}$, donma noktasına inmemiş) ve yağışlı (en yüksek yağış) geçiyor.<br>3. Bu tam olarak 'Yazları sıcak ve kurak, kışları ılık ve yağışlı' tekerlemesiyle bildiğimiz <strong>Akdeniz İklimi</strong>'nin karakteristik özelliğidir.<br>4. Akdeniz ikliminin doğal bitki örtüsü ise kızılçam ormanlarının tahrip edilmesiyle oluşan, kuraklığa dayanıklı kısa boylu bodur ağaççıklar olan <strong>Maki</strong>'dir (Zeytin, zakkum, defne vb.).<br><br><strong>Cevap: Akdeniz İklimi, doğal bitki örtüsü Maki'dir.</strong>",
+                    shortcut: "Bir yerin iklim grafiğinde en çok yağış İLKBAHARDA (e harfinin başı) ise Ilıman Karasal (İç Anadolu), YAZIN ise Sert Karasal (Erzurum-Kars), SONBAHARDA ise Karadeniz (Okyanusal), KIŞIN ise Akdeniz iklimidir. Bunu Türkiye haritası üzerine küçük bir 'e' harfi çizerek kolayca ezberleyebilirsin."
+                }
+
+            ],
+            10: [
+                                {
+                    title: "1. Dünya'nın İç Yapısı, Levha Tektoniği ve Jeolojik Zamanlar",
+                    summary: "Yerkürenin katmanları, kıtaların kayması ve Dünya'nın evreleri.",
+                    description: "<p><strong>Dünya'nın Katmanları:</strong> Yerkabuğu (Litosfer - Sial ve Sima), Manto (Magmanın bulunduğu sıvımsı katman, iç kuvvetlerin enerji kaynağıdır) ve Çekirdek (En sıcak, yoğun ve ağır katman).</p><p><strong>Levha Tektoniği (Kıtaların Kayması):</strong> Alfred Wegener'e göre kıtalar eskiden tek bir parçaydı (<strong>Pangea</strong>). Mantodaki konveksiyonel akımlar (ısınan magmanın yükselip soğuyarak alçalması) nedeniyle kıtalar parçalanıp bugünkü halini almıştır. <em>Kanıtları:</em> Kıtaların yapboz gibi birbirine uyması, benzer fosillerin ve kayaçların okyanus ötesi kıtalarda da bulunması.</p><br><p><strong>Jeolojik Zamanlar:</strong><br>- <em>İlkel Zaman (Prekambriyen):</em> İlk tek hücreli canlılar, sular ve atmosfer oluştu.<br>- <em>I. Zaman (Paleozoik):</em> Pangea oluştu. Masif (yaşlı/sert) araziler ve <strong>Taş kömürü</strong> yatakları oluştu (Zonguldak).<br>- <em>II. Zaman (Mezozoik):</em> Dinozorlar yaşadı. Pangea parçalanmaya (Laurasia ve Gondwana) başladı.<br>- <em>III. Zaman (Tersiyer):</em> Alp-Himalaya kıvrım dağları oluştu (Türkiye'deki Toroslar ve Kuzey Anadolu Dağları). <strong>Linyit, petrol, tuz ve bor</strong> yatakları oluştu. Şiddetli volkanizma ve depremler yaşandı.<br>- <em>IV. Zaman (Kuvaterner):</em> İnsan yaratıldı. Buzul çağları yaşandı. Ege Denizi, İstanbul ve Çanakkale boğazları oluştu.</p>",
+                    items: ["Yerkürenin Katmanları (Litosfer, Manto, Çekirdek)", "Mantodaki Konveksiyonel Akımlar ve Depremlerin Kaynağı", "Kıta Kayması Teorisi (Pangea ve Kanıtları)", "Jeolojik Zamanlar ve Önemli Olaylar", "Türkiye'nin Jeolojik Geçmişi (Toptan Yükselme)"],
+                    formula: null,
+                    question: "Türkiye'de linyit, bor, tuz ve petrol yataklarının yaygın olarak bulunması ve ortalama yükseltisinin (1132 m) çok fazla olması, Türkiye'nin hangi jeolojik zamanda oluştuğunu/şekillendiğini kanıtlar?",
+                    solution: "Türkiye arazisinin oluşum sürecine bakalım:<br>1. Taş kömürü çok eski (1. Zaman) bir madendir ve Türkiye'de sadece Zonguldak çevresinde bulunur. Demek ki Türkiye'nin çok küçük bir kısmı 1. Zamanda (eski) oluşmuştur.<br>2. Ancak linyit, tuz, bor yatakları Türkiye'nin neredeyse her bölgesinde vardır. Bu madenler <strong>3. Jeolojik Zaman'da (Tersiyer)</strong> oluşmuştur.<br>3. Ayrıca Türkiye 3. Zaman'ın sonunda ve 4. Zaman'ın başında Alp-Himalaya orojeneziyle sıkışarak <strong>toptan yükselmiş</strong> 'Genç' oluşumlu bir ülkedir.<br><br><strong>Cevap: III. Jeolojik Zaman (Tersiyer) ve IV. Jeolojik Zaman (Kuvaterner). Ülkemiz genç oluşumlu bir arazidir.</strong>",
+                    shortcut: "Eğer bir ülkede deprem riski yüksek, kaplıca (sıcak su) çok, fay hatları kırık ve linyit madeni bol ise o ülke KESİNLİKLE 'Genç Oluşumlu'dur (3. ve 4. Zamanda oluşmuştur - Türkiye gibi). Yaşlı masif arazilerde (İskandinavya gibi) deprem olmaz."
+                },
+                {
+                    title: "2. İç Kuvvetler ve Dış Kuvvetler",
+                    summary: "Dağ, kıta oluşumu, depremler ile akarsu, rüzgar, buzul şekilleri.",
+                    description: "<p><strong>İç Kuvvetler:</strong> Enerjisini Mantodan alan, yeryüzünü <em>yapıcı</em> kuvvetlerdir.<br>- <em>Orojenez (Dağ Oluşumu):</em> Esnek tortullar yan basınçla kıvrılır (Antiklinal-Senklinal / Örn: Toroslar). Sert tortullar kırılarak fay hattı oluşturur (Horst-Graben / Örn: Ege Bölgesi dağları).<br>- <em>Epirojenez (Kıta Oluşumu):</em> Geniş kara parçalarının yavaşça yükselmesi veya çökmesidir. İklim değişimi veya buzulların erimesiyle kara hafifler ve yükselir, deniz geriler (Regresyon). Kara ağırlaşırsa çöker, deniz ilerler (Transgresyon).<br>- <em>Volkanizma ve Depremler (Seizma):</em> Magmanın yeryüzüne çıkması ve fay hatlarındaki tektonik kırılmalardır. (Pasifik Ateş Çemberi en aktif yerdir).</p><p><strong>Dış Kuvvetler:</strong> Enerjisini Güneşten alan, yeryüzünü <em>yıkıcı/aşındırıcı</em> kuvvetlerdir.<br>- <em>Akarsular:</em> En etkili dış kuvvettir. Aşındırma (Vadi, Menderes, Peribacası, Şelale) ve Biriktirme (Delta ovası, Birikinti konisi) şekilleri yapar.<br>- <em>Rüzgarlar:</em> Kurak/çöl iklimlerinde etkilidir. (Mantar kaya, Barkan, Lös).<br>- <em>Karstik Şekiller:</em> Erimebilen (Kireçtaşı/Kalker) kayaçlarda yeraltı sularının yaptığı şekillerdir. Akdeniz bölgesinde çoktur. (Lapya, Dolin, Uvala, Polye, Sarkıt-Dikit, Traverten).<br>- <em>Buzullar ve Dalgalar:</em> Kutup/yüksek yerlerde buzullar (Hörgüç kaya, Moren), kıyılarda dalgalar (Falez/Yalıyar uçurumu, Tombolo/Saplı ada) şekiller yapar.</p>",
+                    items: ["Orojenez (Kıvrım ve Kırık Dağlar)", "Epirojenez (Transgresyon ve Regresyon)", "Türkiye'deki Fay Hatları (KAF, DAF, BAF)", "Akarsuların Oluşturduğu Şekiller (Delta ve Menderes)", "Karstik (Kireçtaşı) ve Rüzgar Şekilleri"],
+                    formula: null,
+                    question: "Ege Bölgesi'ndeki akarsuların (Gediz, Büyük Menderes) yatak eğimlerinin az olması nedeniyle büklümler (menderesler) çizerek aktığı ve denize döküldükleri yerlerde geniş Delta ovaları oluşturduğu bilinmektedir. Bir kıyıda Delta ovası oluşabilmesi için hangi şartların sağlanması gerekir?",
+                    solution: "Delta, akarsuyun taşıdığı malzemenin (alüvyon) denizin içine birikmesiyle denizin doldurulması olayıdır.<br>Bunun olabilmesi için:<br>1. Akarsu bol miktarda malzeme (alüvyon) taşımalıdır.<br>2. Kıyı sığ olmalıdır (Yani deniz birdenbire derinleşmemeli, kıta sahanlığı geniş olmalıdır).<br>3. Kıyıda güçlü dalga ve okyanus akıntıları OLMAMALIDIR (Biriken toprağı alıp götürmemesi için).<br>4. Kıyıda Gel-Git (Med-Cezir) genliği zayıf olmalıdır (Bu yüzden okyanus kıyılarında delta olmaz, Haliç olur).<br><br><strong>Cevap: Kıyının sığ olması, akıntının olmaması, gel-git etkisinin zayıf olması ve bol alüvyon taşınması gerekir.</strong>",
+                    shortcut: "Bir dağın KIVRIM mı KIRIK mı olduğunu bulmak için Ege'ye bak. Ege'deki dağlar (Kaz, Madra, Yunt, Boz, Aydın, Menteşe - Şifre: Kaz MaYmun Boz Ayıya Meler) KIRIK'tır, aralarından akarsu geçer (Graben). Karadeniz ve Akdeniz'dekiler (Toroslar vs.) ise KIVRIM'dır."
+                },
+                {
+                    title: "3. Sular, Topraklar ve Bitkiler",
+                    summary: "Okyanuslar, göller, toprak tipleri ve bitki formasyonları.",
+                    description: "<p><strong>Sular Coğrafyası:</strong> Dünyadaki suların %97'si tuzludur. Tatlı suların çoğu buzullarda ve yeraltındadır. Göller; tektonik, karstik, volkanik, buzul ve set gölleri olarak ayrılır.</p><p><strong>Toprak Tipleri:</strong> İklimin etkili olduğu topraklara <strong>Zonal (Yerli) Topraklar</strong> denir. Horizonları (katmanları) tamdır.<br>- <em>Laterit:</em> Ekvatoral iklimin yıkanmış, verimsiz, kırmızı toprağıdır.<br>- <em>Terra Rossa:</em> Akdeniz ikliminin demir oksitli kırmızı toprağıdır.<br>- <em>Çernezyom (Kara Toprak):</em> Sert karasal iklimin (Erzurum-Kars) çayır altı toprağıdır. Dünyanın en verimli toprağıdır.<br>- <em>Bozkır (Step):</em> Karasal iklimin tahıl tarımına uygun sarı toprağıdır.<br>Dış kuvvetlerin taşıyıp biriktirdiği topraklara ise <strong>Azonal (Taşınmış) Topraklar</strong> denir. Verimlidirler, horizonları yoktur. Akarsu taşırsa <em>Alüvyal</em>, rüzgar taşırsa <em>Lös</em>, buzul taşırsa <em>Moren</em> adını alır.</p><br><p><strong>Bitki Örtüsü:</strong> Ağaç formasyonu (Ekvatoral yağmur ormanları, Muson ormanları, Tayga iğne yapraklıları), Çalı formasyonu (Maki, Garig, Psödomaki) ve Ot formasyonu (Savan, Bozkır/Step, Çayır, Tundra) olarak üçe ayrılır.</p>",
+                    items: ["Tatlı ve Tuzlu Su Kaynakları Dağılımı", "Göl Oluşum Çeşitleri (Tektonik, Karstik, Set Gölleri)", "Zonal (Yerli) Toprak Çeşitleri (Laterit, Çernezyom, Terra Rossa)", "Azonal (Taşınmış) Topraklar (Alüvyal, Lös, Moren)", "Bitki Formasyonları (Ağaç, Çalı, Ot)"],
+                    formula: null,
+                    question: "Erzurum-Kars platosunda görülen 'Çernezyom (Kara Toprak)', dünyanın en humuslu ve organik maddece en zengin (en verimli) yerli toprağı olmasına rağmen, bu bölgede tarımsal üretim neden gelişmemiştir?",
+                    solution: "Toprağın verimli olması tarım için tek başına yeterli değildir.<br>1. Çernezyom toprakları, yaz yağışlarıyla yeşeren uzun boylu çayırların kışın soğukta çürüyüp toprağa karışmasıyla (humus) oluşur.<br>2. Ancak Erzurum-Kars yöresi <strong>Sert Karasal İklim</strong> bölgesindedir.<br>3. Kışlar çok uzun, sert ve karlı geçer; yazlar ise çok kısadır. Tarım ürünlerinin yetişmesi ve olgunlaşması için gereken <strong>Sıcaklık ve Güneşlenme süresi</strong> bu bölgede yetersizdir.<br>4. Bu yüzden tarım yerine Büyükbaş Mer'a Hayvancılığı yapılır.<br><br><strong>Cevap: İklim şartlarının (aşırı soğukların ve kısa yaz mevsiminin) tarıma elverişli olmaması.</strong>",
+                    shortcut: "Bir harita sorusunda nehirlerin denize döküldüğü uç noktaları (Delta ovalarını - Çukurova, Bafra, Çarşamba gibi) taramışlarsa, orada KESİNLİKLE 'Alüvyal' toprak vardır. Bu topraklarda iklim özelliği aranmaz, hepsi verimlidir."
+                },
+                {
+                    title: "4. Nüfus, Göç ve Yerleşme",
+                    summary: "Nüfus piramitleri yorumlama, nüfus artış hızı ve göçün nedenleri.",
+                    description: "<p><strong>Nüfusun Dağılışını Etkileyen Faktörler:</strong> Doğal faktörler (İklim, yer şekilleri, su kaynakları, bitki örtüsü) ve Beşeri faktörler (Sanayi, tarım, ulaşım, turizm, madencilik). Dünya'da Güneydoğu Asya (Çin/Hindistan) ve Batı Avrupa yoğun nüfusludur. Çöller, kutuplar, Amazon havzası (çok nemli/balta girmemiş) seyrek nüfusludur.</p><p><strong>Nüfus Piramitleri:</strong> Yaş ve cinsiyet gruplarını gösterir. Gelişmişliği anlatır.<br>- <em>İkizkenar Üçgen (Düz Üçgen):</em> Doğum ve ölüm oranı yüksektir. Geri kalmış ülkelerdir (Somali, Afganistan). Tabanı çok geniştir (Çocuk çok).<br>- <em>Arı Kovanı:</em> Doğum ve ölüm oranı düşüktür. Gelişmiş ülkelerdir (İngiltere, İsveç). Tabanı dardır, yaşlı nüfus fazladır.<br>- <em>Çan Şekli:</em> Gelişmiş bir ülke nüfusunu (doğumları) artırma politikası izliyorsa taban tekrar genişlemeye başlar (ABD, Kanada).</p><br><p><strong>Göçler:</strong> İnsanların yer değiştirmesidir. <em>İtici nedenler:</em> İşsizlik, savaş, afet, tarlaların mirasla bölünmesi, makineleşme. <em>Çekici nedenler:</em> İş imkanları, eğitim, sağlık. Göç türleri: İç göç (ülke içi, nüfusu değiştirmez dağılımı değiştirir), Dış göç (ülkeler arası), Beyin göçü (Aydın/okumuş kesimin gitmesi - çok zararlıdır), Mübadele (Antlaşmayla zorunlu yer değişimi - Örn: Türkiye-Yunanistan).</p>",
+                    items: ["Dünya'da Nüfusun Yoğun ve Seyrek Olduğu Yerler", "Aritmetik ve Fizyolojik Nüfus Yoğunluğu", "Nüfus Piramitlerini Yorumlama (Gelişmişlik Göstergeleri)", "Göçün İtici ve Çekici Nedenleri", "Göç Türleri (İç, Dış, Beyin, Mübadele)"],
+                    formula: "$$\\text{Aritmetik Yoğunluk} = \\frac{\\text{Toplam Nüfus}}{\\text{Yüzölçümü}}$$",
+                    question: "Nüfus piramidi 'Geniş Tabanlı İkizkenar Üçgen' şeklinde olan bir ülke için; I. Ortalama yaşam süresi kısadır, II. Nüfusun ikiye katlanma süresi uzundur, III. Tarımda çalışanların oranı yüksektir. Yargılarından hangileri KESİNLİKLE doğrudur?",
+                    solution: "Geniş tabanlı ikizkenar üçgen piramidi, doğum oranlarının çok yüksek, eğitim/sağlık imkanlarının kötü olduğu <strong>Geri Kalmış (Az Gelişmiş)</strong> ülkeleri temsil eder.<br>1. Sağlık sistemi kötü olduğu için bebek ölümleri fazladır, yaşlı nüfus azdır. Dolayısıyla <strong>Ortalama yaşam süresi kısadır</strong>. (I doğru).<br>2. Doğum oranı (üreme) çok yüksek olduğu için nüfus çok hızlı artar. Bu yüzden nüfusun ikiye katlanma süresi uzun değil, tam tersine <strong>çok KISADIR</strong>. (II yanlış).<br>3. Az gelişmiş ülkelerde sanayi ve hizmet sektörü gelişmemiştir. Halkın çok büyük bir çoğunluğu mecburen <strong>Tarım/Hayvancılık</strong> ile uğraşır. (III doğru).<br><br><strong>Cevap: I ve III kesinlikle doğrudur.</strong>",
+                    shortcut: "Eğer bir ülkenin nüfus piramidinin en alt basamağı (0-4 yaş) bir üstündeki basamaktan (5-9 yaş) DAHA DAR ise, bu ülke kesinlikle 'Nüfus artış hızını düşürücü (Doğum kontrol)' politikası uygulamış ve bunda BAŞARILI OLMUŞ demektir."
+                },
+                {
+                    title: "5. Ekonomik Faaliyetlerin Sınıflandırılması",
+                    summary: "Tarım, sanayi ve hizmet sektörlerinin özellikleri ve gelişmişliğe etkisi.",
+                    description: "<p>Ekonomik faaliyetler doğayla olan ilişkiye ve üretim şekline göre kollara ayrılır:</p><p><strong>Birincil (1.) Ekonomik Faaliyetler:</strong> Doğadan doğrudan elde edilen, işlenmemiş ürünlerdir. Tarım, hayvancılık, ormancılık, madencilik ve balıkçılık bu gruba girer. Geri kalmış ülkelerde çalışanların çoğu bu gruptadır.</p><p><strong>İkincil (2.) Ekonomik Faaliyetler:</strong> Hammaddenin atölye veya fabrikalarda işlenerek yeni bir ürüne (mamul maddeye) dönüştürülmesidir. <strong>Sanayi (Endüstri)</strong> ve İnşaat bu gruba girer. Gelişmekte olan ülkelerde oranı hızla artar.</p><p><strong>Üçüncül (3.) Ekonomik Faaliyetler:</strong> Üretim yoktur, doğrudan insanlara sunulan 'Hizmet' sektörüdür. Eğitim (öğretmen), Sağlık (doktor), Ulaşım, Turizm, Ticaret, Bankacılık ve Güvenlik bu gruptadır. <strong>Gelişmiş ülkelerde çalışanların %70'inden fazlası bu grupta yer alır.</strong></p><p><em>Dördüncül (4.) ve Beşincil (5.) Faaliyetler:</em> Bilişim teknolojileri, yazılım, Ar-Ge uzmanları dördüncül; küresel çaplı şirketlerin CEO'ları ve üst düzey yöneticiler beşincil faaliyettir.</p>",
+                    items: ["Birincil Faaliyetler (Tarım, Maden, Ormancılık)", "İkincil Faaliyetler (Sanayi, İmalat, İnşaat)", "Üçüncül Faaliyetler (Hizmet, Eğitim, Turizm, Bankacılık)", "Gelişmişlik Seviyesine Göre Sektörel Dağılım", "Aktif Nüfus ve İstihdam Kavramları"],
+                    formula: null,
+                    question: "Çalışan nüfusunun %15'i birincil (tarım), %25'i ikincil (sanayi) ve %60'ı üçüncül (hizmet) ekonomik faaliyet kolunda istihdam edilen (çalışan) bir ülke için ne söylenebilir?",
+                    solution: "Bir ülkedeki sektör dağılımı, o ülkenin gelişmişlik seviyesinin aynasıdır.<br>1. Bir ülkede insanların büyük çoğunluğu Birincil sektörde (Tarım) çalışıyorsa, makineleri olmadığı (kas gücü kullandıkları) içindir ve bu ülke <strong>Geri kalmıştır</strong> (Örn: Çad, Mali).<br>2. Verilen oranlarda ise halkın %60'ı Üçüncül (Hizmet: Eğitim, banka, turizm vs.) sektörde çalışmaktadır. Tarımda çalışanlar çok azdır (%15).<br>3. Tarımda çalışanların az olması tarımın yapılmadığını göstermez, <strong>Modern (İntansif) Tarım</strong> yapıldığını, traktör/makine kullanıldığı için insana az ihtiyaç duyulduğunu gösterir.<br>4. Hizmet ve Sanayi sektörünün bu kadar yüksek olması, o ülkenin <strong>Gelişmiş bir ülke</strong> (Örn: Almanya, Japonya) olduğunu kesin olarak kanıtlar.<br><br><strong>Cevap: Gelişmiş bir ülkedir. Modern yöntemler kullanır. Ortalama yaşam süresi uzundur, kişi başına düşen gelir fazladır.</strong>",
+                    shortcut: "Sorularda 'Aktif Nüfus' çalışma çağındaki (15-64 yaş arası) sağlıklı nüfusu ifade eder. 'Bağımlı Nüfus' ise çalışanların bakmak zorunda olduğu 0-14 yaş (çocuk) ve 65+ yaş (ihtiyar) kesimidir. Gelişmemiş ülkelerde genç bağımlı nüfus (bebek) çok fazladır."
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. Biyoçeşitlilik, Biyomlar ve Ekosistem",
+                    summary: "Canlıların yeryüzüne dağılışı, adaptasyon ve büyük iklim/bitki bölgeleri.",
+                    description: "<p><strong>Biyoçeşitlilik:</strong> Bir bölgedeki gen, tür ve ekosistemlerin çeşitliliğidir. Ekvator'dan kutuplara gidildikçe sıcaklık azaldığı için biyoçeşitlilik azalır. Biyoçeşitliliği etkileyen faktörler: Fiziki (İklim, yer şekilleri, toprak), Paleocoğrafya (Kıtaların kayması, iklim değişiklikleri) ve Biyolojik (İnsan ve diğer canlılar) faktörlerdir.</p><p><strong>Biyomlar:</strong> Kendine has iklimi, bitki örtüsü ve hayvan topluluğu olan devasa yaşam alanlarıdır.<br>- <em>Tropikal Yağmur Ormanları Biyomu:</em> Biyoçeşitliliğin en yüksek olduğu, her mevsim sıcak ve yağışlı, dev ağaçların bulunduğu alandır (Amazon, Kongo).<br>- <em>Savan Biyomu:</em> Uzun boylu otluklar, aslan, zebra, zürafa ve belgesellerin çekildiği alandır.<br>- <em>Çöl Biyomu:</em> Su tutabilen bitkiler (kaktüs) ve açık renkli, uzun kulaklı, az terleyen (adaptasyon) hayvanlar (deve, çöl tilkisi) bulunur.<br>- <em>Tundra Biyomu:</em> Yılın büyük kısmı donmuş topraklardır, ren geyiği ve yosunlar (liken) bulunur.<br>- <em>Karasal (Bozkır) Biyom:</em> Türkiye'nin iç kesimlerindeki gibi kısa boylu otlar ve koyun/keçi, tavşan gibi hayvanlar bulunur.</p><br><p><strong>Adaptasyon (Uyum):</strong> Canlıların yaşama ve üreme şansını artırmak için çevreye gösterdikleri kalıtsal uyumdur (Nilüfer bitkisinin geniş yapraklı olması, çöl bitkilerinin dikenli ve derin köklü olması).</p>",
+                    items: ["Biyoçeşitliliğin Dağılışını Etkileyen Faktörler (Paleocoğrafya)", "Karasal Biyomlar (Yağmur Ormanı, Savan, Çöl, Tundra)", "Su Biyomları (Tatlı Su ve Tuzlu Su/Mercan Resifleri)", "Adaptasyon (Uyum) Örnekleri", "Besin Zinciri ve Enerji Akışı (Biyoloji ile Ortak)"],
+                    formula: null,
+                    question: "Avustralya kıtasındaki kanguruların ve koalaların dünyanın başka hiçbir doğal bölgesinde (kıtasında) bulunmamasının (endemik olmalarının), coğrafyanın hangi 'Paleocoğrafya' nedeni ile açıklanması en doğrudur?",
+                    solution: "Biyoçeşitliliği etkileyen Paleocoğrafya (Eski Dünya Coğrafyası) faktörleri 'Kıtaların Kayması' ve 'İklim Değişiklikleri'dir.<br>1. Dünya tek bir kıta (Pangea) halindeyken canlılar daha geniş alanlara yayılabiliyordu.<br>2. Kıtalar parçalanmaya başladığında, Avustralya kıtası diğer kara parçalarından (Asya ve Antarktika'dan) çok erken kopmuş ve etrafı devasa okyanuslarla çevrili bir ada (kıta) haline gelmiştir.<br>3. Denizlerle izole olan bu kara parçasındaki hayvanlar (kanguru gibi keseliler) diğer kıtalara göç edememiş, dışarıdan da yeni türler gelememiştir.<br>4. Milyonlarca yıl boyunca sadece kendi içlerinde izole bir şekilde evrimleşmişlerdir.<br><br><strong>Cevap: Kıtaların kayması sonucu Avustralya'nın çok erken izole olması (denizlerle çevrilmesi) nedeniyle canlı geçişlerinin durması.</strong>",
+                    shortcut: "Mercan Resifleri, tuzlu su (deniz) biyomlarının 'tropikal yağmur ormanları' gibidir. Biyoçeşitliliğin okyanuslarda en zengin olduğu, sığ, sıcak ve tertemiz Ekvatoral bölge sularıdır (Örn: Avustralya Büyük Set Resifi)."
+                },
+                {
+                    title: "2. Şehirlerin Fonksiyonları ve Nüfus Politikaları",
+                    summary: "Küresel/bölgesel şehirler, ilk yerleşmeler ve devletlerin nüfus planlaması.",
+                    description: "<p><strong>İlk Yerleşmeler:</strong> İnsanlar Paleolitik çağda mağaralarda (avcı-toplayıcı) yaşarken, Neolitik çağda tarımın başlamasıyla yerleşik hayata geçip köyler kurdular. İlk medeniyetler her zaman <em>Ilıman iklimlerin, verimli toprakların ve tatlı su kenarlarının</em> (Mezopotamya-Fırat/Dicle, Mısır-Nil, Hindistan-Ganj, Çin-Sarıırmak) etrafında kurulmuştur.</p><p><strong>Şehirlerin Etki Alanları (Fonksiyonları):</strong> Bir şehrin fonksiyonu ne kadar çeşitliyse, küresel etki alanı da o kadar geniştir.<br>- <em>Dini Şehirler:</em> Mekke, Kudüs, Vatikan, Lhasa.<br>- <em>İdari (Başkent) Şehirler:</em> Londra, Washington, Moskova, Ankara, Paris.<br>- <em>Küresel Finans/Ticaret Şehirleri:</em> New York (Wall Street), Tokyo, Londra.<br>- <em>Sanayi Şehirleri:</em> Essen, Manchester, Detroit.<br>- <em>Turizm/Moda Şehirleri:</em> Paris, Roma, Venedik, Milano.</p><p><strong>Nüfus Politikaları:</strong> Ülkelerin nüfusun niteliğini ve niceliğini değiştirmek için uyguladıkları kararlardır.<br>1. <em>Nüfus Artış Hızını Düşürücü (Azaltıcı):</em> Geri kalmış veya çok kalabalık ülkeler uygular (Hindistan, Çin'in eski 'tek çocuk' politikası).<br>2. <em>Nüfus Artış Hızını Yükseltici (Artırıcı):</em> Yaşlı nüfusu çok olan, iş gücü (genç) açığı çeken gelişmiş Avrupa ülkeleri uygular (İsveç, Almanya, Rusya, Japonya).<br>3. <em>Nitelik ve Niceliği İyileştirici (Dengeleyici):</em> Türkiye, Brezilya gibi gelişmekte olan ülkelerin kaliteli (eğitimli) nüfus yetiştirme çabasıdır.</p>",
+                    items: ["İlk Medeniyetlerin Kurulduğu Yerler ve Nedenleri", "Şehirlerin Küresel, Bölgesel ve Yerel Etki Alanları", "Dini, İdari, Sanayi ve Ticaret Şehirleri Örnekleri", "Ülkelerin Uyguladıkları Nüfus Politikaları (Artırıcı, Azaltıcı)", "Şehirleşme, Göç ve Sanayileşme İlişkisi"],
+                    formula: null,
+                    question: "Japonya, Almanya, Fransa ve Rusya gibi dünyanın ekonomik açıdan en gelişmiş ülkelerinin 'Nüfus Artış Hızını Yükseltici (Doğumları Teşvik Edici)' politikalar uygulamalarının ve ailelere maddi yardımlar yapmalarının EN TEMEL nedeni nedir?",
+                    solution: "Gelişmiş ülkelerin refah seviyesi ve eğitim durumu yüksektir. Bu da kadınların iş hayatına katılımını artırır ve doğum oranlarını hızla düşürür.<br>1. Doğum oranları düşünce, alttan genç (çocuk) nüfus gelmez.<br>2. Sağlık imkanları iyi olduğu için yaşlılar uzun süre yaşar ve toplum hızla 'Yaşlanır'.<br>3. Yaşlı nüfusun artması ve genç nüfusun azalması, fabrikalarda ve hizmet sektöründe çalışacak <strong>'Dinamik/Aktif İş Gücünün' (çalışan insanın)</strong> bulunamamasına neden olur.<br>4. İş gücü açığını kapatmak için dışarıdan göç almak zorunda kalırlar.<br><br><strong>Cevap: Genç ve dinamik iş gücü (çalışan insan) ihtiyacını karşılamak ve nüfusun yaşlanmasını (emekli yükünü) engellemek.</strong>",
+                    shortcut: "Bir şehrin etki alanının 'KÜRESEL' (Tüm dünyayı etkileyen) olabilmesi için o şehrin Dünya borsasına, modasına, büyük teknoloji firmalarına veya devasa limanlara sahip olması gerekir. Örneğin Türkiye'de İstanbul bölgesel/küresel arası bir etkiye sahipken, Bayburt'un etki alanı sadece yereldir."
+                },
+                {
+                    title: "3. Türkiye'nin Ekonomisi (Tarım, Hayvancılık, Madenler)",
+                    summary: "Ülkemizde yetişen ürünler, çıkarılan madenler ve sanayi tesisleri.",
+                    description: "<p><strong>Türkiye'de Tarım:</strong> İklim çeşitliliği fazla olduğu için tarım ürünü çeşitliliği çoktur. <em>Ekstansif (İlkel) Tarım:</em> Makineleşmenin az, doğaya bağımlılığın yüksek olduğu tarımdır (Verim düşüktür). <em>İntansif (Modern) Tarım:</em> Gübreleme, sulama ve makine kullanımının yüksek olduğu, iklime bağımlılığın az olduğu tarımdır (Örn: Çukurova, Ege).<br>- <em>Kıyı Ürünleri (Bol su ve kış ılıklığı isterler):</em> Fındık, Çay, Turunçgil, Zeytin, Pamuk, İncir.<br>- <em>İç Kesim Ürünleri (Kuraklık ve soğuğa dayanıklıdırlar):</em> Buğday, Arpa, Şeker Pancarı (küspesi hayvan yemi olduğu için fabrikaları iç bölgelerdedir), Elma, Üzüm.</p><p><strong>Hayvancılık:</strong> İklim ve bitki örtüsüne bağlıdır. Bozkır alanlarda (İç Anadolu) <em>Küçükbaş (Koyun)</em>, yüksek çayırlarda (Erzurum-Kars) <em>Büyükbaş (Sığır)</em> mera hayvancılığı, dağlık ve ormanlık alanlarda (Muğla, Ordu, Hakkari) <em>Arıcılık</em>, dut ağacının çok olduğu yörelerde (Diyarbakır, Bursa) <em>İpekböcekçiliği</em> yapılır. Kümes hayvancılığı (Tavuk) büyük şehirlerin (Marmara) etrafında toplanmıştır (Tüketici nüfustan dolayı).</p><br><p><strong>Madenler ve Enerji Kaynakları:</strong><br>- <em>Bor:</em> Dünya rezervinin %73'ü Türkiye'dedir (Marmara, Ege). Roket yakıtı, cam ve deterjan sanayisinde kullanılır.<br>- <em>Demir:</em> Sivas (Divriği), Malatya (Hekimhan). Karabük ve Ereğli'de işlenir (Çünkü taş kömürü/enerji oradadır).<br>- <em>Bakır:</em> Artvin (Murgul), Kastamonu (Küre). İletkenliği yüksek olduğu için kablo/elektrik sanayisinde kullanılır.<br>- <em>Krom:</em> Çeliği sertleştiren, paslanmaz yapan stratejik madendir (Elazığ-Guleman, Muğla-Fethiye).<br>- <em>Enerji Kaynakları:</em> Taş Kömürü (Zonguldak-1. Zaman), Linyit (Afyon, Kütahya, Manisa, Maraş-Afşin - 3. Zaman, elektrik üretiminde kullanılır), Petrol (Batman), Doğalgaz (Kırklareli-Hamitabat), Jeotermal (Denizli-Sarayköy, Aydın-Germencik).</p>",
+                    items: ["Ekstansif (İlkel) ve İntansif (Modern) Tarım Metotları", "Türkiye'de Tarım Ürünlerinin Dağılışı (Kıyı ve İç Kesim)", "Büyükbaş, Küçükbaş, Arıcılık ve Kümes Hayvancılığı Dağılışı", "Bor, Demir, Bakır ve Krom Madenleri", "Linyit, Taşkömürü, Jeotermal ve Rüzgar Enerjisi"],
+                    formula: null,
+                    question: "Sivas (Divriği) ve Malatya (Hekimhan) bölgelerinden çıkarılan Demir cevheri (madeni), çıkarıldığı yerde değil de neden Karadeniz kıyısındaki Karabük ve Zonguldak (Ereğli) illerine taşınarak oradaki devasa demir-çelik fabrikalarında eritilip işlenmektedir?",
+                    solution: "Sanayi tesislerinin (fabrikaların) kuruluş yerini belirleyen faktörler (Hammaddeye yakınlık, enerjiye yakınlık, ulaşım vb.) vardır.<br>1. Demir çok sert bir madendir. Onu eritip çelik haline getirmek için devasa fırınlara ve <strong>çok yüksek ısı enerjisine</strong> ihtiyaç vardır.<br>2. Bu ısı enerjisini verebilecek olan en güçlü yakıt <strong>Taş Kömürü</strong>'dür.<br>3. Türkiye'de taş kömürü sadece Zonguldak ve çevresinde çıkmaktadır.<br>4. Demiri çıkarıldığı yerde (Sivas'ta) eritmek için milyonlarca ton kömürü Sivas'a taşımaktansa, demiri kömürün olduğu yere (Karabük/Ereğli) taşımak nakliye açısından daha ucuzdur.<br><br><strong>Cevap: Enerji Kaynağına (Taş Kömürüne) yakınlık ilkesinden dolayı.</strong>",
+                    shortcut: "Devlet, bazı tarım ürünlerinin ekimine sınırlama (Kota) getirmiştir. Kaliteyi korumak için <strong>Tütün</strong>'e, uyuşturucu yapımında kullanıldığı (kaçakçılığı önlemek) için <strong>Haşhaş ve Kenevir</strong>'e, sıtma hastalığı yapan sivrisinekleri çoğalttığı için su içinde yetişen <strong>Pirinç (Çeltik)</strong>'e kısıtlama uygulanır."
+                },
+                {
+                    title: "4. Küresel Ortam: Ülkeler ve Örgütler",
+                    summary: "Küresel ve bölgesel örgütler, gelişmişlik endeksleri ve kültür bölgeleri.",
+                    description: "<p><strong>Küresel (Tüm Dünyayı Kapsayan) Örgütler:</strong><br>- <em>BM (Birleşmiş Milletler):</em> II. Dünya Savaşı'ndan sonra dünya barışını korumak için kuruldu. 5 daimi üyesinin (ABD, Çin, İngiltere, Fransa, Rusya - FİRÇA şifresi) her kararı VETO (reddetme) hakkı vardır.<br>- <em>NATO (Kuzey Atlantik İttifakı):</em> Sovyet (Komünist) tehdidine karşı ABD önderliğinde kurulan uluslararası <strong>Askeri (Savunma)</strong> örgütüdür. Türkiye üyedir.<br>- <em>OPEC (Petrol İhraç Eden Ülkeler):</em> Dünya petrol fiyatlarını belirleyen örgüttür (Suudi Arabistan, Kuveyt, Irak, İran, Venezuela).<br>- <em>IMF ve Dünya Bankası:</em> Ülkelere ekonomik kredi veren küresel finans kuruluşlarıdır.</p><br><p><strong>Bölgesel Örgütler:</strong><br>- <em>AB (Avrupa Birliği):</em> Kömür ve Çelik topluluğu olarak başlayıp Avrupa'nın siyasi/ekonomik birliğine dönüşen yapıdır. (Türkiye üye değildir).<br>- <em>NAFTA:</em> ABD, Kanada ve Meksika arasındaki serbest ticaret antlaşmasıdır.<br>- <em>Karadeniz Ekonomik İşbirliği (KEİ):</em> Türkiye'nin önderliğinde Karadeniz'e kıyısı olan ve o bölgedeki ülkelerin ekonomik işbirliğidir.</p><p><strong>Ülkelerin Gelişmişlik Göstergeleri:</strong> Bir ülkenin gelişmişliğini sadece parası (Milli geliri) belirlemez. İnsani Gelişme Endeksi (İGE); eğitim seviyesi, ortalama yaşam süresi, sağlık hizmetleri ve kişi başına düşen gelirin ortaklaşa hesaplanmasıyla bulunur. Norveç, İsviçre en üstteyken; Orta Afrika ülkeleri (Nijer, Çad) en alt sıradadır.</p>",
+                    items: ["Birleşmiş Milletler (BM) ve Veto Hakkı Olan 5 Daimi Üye", "NATO (Askeri Örgüt) ve Türkiye'nin Katılımı (Kore Savaşı)", "OPEC, IMF ve Dünya Bankası (Ekonomik Örgütler)", "Bölgesel Örgütler (AB, NAFTA, KEİ)", "İnsani Gelişme Endeksi (İGE) ve Kriterleri"],
+                    formula: null,
+                    question: "Merkezi New York'ta bulunan ve dünyanın en büyük uluslararası örgütü olan Birleşmiş Milletler'in (BM) yapısındaki en büyük adaletsizlik/demokratik sorun olarak gösterilen 'VETO' yetkisi nedir ve hangi ülkelere verilmiştir?",
+                    solution: "Birleşmiş Milletler (BM), II. Dünya Savaşı'nın galipleri tarafından kurulmuştur.<br>1. Örgütün içinde 190'dan fazla ülke üye olmasına rağmen, 'Güvenlik Konseyi' adı verilen komitede 5 tane daimi (kalıcı) ülke vardır.<br>2. Bu 5 ülke: Fransa, İngiltere, Rusya, Çin ve ABD'dir (Şifre: FIRÇA).<br>3. VETO yetkisi şudur: Tüm 190 ülke bir karara 'Evet' dese bile, bu 5 daimi ülkeden sadece 1 tanesi bile karara 'Hayır (Veto)' derse o karar <strong>kesinlikle iptal olur ve uygulanamaz</strong>.<br>4. Bu durum uluslararası eşitliğe aykırıdır. (Cumhurbaşkanı Erdoğan'ın 'Dünya 5'ten Büyüktür' sözü bu adaletsizliğe bir tepkidir).<br><br><strong>Cevap: FİRÇA (Fransa, İngiltere, Rusya, Çin, ABD) devletlerinin, alınan her türlü uluslararası kararı tek başlarına iptal etme (Veto) ayrıcalığıdır.</strong>",
+                    shortcut: "Türkiye, Avrupa Birliği'ne (AB) veya Petrol İhraç Edenler (OPEC)'e ÜYE DEĞİLDİR. Ancak NATO, Birleşmiş Milletler (Kurucu üye), İslam İşbirliği Teşkilatı, KEİ ve G-20 (Dünyanın en büyük 20 ekonomisi) gibi örgütlere üyedir."
+                },
+                {
+                    title: "5. Çevre ve Toplum: Afetler ve Çevre Sorunları",
+                    summary: "Küresel iklim değişikliği, ekstrem olaylar, geri dönüşüm ve doğal afetler.",
+                    description: "<p><strong>Ekstrem Doğa Olayları:</strong> Alışılmışın dışında olan, çok nadir görülen ve devasa yıkım yapan doğa olaylarıdır.<br>- <em>Klimatolojik (Meteorolojik) Ekstremler:</em> Aşırı sıcak/soğuk dalgaları, devasa kasırga ve tayfunlar, aşırı yağışlar/seller ve <strong>Kuraklık</strong> (en yavaş gelişen, ama en tehlikeli ve uzun süreli afettir).<br>- <em>Jeolojik (Yere Bağlı) Ekstremler:</em> 9.0 büyüklüğündeki depremler, şiddetli Tsunami (okyanus tabanındaki deprem/volkan kaynaklı dev dalgalar) ve devasa volkanik patlamalar.</p><p><strong>Küresel Çevre Sorunları:</strong><br>- <em>Sera Etkisi ve Küresel Isınma:</em> Fosil yakıtların (kömür, petrol, doğalgaz) yanmasıyla atmosferde biriken Karbondioksit ($CO_2$) ve Metan gazlarının, Güneşten yansıyan ısıyı uzaya bırakmayıp Dünya'yı bir sera gibi ısıtmasıdır. (Sonuç: Buzullar erir, deniz seviyesi yükselir, Hollanda sular altında kalır, iklimler kayar).<br>- <em>Asit Yağmurları:</em> Fabrika bacalarından çıkan Kükürt ve Azot gazlarının havadaki su buharıyla birleşip asit olarak yağmasıdır (Ormanları ve tarihi eserleri eritir).</p><p><strong>Geri Dönüşüm ve Karbon Ayak İzi:</strong> Atıkların (kağıt, cam, metal, plastik) yeniden ham madde olarak sanayiye kazandırılmasıdır. Tükettiğimiz enerji ve ulaşım alışkanlıklarımız doğaya ne kadar Karbondioksit bırakıyorsa 'Karbon Ayak İzimiz' o kadar büyüktür. Fosil yakıtlar yerine <em>Yenilenebilir Enerji (Güneş, Rüzgar, Jeotermal)</em> kullanmak sorunu azaltır.</p>",
+                    items: ["Ekstrem (Sıra Dışı) Doğa Olayları Örnekleri", "Tsunami, Deprem ve Volkanizmanın Etkileri", "Sera Etkisi, Karbon Emisyonu ve Küresel Isınma", "Asit Yağmurları ve Ozon Tabakasının Seyrelmesi", "Yenilenebilir Enerji Kaynakları ve Geri Dönüşüm"],
+                    formula: null,
+                    question: "Kuraklık (şiddetli susuzluk ve yağış azlığı) da bir doğal afettir, deprem de bir doğal afettir. Bu iki afetin oluşum hızını ve etkisini gösterdiği süreyi (başlangıç ve bitiş zamanını) karşılaştırarak açıklayınız.",
+                    solution: "1. <strong>Deprem (Jeolojik afet):</strong> Saniyeler içinde, aniden başlar (çok hızlı gelişir) ve birkaç dakika içinde yıkımını yapıp biter. Önceden ne zaman olacağı kesin olarak bilinemez.<br>2. <strong>Kuraklık (Klimatolojik afet):</strong> Depremin tam zıddıdır. Yavaş yavaş, aylar hatta yıllar içinde gelişir ('Sinsi Afet' de denir). Başlangıç ve bitiş zamanını kesin bir çizgiyle belirlemek imkansızdır.<br>3. Etkisi de hemen bitmez; tarımın çökmesine, kıtlığa, salgın hastalıklara ve uzun vadede kitlesel insan/hayvan göçlerine neden olur.<br><br><strong>Cevap: Deprem aniden (saniyeler içinde) olur ve biter; kuraklık ise çok yavaş (yıllar içinde sinsi bir şekilde) gelişir ve etkisi çok uzun yıllar sürer.</strong>",
+                    shortcut: "Kasırga, Tayfun ve Hurricane gibi devasa yıkıcı fırtınalar SADECE TROPİKAL KUŞAKTA (Ekvator çevresindeki Okyanus kıyılarında) oluşurlar. Türkiye gibi 'Orta Kuşak' ülkelerinde (iklim sakin olduğu için) kasırga ve tayfun GÖRÜLMEZ."
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. Küresel Ticaret, Ulaşım Hatları ve Enerji Koridorları",
+                    summary: "Dünyadaki önemli boğazlar, kanallar ve ticaret yolları.",
+                    description: "<p><strong>Küresel Ticaret:</strong> Ham madde, üretim ve pazar alanlarının dünya üzerindeki dağılışı ticareti doğurur. Günümüzde ticaretin en yoğun olduğu bölgeler: Kuzey Amerika, Batı Avrupa ve Doğu Asya'dır.</p><p><strong>Önemli Boğazlar (Doğal):</strong><br>- <em>Hürmüz Boğazı:</em> Basra Körfezi'ni Umman Denizi'ne bağlar. Ortadoğu <strong>Petrolünün</strong> dünyaya çıkış kapısıdır. (Alternatifi yoktur, stratejiktir).<br>- <em>Babülmendep Boğazı:</em> Kızıldeniz'i Hint Okyanusu'na bağlar (Korsan saldırılarıyla ünlüdür).<br>- <em>Cebelitarık Boğazı:</em> Akdeniz'i Atlas Okyanusu'na bağlar.<br>- <em>Malakka Boğazı:</em> Hint Okyanusu ile Pasifik (Çin/Japonya) arasındadır. Dünyanın en yoğun ve tehlikeli (korsan/dar) boğazlarından biridir.</p><br><p><strong>Önemli Kanallar (İnsan Yapımı):</strong><br>- <em>Süveyş Kanalı (Mısır):</em> Akdeniz'i Kızıldeniz'e bağlar. Açılmasıyla Ümit Burnu'nun önemi azalmış, Akdeniz ticareti yeniden canlanmıştır. Kapak (havuz) sistemi yoktur.<br>- <em>Panama Kanalı (Orta Amerika):</em> Atlas Okyanusu'nu Pasifik'e bağlar. Macellan Boğazı'nın önemini bitirmiştir. Dağların üzerinden gemileri aşıran <strong>Havuz (Kaldırma) Sistemi</strong> olan, dünyanın en pahalı mühendislik harikasıdır.<br>- <em>Kiel Kanalı:</em> Almanya'da Baltık Denizi'ni Kuzey Denizi'ne bağlar.</p>",
+                    items: ["Üretim, Dağıtım ve Tüketim Ağları", "Küresel Ticaretin Üç Büyük Merkezi (Avrupa, ABD, Asya)", "Dünyadaki Stratejik Boğazlar (Hürmüz, Malakka, Cebelitarık)", "İnsan Yapımı Kanallar (Süveyş, Panama, Kiel)", "Enerji Nakil Hatları ve Boru Hatları"],
+                    formula: null,
+                    question: "Ortadoğu'daki (Suudi Arabistan, Kuveyt, Irak, İran) petrol ve doğalgaz rezervlerinin dünya pazarlarına deniz yoluyla ulaştırılmasında kullanılması ZORUNLU olan, alternatifi bulunmayan ve bu nedenle dünyanın en stratejik enerji koridoru sayılan boğaz hangisidir?",
+                    solution: "Ortadoğu'daki devasa petrol yatakları Basra Körfezi etrafında toplanmıştır.<br>1. Basra Körfezi kapalı bir deniz gibidir, açık okyanuslara (Hint Okyanusu/Umman Denizi) açılan tek bir çıkış kapısı vardır.<br>2. Bu kapı İran ile Umman arasında yer alan <strong>Hürmüz Boğazı</strong>'dır.<br>3. Buradan çıkan dev petrol tankerleri daha sonra Babülmendep ve Süveyş Kanalı üzerinden Avrupa'ya veya Malakka üzerinden Asya'ya giderler. Ancak ilk çıkış noktası kesinlikle Hürmüz'dür.<br><br><strong>Cevap: Hürmüz Boğazı.</strong>",
+                    shortcut: "Boğazlar doğal oluşumludur (İstanbul, Çanakkale, Cebelitarık), Kanallar ise insan yapımıdır (Süveyş, Panama, Korint). Süveyş Kanalı açılınca Ümit Burnu (Güney Afrika) çökmüş, Panama Kanalı açılınca Macellan Boğazı (Güney Amerika) çökmüştür."
+                },
+                {
+                    title: "2. Türkiye'nin Bölgesel Kalkınma Projeleri",
+                    summary: "GAP, KOP, DOKAP, ZBK ve DAP projelerinin amaçları.",
+                    description: "<p>Ülkemizdeki bölgeler arası gelişmişlik farkını (göçleri) azaltmak için hazırlanan projelerdir:</p><p><strong>GAP (Güneydoğu Anadolu Projesi):</strong> Türkiye'nin en büyük, en kapsamlı (ve büyük oranda tamamlanmış) projesidir. Fırat ve Dicle üzerine kurulan barajlarla (Atatürk Barajı) bölgeyi sulu tarıma geçirmek hedeflenmiştir. <strong>Sonuçları:</strong> Pamuk üretimi patlamış (Türkiye 1.si olmuştur), kuraklık isteyen kırmızı mercimek ve buğday ekimi azalmıştır. Sanayi, ulaşım ve eğitim gelişmiştir.</p><p><strong>KOP (Konya Ovası Projesi):</strong> Türkiye'nin tahıl ambarı olan bölgenin en büyük sorunu 'Kuraklık'tır (Su yetersizliği). Mavi Tünel projesiyle Göksu nehrinin suları Konya ovasına aktarılarak sulu tarım ve verim artırılmaya çalışılmaktadır.</p><p><strong>ZBK (Zonguldak, Bartın, Karabük):</strong> Temeli madenciliğe (Taş kömürü ve Demir-Çelik) dayanan tek projedir. Kömür rezervlerinin azalması ve fabrikaların küçülmesiyle artan işsizliği (göçü) önlemek, yeni iş sahaları (tarım, ormancılık) açmak hedeflenmiştir.</p><p><strong>DOKAP (Doğu Karadeniz Projesi):</strong> Bölgenin en büyük sorunu dağlık arazi, dağınık yerleşme ve ulaşım zorluğudur. Yaylacılığı turizme (Yeşil Yol Projesi) kazandırmak, balıkçılığı ve ulaşımı geliştirmek hedeflenir.</p><p><strong>DAP (Doğu Anadolu Projesi):</strong> Geniş meralara sahip bölgede, ilkel hayvancılığı modern (besi/ahır) hayvancılığına dönüştürmek, et/süt entegre tesisleri kurarak kış turizmini canlandırmak hedeflenir.</p>",
+                    items: ["Bölgeler Arası Gelişmişlik Farklarının Nedenleri", "GAP ile Sulu Tarıma Geçişin Sonuçları (Pamuk Artışı)", "KOP (Mavi Tünel) ve Su Sorununun Çözümü", "DOKAP ve Yeşil Yol (Yaylacılık/Turizm) Projesi", "ZBK (Maden/Sanayi) ve DAP (Hayvancılık) Projeleri"],
+                    formula: null,
+                    question: "GAP (Güneydoğu Anadolu Projesi) tamamlanıp bölge sulu tarıma geçtikten sonra, bölgede Pamuk, Mısır ve Soya Fasulyesi gibi ürünlerin ekim alanı hızla genişlerken; Kırmızı Mercimek ve Buğday gibi ürünlerin ekim alanı daralmıştır. Bu durumun temel nedeni nedir?",
+                    solution: "Çiftçilerin ürün tercihlerini belirleyen en önemli faktörlerden biri ekonomik gelirdir.<br>1. Kırmızı mercimek ve buğday, kuraklığa dayanıklı ürünlerdir ve su olmayan yerlerde mecburen ekilirler.<br>2. Bölgeye su gelince, çiftçiler bu mecburi (ve nispeten daha az kazandıran) ürünleri ekmeyi bırakmıştır.<br>3. Suyun bol olduğu yerlerde yetişebilen, sanayide kullanılan (tekstil/yağ) ve ekonomik getirisi (parası) çok daha yüksek olan 'Endüstri (Sanayi) Bitkilerine' (Pamuk, Mısır) yönelmişlerdir.<br><br><strong>Cevap: Çiftçilerin sulama imkanıyla birlikte ekonomik getirisi daha yüksek olan sanayi ürünlerine (Pamuğa) yönelmesi.</strong>",
+                    shortcut: "Bir kalkınma projesinin adını duyduğunda aklına hemen 'Bölgenin ana sorunu nedir?' sorusu gelsin. Güneydoğu ve Konya'nın sorunu 'Susuzluk' (GAP/KOP), Doğu Karadeniz'in sorunu 'Dağlık arazi/Ulaşım' (DOKAP), Doğu Anadolu'nun sorunu 'Sert kışlar/İlkel Hayvancılık' (DAP), Zonguldak'ın sorunu ise 'Madenlerin tükenmesi'dir (ZBK)."
+                },
+                {
+                    title: "3. Çevre Sorunları, Antlaşmalar ve Sürdürülebilirlik",
+                    summary: "Kyoto Protokolü, Paris Anlaşması, Ramsar ve karbon ayak izi.",
+                    description: "<p><strong>Küresel Çevre Sorunları:</strong> Fosil yakıt (kömür, petrol) kullanımı, hızlı sanayileşme ve orman tahribatı sonucunda Küresel Isınma (Sera Etkisi), Asit Yağmurları ve Ozon Tabakasının incelmesi meydana gelmiştir. Bu durum deniz seviyesinin yükselmesine, tatlı su kaynaklarının kurumasına ve ekstrem hava olaylarına yol açmaktadır.</p><p><strong>Küresel Çevre Sözleşmeleri:</strong><br>- <em>Kyoto Protokolü (1997):</em> Küresel ısınmaya neden olan sera gazı (karbondioksit) salınımını (emisyonunu) 1990 yılı seviyesinin altına indirmeyi hedefleyen en önemli uluslararası sözleşmedir.<br>- <em>Paris İklim Anlaşması (2015):</em> Kyoto'nun devamı niteliğindedir. Küresel sıcaklık artışını 1,5 - 2 °C ile sınırlandırmayı hedefler.<br>- <em>Ramsar Sözleşmesi:</em> Özellikle su kuşlarının yaşama alanı olan 'Sulak Alanları' (Göller, bataklıklar, deltalar) koruma sözleşmesidir. (İran'ın Ramsar kentinde imzalanmıştır). Türkiye'de Manyas (Kuş) Gölü, Seyfe Gölü, Göksu Deltası vb. koruma altındadır.</p><p><strong>Sürdürülebilirlik:</strong> Gelecek nesillerin (çocuklarımızın) ihtiyaçlarını tehlikeye atmadan, doğayı kendini yenileyebileceği hızda kullanmaktır. Fosil yakıtlar yerine Yenilenebilir enerji (Güneş, Rüzgar, Biyokütle) kullanmak, geri dönüşüm yapmak ve Karbon Ayak İzini küçültmek esastır.</p>",
+                    items: ["Sera Etkisi, Karbon Emisyonu ve Küresel Isınma", "Kyoto Protokolü ve Sera Gazlarını Azaltma Hedefi", "Paris İklim Anlaşması ve Sıcaklık Artışı Sınırı", "Ramsar Sözleşmesi ve Sulak Alanların Korunması", "Sürdürülebilir Doğal Kaynak Kullanımı"],
+                    formula: null,
+                    question: "Ramsar Sözleşmesi kapsamında koruma altına alınan Türkiye'deki 'Sulak Alanların' (Deltalar, sığ göller, sazlıklar) ekosistem açısından en büyük önemi nedir ve bu alanlar hangi insan faaliyetleriyle en çok tehdit edilmektedir?",
+                    solution: "1. <strong>Önemi:</strong> Sulak alanlar, biyoçeşitliliğin (özellikle endemik bitkiler, böcekler ve kurbağalar) en zengin olduğu yerlerdir. Ancak en büyük önemi, kıtalar arası göç eden <strong>Su Kuşlarının (Göçmen kuşların)</strong> dinlenme, beslenme ve üreme alanları olmalarıdır. (Doğanın otelleridir).<br>2. <strong>Tehdit Eden Olay:</strong> Geçmişte ve günümüzde insanların tarım alanı elde etmek (tarla açmak) veya sivrisinek/sıtma ile mücadele etmek amacıyla <strong>sulak alanları ve bataklıkları kurutması</strong> (drenaj kanalları açması), bu ekosisteme yapılan en büyük yıkımdır.<br><br><strong>Cevap: Önemi göçmen kuşların konaklama ve üreme alanı olmasıdır. En büyük tehdit ise tarım alanı açmak için buraların kurutulmasıdır.</strong>",
+                    shortcut: "Eğer bir metinde 'Sera gazı salınımı, Karbon emisyonu, Karbon ayak izi' geçiyorsa aklına doğrudan <strong>Kyoto Protokolü</strong> ve <strong>Paris İklim Anlaşması</strong> gelsin. Eğer 'Göçmen kuşlar, Göller, Bataklıklar' geçiyorsa cevap kesinlikle <strong>Ramsar Sözleşmesi</strong>'dir."
+                },
+                {
+                    title: "4. Türkiye'nin Jeopolitiği ve Bölgesel Çatışmalar",
+                    summary: "Türkiye'nin özel konumu, enerji koridoru olması ve Ortadoğu/Kafkas krizleri.",
+                    description: "<p><strong>Jeopolitik Konum:</strong> Bir ülkenin bulunduğu coğrafi konumun, onun dünya siyasetindeki (politik) önemine etkisidir. Değişmeyen unsurlar (iklim, yer şekilleri, su kaynakları, stratejik boğazlar) ve değişen unsurlar (nüfus, ekonomi, teknoloji, askeri güç) olarak ikiye ayrılır.</p><p><strong>Türkiye'nin Jeopolitik Önemi:</strong><br>1. Üç kıtanın (Asya, Avrupa, Afrika) birbirine en çok yaklaştığı kavşak noktasındadır.<br>2. Zengin enerji kaynaklarına sahip Ortadoğu/Hazar bölgesi ile, enerjiye çok aç olan Sanayileşmiş Avrupa arasında devasa bir <strong>Enerji Koridoru (Köprü)</strong> konumundadır (Örn: TANAP, Bakü-Tiflis-Ceyhan boru hatları).<br>3. Karadeniz'e kıyısı olan ülkelerin okyanuslara açılmasını sağlayan İstanbul ve Çanakkale boğazlarına tam egemendir (Montrö).<br>4. Ortadoğu'nun aksine, zengin tatlı su kaynaklarına (Fırat, Dicle, Çoruh) sahiptir.</p><br><p><strong>Sıcak Çatışma Bölgeleri (Kriz Noktaları):</strong><br>- <em>Ortadoğu:</em> Petrolün varlığı, su paylaşım sorunları (Örn: GAP nedeniyle Suriye/Irak ile yaşanan gerginlikler) ve İsrail-Filistin dini/tarihi çatışmaları bölgeyi dünyanın en sıcak çatışma alanı yapmıştır.<br>- <em>Kafkaslar ve Orta Asya:</em> Hazar havzası petrolleri/doğalgazı ve Rusya'nın sıcak denizlere inme politikası (Ukrayna, Gürcistan krizleri).</p>",
+                    items: ["Jeopolitiğin Değişen (Nüfus, Ekonomi) ve Değişmeyen (İklim, Yer Şekilleri) Unsurları", "Türkiye'nin Jeopolitik Önemini Artıran Faktörler", "Enerji Koridoru (Boru Hatları) Olma Stratejisi", "Sıcak Çatışma Bölgeleri (Ortadoğu ve Kafkaslar)", "Sınır Aşan Sular Sorunu (Fırat ve Dicle)"],
+                    formula: null,
+                    question: "Türkiye'nin Asya ile Avrupa arasında transit bir geçiş yolu (köprü) olmasının yanı sıra, son yıllarda inşa edilen TANAP (Trans Anadolu Doğalgaz Boru Hattı) ve BTC (Bakü-Tiflis-Ceyhan Petrol Boru Hattı) projeleriyle uluslararası alanda hangi rolü güçlenmiştir?",
+                    solution: "Türkiye eskiden beri doğu ile batı arasında sadece bir yolcu ve eşya geçiş noktasıydı.<br>1. Ancak Ortadoğu ve Hazar bölgesindeki doğalgaz ve petrolün gemilerle taşınmasının zor ve pahalı olması, boru hatlarını (boru taşımacılığını) zorunlu kılmıştır.<br>2. Bu boru hatlarının en güvenli güzergahı Türkiye üzerinden Avrupa'ya ulaşmasıdır.<br>3. Bu devasa boru hattı projeleriyle Türkiye, dünyadaki enerji kaynaklarının tüketiciye güvenle ulaştırılmasını sağlayan stratejik bir <strong>'Enerji Koridoru' (Enerji terminali)</strong> konumuna yükselmiştir.<br><br><strong>Cevap: Türkiye'nin Avrupa'nın enerji güvenliğini sağlayan stratejik bir 'Enerji Koridoru' olma rolü güçlenmiştir.</strong>",
+                    shortcut: "Bir ülkenin 'Matematik (Mutlak) Konumu' (Enlem/Boylam değerleri) asla o ülkeye jeopolitik bir güç veya ayrıcalık KAZANDIRMAZ. Jeopolitik gücü belirleyen şeyler o ülkenin dağları, boğazları, yeraltı kaynakları ve komşularıdır, yani <strong>Özel (Göreceli) Konumu</strong>'dur."
+                },
+                {
+                    title: "5. Turizm, Milli Parklar ve Kültürel Miras",
+                    summary: "Bacasız sanayi, turizmin etkileri ve UNESCO Dünya Mirasları.",
+                    description: "<p><strong>Turizm (Bacasız Sanayi):</strong> İnsanların dinlenme, eğlenme, kültürel veya sağlık amacıyla yaptıkları yer değiştirmelerdir.<br><em>Ekonomik Etkisi:</em> Ülkeye döviz (yabancı para) girdisi sağlar, dış ticaret açığını kapatır, yeni iş sahaları (istihdam) açar, altyapı ve ulaşımın gelişmesini zorunlu kılar.<br><em>Sosyo-Kültürel Etkisi:</em> Farklı milletlerin birbirini tanımasını, önyargıların yıkılmasını ve barışın sağlanmasını destekler.</p><p><strong>Milli Parklar:</strong> Doğal ve kültürel güzellikleri korunması gereken, devlet tarafından sit alanı ilan edilen yerlerdir. Türkiye'nin ilk milli parkı <strong>Yozgat Çamlığı</strong>'dır. Uludağ, Yedigöller, Göreme, Beydağları önemli milli parklardır.</p><p><strong>UNESCO Dünya Kültür ve Doğa Mirası:</strong> Tüm insanlığın ortak malı sayılan ve korunması garanti altına alınan eşsiz yerlerdir. Türkiye'de pek çok miras alanı vardır:<br>- <em>Tarihi/Kültürel Miraslar:</em> İstanbul'un Tarihi Alanları, Divriği Ulu Camii ve Darüşşifası (Sivas), Hattuşaş (Çorum - Hitit Başkenti), Nemrut Dağı Heykelleri (Adıyaman), Truva Antik Kenti (Çanakkale), Efes Antik Kenti (İzmir), <strong>Göbeklitepe (Şanlıurfa - Dünyanın en eski tapınağı, sıfır noktası)</strong>.<br>- <em>Karma (Hem Doğal Hem Kültürel) Miraslar:</em> Sadece iki tanedir: <strong>Kapadokya (Nevşehir)</strong> ve <strong>Pamukkale-Hierapolis (Denizli)</strong>. (Doğal oluşumların içine insanlar tarafından şehir/kilise oyulduğu için karmadır).</p>",
+                    items: ["Turizmin Ekonomik (Döviz, İstihdam) ve Sosyal Etkileri", "İnanç, Sağlık (Termal), Kış ve Kongre Turizmi", "Türkiye'nin Önemli Milli Parkları", "UNESCO Dünya Mirası Listesindeki Eserlerimiz", "Karma Miras Alanları (Kapadokya ve Pamukkale)"],
+                    formula: null,
+                    question: "Turizm sektörünün bir ülkenin ekonomisine (özellikle Türkiye, İspanya, İtalya gibi gelişmekte olan ülkelere) yaptığı en büyük makroekonomik katkı nedir?",
+                    solution: "Gelişmekte olan ülkelerin en büyük ekonomik sorunu, dışarıdan aldıkları ürünlerin (ithalat), dışarıya sattıkları ürünlerden (ihracat) fazla olmasıdır.<br>1. İthalat > İhracat durumuna <strong>Dış Ticaret Açığı</strong> denir.<br>2. Bu açığı kapatmak için ülkeye sıcak para (Döviz) girmesi gerekir.<br>3. Yabancı turistler ülkeye gelirken kendi ülkelerinin parasını (Dolar, Euro) getirip burada harcarlar.<br>4. Herhangi bir fabrika bacası tütmeden ülkeye giren bu döviz sayesinde, ülkenin dış ticaret açığı (cari açık) büyük ölçüde kapanır.<br><br><strong>Cevap: Ülkeye döviz girdisi sağlayarak 'Dış Ticaret Açığını (Cari Açığı)' kapatmasıdır.</strong>",
+                    shortcut: "UNESCO miras listesinde sadece iki tane 'Karma' (Hem doğanın kendi kendine yaptığı hem de insanın şekil verdiği) alanımız vardır. Bunlar: 1. Pamukkale Travertenleri (Doğal) + Hierapolis Antik Kenti (Kültürel). 2. Peribacaları (Doğal) + Göreme yeraltı kiliseleri/şehirleri (Kültürel). Sınavlarda bu karma alanlar mutlaka sorulur."
+                }
+
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
