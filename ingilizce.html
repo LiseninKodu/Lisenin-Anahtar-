@@ -230,20 +230,25 @@
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // Gemini API
-        const GEMINI_API_KEY = 'AIzaSyCDQWieXsYuLKmmLUpwwGVp0Mo39SZsZgw'; 
-        let base64Image = '';
+        // --- YAPAY ZEKA KODLARI BAŞLANGICI ---
 
-        document.getElementById('aiImageInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
-                reader.readAsDataURL(file);
-            }
-        });
+    let base64Image = "";
+    
+    // API Anahtarını buraya koyuyoruz
+    const apiKey = "AIzaSyCDQWieXsYuLKmmLUpwwGVp0Mo39SZsZgw";
 
-        async function solveQuestion() {
+    document.getElementById('aiImageInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => { 
+                base64Image = e.target.result.split(',')[1]; 
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+       async function solveQuestion() {
         if(!base64Image) {
             alert("Lütfen önce bir fotoğraf seçin!");
             return;
@@ -254,7 +259,7 @@
         resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
 
         // DİKKAT: YENİ ALDIĞIN ANAHTARI AŞAĞIDAKİ TIRNAKLARIN İÇİNE YAPIŞTIR
-        const apiKey = "AIzaSyAXLZVEpevTL7v7JX6w7pWijyhEBDiHelI";
+        const apiKey = "AIzaSyAr1hwTFz1reG2Lu2mXWfbfv2ATEvDYhSs";
         
         try {
             const url = https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey};
