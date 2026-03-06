@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Kimya";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Kimya Bilimi",
+                    summary: "Simyadan kimyaya geçiş, kimyanın alt disiplinleri ve güvenlik sembolleri.",
+                    description: "<p><strong>Simyadan Kimyaya:</strong> Değersiz madenleri altına çevirme ve ölümsüzlük iksirini bulma uğraşına <em>Simya (Alşimi)</em> denir. Simya bir bilim değildir çünkü teorik temelleri yoktur ve deneme-yanılmaya dayanır. Ancak damıtma, mayalama gibi yöntemleri ve sülfürik asit (zaç yağı), nitrik asit (kezzap) gibi maddeleri bularak kimyaya öncülük etmiştir.</p><p><strong>Kimyanın Alt Disiplinleri:</strong> Analitik kimya (madde analizi), Biyokimya (canlı yapısı), Fizikokimya (enerji, hız), Polimer kimyası (plastikler), Anorganik kimya (mineraller, asit-baz) ve Organik kimya (karbon bileşikleri).</p><br><p><strong>Güvenlik ve Malzemeler:</strong> Laboratuvarda uyulması gereken kurallar, tehlike uyarı işaretleri (toksik, korozif, radyoaktif vb.) ve temel cam malzemeler (beherglas, erlenmayer, büret).</p>",
+                    items: ["Simya ile Kimya Arasındaki Farklar", "Kimyanın Alt Disiplinleri ve Çalışma Alanları", "Laboratuvar Güvenlik Sembolleri", "Yaygın Elementler ve Bileşiklerin Adları"],
+                    formula: null,
+                    question: "Aşağıdaki ifadelerden hangisi simyacıların amaçlarından biri değildir?<br>A) Değersiz metalleri altına çevirmek<br>B) Ölümsüzlük iksirini (Ab-ı Hayat) bulmak<br>C) Hastalıkları tedavi etmek için bitkisel ilaçlar hazırlamak<br>D) Polimer sentezleyerek plastik malzemeler üretmek",
+                    solution: "Simyacılar eski çağlarda yaşamıştır ve amaçları altın bulmak, ölümsüzlüğü keşfetmek ve hastalıkları iyileştirmek (lokman hekimlik) olmuştur. Ancak <strong>polimer sentezi</strong> (plastik, naylon, teflon üretimi) çok modern bir kimya dalıdır ve 20. yüzyılda gelişmiştir. Simyacıların böyle bir amacı veya bilgisi olamaz.<br><br><strong>Cevap: D şıkkı</strong>",
+                    shortcut: "Sorularda 'Yanıcı' (alev sembolü) ile 'Yakıcı/Oksitleyici' (O harfi üzerinde alev sembolü) işaretlerini karıştırma. Oksijen yakıcıdır, O harfinden aklında kalsın."
+                },
+                {
+                    title: "2. Atom ve Periyodik Sistem",
+                    summary: "Atom modelleri, atomun yapısı ve periyodik cetvelin özellikleri.",
+                    description: "<p><strong>Atom Modelleri:</strong> Dalton (İçi dolu küre), Thomson (Üzümlü kek - artı ve eksiler homojen dağılmış), Rutherford (Çekirdekli model - altın levha deneyi) ve Bohr (Yörünge modeli - elektronlar belirli katmanlarda döner).</p><p><strong>Atomun Yapısı:</strong> Çekirdekte proton ($p^+$) ve nötron ($n^0$) bulunur. Bunların toplamına <strong>Kütle Numarası (Nükleon Sayısı)</strong> denir. Yörüngelerde elektronlar ($e^-$) bulunur. Proton sayısına <strong>Atom Numarası</strong> da denir ve elementin kimliğini belirler.</p><br><p><strong>Periyodik Sistem:</strong> Günümüz periyodik cetveli artan <strong>Atom Numaralarına</strong> (proton sayısına) göre düzenlenmiştir. Yatay sıralara <em>Periyot</em> (7 tane), dikey sütunlara <em>Grup</em> (18 tane) denir. Aynı gruptaki elementlerin kimyasal özellikleri benzerdir. (1A: Alkali Metaller, 2A: Toprak Alkali, 7A: Halojenler, 8A: Soygazlar).</p>",
+                    items: ["Atom Modellerinin Tarihsel Gelişimi", "Atom Altı Tanecikler (Proton, Nötron, Elektron)", "İzotop, İzoton, İzobar ve İzoelektronik Tanecikler", "Periyodik Özelliklerin Değişimi (Atom Çapı, İyonlaşma Enerjisi)"],
+                    formula: "$$\\text{Kütle Numarası} = \\text{Proton} + \\text{Nötron}$$ $$\\text{İyon Yükü} = \\text{Proton} - \\text{Elektron}$$",
+                    question: "$^{23}_{11}Na^+$ iyonunun proton, nötron ve elektron sayılarını bulunuz.",
+                    solution: "1. Sol alt köşedeki sayı Atom Numarasıdır (Proton sayısı). Yani $p^+ = 11$.<br>2. Sol üst köşedeki sayı Kütle Numarasıdır. Kütle Numarası = Proton + Nötron.<br>3. $23 = 11 + n^0 \\implies n^0 = 12$ (Nötron sayısı).<br>4. İyon yükü sağ üstte yazan artıdır (+1). Formüle göre: İyon Yükü = Proton - Elektron.<br>5. $+1 = 11 - e^- \\implies e^- = 10$ (Elektron sayısı).<br><br><strong>Cevap: Proton=11, Nötron=12, Elektron=10</strong>",
+                    shortcut: "Periyodik cetvelde soldan sağa gidildikçe genellikle İyonlaşma Enerjisi ARTAR (Ancak 3 aşağı 5 yukarı kuralına dikkat: 2A > 3A ve 5A > 6A). Yukarıdan aşağıya inildikçe ise Atom Çapı ARTAR, iyonlaşma enerjisi AZALIR."
+                },
+                {
+                    title: "3. Kimyasal Türler Arası Etkileşimler",
+                    summary: "Güçlü (kimyasal) bağlar ve zayıf (fiziksel) bağların sınıflandırılması.",
+                    description: "<p><strong>Kimyasal Türler:</strong> Atom (elementin en küçük birimi), Molekül (en az iki ametal atomunun kovalent bağı, örn: $H_2O, O_2$) ve İyon (elektron almış/vermiş tanecik, örn: $Na^+, Cl^-$).</p><p><strong>Güçlü Etkileşimler (Kimyasal Bağlar):</strong><br>1. <strong>İyonik Bağ:</strong> Metal ile Ametal arasında elektron alışverişi ile oluşur (Örn: $NaCl$). Katı halde elektriği iletmezler, suda çözününce iletirler.<br>2. <strong>Kovalent Bağ:</strong> Ametal ile Ametal arasında elektronların ortaklaşa kullanılmasıyla oluşur. Aynı ametaller arası apolar (kutupsuz), farklı ametaller arası polar (kutuplu) kovalent bağdır.<br>3. <strong>Metalik Bağ:</strong> Metallerin kendi aralarında ve alaşımlarda görülen elektron denizi modelidir.</p><p><strong>Zayıf Etkileşimler (Fiziksel Bağlar):</strong> Moleküller arasında görülür. Hal değişimlerini (kaynama noktası vb.) belirler. Van der Waals bağları (Dipol-dipol, London) ve Hidrojen Bağı (F, O, N atomlarının H ile yaptığı en güçlü zayıf bağ).</p>",
+                    items: ["Kimyasal Türler (Atom, Molekül, İyon)", "Lewis Nokta Yapısı Çizimi", "İyonik Bileşiklerin Özellikleri ve Adlandırılması", "Kovalent Bağ (Polar ve Apolar)", "Moleküller Arası Zayıf Etkileşimler (Hidrojen Bağı)"],
+                    formula: null,
+                    question: "$H_2O$ molekülü ve $H_2O$ molekülleri arasındaki etkileşim türleri nelerdir? (H: Ametal, O: Ametal)",
+                    solution: "Bir maddenin hem atomları arasındaki bağa (güçlü) hem de molekülleri arasındaki bağa (zayıf) bakmalıyız.<br>1. $H_2O$ molekülünün <strong>İÇİNDE</strong>, H ve O atomları (ikisi de ametal) arasındaki bağ, elektronların ortaklaşa kullanıldığı ve atomlar farklı olduğu için <strong>Polar Kovalent Bağdır</strong> (Güçlü etkileşim).<br>2. $H_2O$ moleküllerinin <strong>ARASINDA</strong> ise; Oksijen (F, O, N grubundan) ve ona bağlı Hidrojen bulunduğu için, molekülleri birbirine bağlayan temel kuvvet <strong>Hidrojen Bağıdır</strong> (Zayıf etkileşim).<br><br><strong>Cevap: Atomlar arası Polar Kovalent, Moleküller arası Hidrojen Bağı.</strong>",
+                    shortcut: "Adlandırma yaparken; bileşik İyonikse (Metal+Ametal) Mono, Di, Tri GİBİ LATİNCE SAYILAR KULLANILMAZ (Örn: $MgCl_2$ = Magnezyum klorür). Eğer bileşik Kovalentse (Ametal+Ametal) Latince sayılar KULLANILMAK ZORUNDADIR (Örn: $CO_2$ = Karbon DIoksit)."
+                },
+                {
+                    title: "4. Maddenin Halleri",
+                    summary: "Katı, sıvı, gaz ve plazma hallerinin genel özellikleri.",
+                    description: "<p><strong>Katılar:</strong> Amorf katılar (camsı geçiş sıcaklığı olan, düzensiz; örn: cam, plastik, tereyağı) ve Kristal katılar (düzenli istiflenmiş; örn: elmas, tuz, buz) olarak ayrılır.</p><p><strong>Sıvılar:</strong><br>- <strong>Viskozite:</strong> Sıvıların akmaya karşı gösterdiği dirençtir. Moleküller arası çekim kuvveti büyükse viskozite büyüktür (Bal > Su). Sıcaklık artarsa viskozite azalır, akıcılık artar.<br>- <strong>Buharlaşma ve Kaynama:</strong> Buharlaşma her sıcaklıkta ve sadece yüzeyde olur. Kaynama ise sıvının buhar basıncının, dış (atmosfer) basınca eşit olduğu tek bir sıcaklıkta ve sıvının her yerinde olur.</p><p><strong>Gazlar ve Plazma:</strong> Gazlar sıkıştırılabilir ve bulundukları kabı doldururlar. Plazma hali (iyonize gaz), Güneş, yıldızlar, şimşek ve neon lambalarda bulunur; elektriği çok iyi iletir.</p>",
+                    items: ["Katı Türleri (Amorf ve Kristal Katılar)", "Sıvılarda Viskozite ve Etkileyen Faktörler", "Buharlaşma, Yoğuşma ve Kaynama Noktası", "Atmosferdeki Nem ve Bağıl Nem", "Gazların Genel Özellikleri ve Plazma Hali"],
+                    formula: null,
+                    question: "Aynı ortamda bulunan saf X ve Y sıvılarından X'in kaynama noktası $110^\\circ\\text{C}$, Y'nin kaynama noktası $78^\\circ\\text{C}$'dir. Buna göre aynı sıcaklıktaki X ve Y sıvıları için; buhar basınçlarını ve viskozitelerini (moleküller arası çekim kuvveti kaynaklı) karşılaştırınız.",
+                    solution: "Kaynama noktası (KN), moleküller arası çekim kuvvetinin bir ölçüsüdür.<br>1. X'in KN'si ($110^\\circ\\text{C}$) > Y'nin KN'si ($78^\\circ\\text{C}$) olduğuna göre, X'in molekülleri birbirini daha sıkı tutmaktadır. (Çekim Kuvveti: X > Y).<br>2. Moleküller birbirini sıkı tuttuğu için X daha zor buharlaşır. Zor buharlaşan sıvının buhar basıncı düşüktür. (Buhar Basıncı: Y > X).<br>3. Çekim kuvveti büyük olan sıvının akmaya karşı direnci (viskozitesi) de daha büyüktür. (Viskozite: X > Y).<br><br><strong>Cevap: Buhar Basıncı Y > X, Viskozite X > Y.</strong>",
+                    shortcut: "Bir dağın tepesine çıkıldıkça dış basınç (açık hava basıncı) AZALIR. Kaynamanın şartı iç basıncın dış basınca eşit olması olduğu için, dış basınç azalınca DÜŞÜK sıcaklıklarda kaynama gerçekleşir (Örn: Dağda su $95^\\circ\\text{C}$'de kaynar)."
+                },
+                {
+                    title: "5. Doğa ve Kimya",
+                    summary: "Su kaynakları, çevre kirliliği ve sera etkisi.",
+                    description: "<p><strong>Su ve Hayat:</strong> Dünyadaki suyun %97'si tuzlu (okyanus/deniz), sadece %3'ü tatlı sudur. İnsan vücudunun büyük kısmı sudur. Sert sular (içinde kalsiyum ve magnezyum iyonu fazla olan) sabunu köpürtmez, çaydanlıklarda kireç oluşturur. Yumuşak sular ise temizlikte daha etkilidir.</p><p><strong>Çevre Kirliliği:</strong><br>- Hava Kirliliği: Fosil yakıtların yanması sonucu çıkan $CO_2$ (sera etkisine ve küresel ısınmaya yol açar) ve $SO_x, NO_x$ gazları (asit yağmurlarına sebep olur).<br>- Su ve Toprak Kirliliği: Ağır metaller (Kurşun, Cıva), plastikler (polimerler doğada yüzyıllarca bozulmaz), deterjanlar ve aşırı gübreleme (ötrofikasyon).</p>",
+                    items: ["Dünyadaki Tatlı ve Tuzlu Su Dağılımı", "Sert ve Yumuşak Su Özellikleri", "Hava Kirliliğine Neden Olan Gazlar", "Sera Etkisi, Küresel Isınma ve Asit Yağmurları"],
+                    formula: "$$\\text{Asit Yağmuru: } SO_3 + H_2O \\rightarrow H_2SO_4$$",
+                    question: "Günlük hayatta kullanılan; I. Sabun, II. Deterjan, III. Çamaşır Sodası maddelerinden hangileri sert sularda (kireçli sularda) temizleme özelliğini kaybederek çökelek (kir tabakası) oluşturur?",
+                    solution: "1. Deterjanlar petrol türevidir, sert veya soğuk su fark etmeksizin her türlü suda çok iyi köpürürler ve temizlerler. Ancak çevreye çok zararlıdırlar.<br>2. Çamaşır sodası zaten suyu yumuşatmak için makinelere katılan bir maddedir, etkisini kaybetmez.<br>3. Sabunlar bitkisel/hayvansal yağlardan elde edilir. Sert sulardaki Kalsiyum ($Ca^{+2}$) ve Magnezyum ($Mg^{+2}$) iyonlarıyla birleşerek suda çözünmeyen bir çökelek oluştururlar ve köpüremezler.<br><br><strong>Cevap: Yalnız I (Sabun)</strong>",
+                    shortcut: "Atmosferdeki Ozon tabakasının incelmesinin/delinmesinin sebebi sera gazları ($CO_2$) DEĞİLDİR. Ozonu delen gazlar, deodorantlarda ve eski buzdolaplarında kullanılan CFC (Kloroflorokarbon) gazlarıdır."
+                }
+
+            ],
+            10: [
+                                {
+                    title: "1. Kimyanın Temel Kanunları ve Mol Kavramı",
+                    summary: "Kütlenin korunumu, sabit oranlar ve kimyasal miktar ölçüsü (Mol).",
+                    description: "<p><strong>Kimyanın Temel Kanunları:</strong><br>- Kütlenin Korunumu (Lavoisier): Kapalı kapta tepkimeye giren maddelerin kütleleri toplamı, oluşan maddelerin kütleleri toplamına eşittir.<br>- Sabit Oranlar (Proust): Bir bileşiği oluşturan elementlerin kütleleri arasında değişmeyen sabit bir oran vardır ($H_2O$ için her zaman $2$ g H ile $16$ g O birleşir).<br>- Katlı Oranlar (Dalton): İki element birden fazla bileşik oluşturuyorsa ($CO$ ve $CO_2$ gibi), elementlerden birinin sabit miktarına karşılık diğerinin değişen miktarları arasında tam sayılı bir oran vardır.</p><p><strong>Mol Kavramı:</strong> Atomlar gözle görülemeyecek kadar küçük olduğundan, onları saymak için 'düzine' veya 'deste' gibi büyük bir paket kullanırız. Bu devasa pakete <strong>1 Mol</strong> denir. 1 Mol, içinde tam olarak Avogadro sayısı ($N_A = 6,02 \\times 10^{23}$) kadar tanecik barındırır. Normal Şartlar Altında (N.Ş.A: $0^\\circ\\text{C}$ ve $1\\text{ atm}$), 1 mol ideal gaz daima $22,4\\text{ Litre}$ hacim kaplar.</p>",
+                    items: ["Kütlenin Korunumu ve Sabit Oranlar Kanunu", "Katlı Oranlar Kanunu (Uygulama Şartları)", "Avogadro Sayısı ($N_A$) ve Mol-Tanecik İlişkisi", "Mol-Kütle ($n=m/M_A$) ve Mol-Hacim ($n=V/22,4$) İlişkisi", "Gerçek Atom Kütlesi ve Bağıl Atom Kütlesi (akb)"],
+                    formula: "$$\\frac{m_X}{m_Y} = \\text{Sabit Oran} \\quad n = \\frac{m}{M_A} = \\frac{V}{22,4} = \\frac{N}{N_A}$$",
+                    question: "$Fe_2O_3$ bileşiğinde demirin ($Fe$) oksijene ($O$) kütlece birleşme oranı $\\frac{m_{Fe}}{m_O} = \\frac{7}{3}$'tür. Eşit kütlelerde demir ve oksijen alınarak tam verimle $40\\text{ gram } Fe_2O_3$ bileşiği oluşturulduğunda hangi elementten kaç gram artar?",
+                    solution: "Sabit Oranlar (Proust) mantığıyla çözelim:<br>1. Orana göre $7\\text{g Fe}$ ile $3\\text{g O}$ birleşirse $7+3=10\\text{g}$ bileşik ($Fe_2O_3$) oluşur.<br>2. Bizden istenen bileşik $40\\text{g}$ (Yani referans bileşiğin tam 4 katı).<br>3. O halde harcanan maddeler de 4 katı olmalıdır: $Fe = 7 \\cdot 4 = 28\\text{g}$, $O = 3 \\cdot 4 = 12\\text{g}$ harcanır.<br>4. Soru 'eşit kütlelerde başlangıç' diyor. Başlangıçta ikisinden de büyük olan kadar, yani $28\\text{er gram}$ almalıyız.<br>5. Demir ($Fe$): $28\\text{g}$ aldık, $28\\text{g}$ harcadık (Bitti, Sınırlayıcı bileşen).<br>6. Oksijen ($O$): $28\\text{g}$ aldık, $12\\text{g}$ harcadık. $28 - 12 = 16\\text{g}$ arttı.<br><br><strong>Cevap: Oksijenden 16 gram artar.</strong>",
+                    shortcut: "Katlı oranlar kanunu aranırken; bileşikler 3 tür element içeremez (örn: $H_2SO_4$ olmaz), bileşiklerin basit (kaba) formülleri aynı olamaz (örn: $NO_2$ ile $N_2O_4$ olmaz çünkü sadeleşince aynı olurlar)."
+                },
+                {
+                    title: "2. Kimyasal Tepkimeler ve Hesaplamalar",
+                    summary: "Tepkime türleri, denkleştirme ve kimyasal denklemler üzerinden kütle geçişleri.",
+                    description: "<p><strong>Tepkime Türleri:</strong> Yanma (Oksijen ile reaksiyon), Sentez (Birleşme), Analiz (Ayrışma), Asit-Baz (Nötralleşme) ve Çözünme-Çökelme (İki çözeltinin karıştırılıp katı bir dibe çökme oluşturması) tepkimeleridir.</p><p><strong>Tepkime Denkleştirme:</strong> Lavoisier kuralı gereği, girenlerdeki (reaktifler) her bir elementin atom sayısı, ürünlerdeki atom sayısına eşit olmak zorundadır. Katsayılar kullanılarak eşitlik sağlanır.</p><p><strong>Hesaplamalar:</strong> Bir kimyasal denklemde baş katsayılar (örn: $1N_2 + 3H_2 \\rightarrow 2NH_3$) o maddelerin <strong>Mol Sayısı</strong> oranını verir. Sınırlayıcı bileşen (ilk biten madde), % Verim (gerçekten oluşan / teorik hesaplanan) ve saflık derecesi problemleri çözülür.</p>",
+                    items: ["Kimyasal Tepkime Denklemlerinin Denkleştirilmesi", "Yanma, Sentez, Analiz, Nötralleşme ve Çözünme-Çökelme", "Kimyasal Denklemlerle Mol ve Kütle Geçişleri", "Sınırlayıcı Bileşen ve Artan Madde Problemleri", "Yüzde Verim ve Saflık Problemleri"],
+                    formula: "$$\\text{\\% Verim} = \\frac{\\text{Gerçek Verim}}{\\text{Teorik Verim}} \\times 100$$",
+                    question: "$C_3H_8 + O_2 \\rightarrow CO_2 + H_2O$ tepkimesi denkleştirildiğinde, ürünlerin (sağ tarafın) katsayıları toplamı kaç olur?",
+                    solution: "Denkleştirme yaparken en kalabalık gruba 1 katsayısını vermek (MAHO kuralı: Metal, Ametal, Hidrojen, Oksijen sırası) işi kolaylaştırır.<br>1. Karbonları eşitleyelim: Solda 3 Karbon var, sağdaki $CO_2$'nin başına 3 yazalım. ($3CO_2$)<br>2. Hidrojenleri eşitleyelim: Solda 8 Hidrojen var, sağdaki $H_2O$'nun başına 4 yazalım (çünkü $4 \\cdot 2 = 8$). ($4H_2O$)<br>3. Oksijenleri eşitleyelim: Sağda toplam oksijen: $3CO_2$'den $3 \\cdot 2=6$, $4H_2O$'dan $4 \\cdot 1=4$. Toplam 10 Oksijen.<br>4. Soldaki $O_2$'nin başına 5 yazalım ki $5 \\cdot 2 = 10$ olsun.<br>5. Son hali: $1C_3H_8 + 5O_2 \\rightarrow 3CO_2 + 4H_2O$<br>6. Ürünler (sağ taraf) katsayı toplamı: $3 + 4 = 7$<br><br><strong>Cevap: 7</strong>",
+                    shortcut: "Organik bileşiklerin (C ve H içerenler) yanma tepkimesi sonucunda DAİMA ve SADECE Karbondioksit ($CO_2$) ve Su ($H_2O$) açığa çıkar."
+                },
+                {
+                    title: "3. Karışımlar",
+                    summary: "Homojen/Heterojen sınıflandırması, derişim birimleri ve ayırma yöntemleri.",
+                    description: "<p><strong>Karışımların Sınıflandırılması:</strong> Saf olmayan maddelerdir. Her yerinde aynı özelliği gösteren, tek fazlı karışımlara <strong>Homojen (Çözelti)</strong> denir (Örn: Tuzlu su, hava, alaşımlar). Farklı fazlar içerenlere <strong>Heterojen</strong> denir (Süspansiyon: Katı-sıvı, Emülsiyon: Sıvı-sıvı, Aerosol: Gaz-sıvı/katı, Kolloid: Çıplak gözle homojen görünen ama ışığı saçan heterojenler).</p><p><strong>Derişim (Konsantrasyon):</strong> Çözücü içinde çözünen madde miktarıdır. Kütlece Yüzde Derişim ve Hacimce Yüzde Derişim hesaplamaları. Çözeltilerin karıştırılması, seyreltilmesi (su ekleme) ve deriştirilmesi (su buharlaştırma) formülleri işlenir.</p><br><p><strong>Ayırma ve Saflaştırma:</strong><br>- Tanecik boyutu farkı: Süzme, diyaliz (kan).<br>- Yoğunluk farkı: Ayırma hunisi (zeytinyağı-su), Yüzdürme (flotasyon).<br>- Kaynama noktası farkı: Basit damıtma (tuzlu su), Ayrımsal damıtma (alkol-su, petrol).<br>- Çözünürlük farkı: Özütleme (ekstraksiyon - çay demleme), Kristallendirme.</p>",
+                    items: ["Homojen (Çözelti) ve Heterojen Karışım Türleri", "Çözünme Süreci ve 'Benzer Benzeri Çözer' Kuralı", "Kütlece ve Hacimce Yüzde Derişim Hesapları", "ppm (Milyonda Birlik Kısım)", "Karışımları Ayırma Teknikleri (Damıtma, Ekstraksiyon, Ayırma Hunisi)"],
+                    formula: "$$\\text{Kütlece \\%} = \\frac{m_{\\text{çözünen}}}{m_{\\text{çözelti}}} \\cdot 100$$ $$M_1 \\cdot \\%_1 + M_2 \\cdot \\%_2 = M_{son} \\cdot \\%_{son}$$",
+                    question: "Kütlece %20'lik $200\\text{ gram}$ tuzlu su çözeltisi ile kütlece %40'lık $300\\text{ gram}$ tuzlu su çözeltisi karıştırılırsa, son çözeltinin kütlece tuz yüzdesi kaç olur?",
+                    solution: "Karışım (çözelti birleştirme) formülünü uygulayacağız.<br>1. Formül: (1. Kütle $\\times$ 1. Yüzde) + (2. Kütle $\\times$ 2. Yüzde) = (Toplam Kütle $\\times$ Son Yüzde)<br>2. Verilenleri yerine koyalım: $(200 \\cdot 20) + (300 \\cdot 40) = (200 + 300) \\cdot \\%_{son}$<br>3. $4000 + 12000 = 5000 \\cdot \\%_{son}$<br>4. $16000 = 5000 \\cdot \\%_{son} \\implies \\%_{son} = \\frac{16000}{5000} = 32$<br><br><strong>Cevap: %32</strong>",
+                    shortcut: "Eğer bir çözeltiye sadece SAF SU eklersen, eklenecek suyun yüzdesini formülde her zaman 0 (SIFIR) almalısın. Eğer çözeltiye sadece SAF TUZ (çözünen) eklersen, yüzdesini her zaman 100 (YÜZ) almalısın."
+                },
+                {
+                    title: "4. Asitler, Bazlar ve Tuzlar",
+                    summary: "Asit-baz özellikleri, pH kavramı, tepkimeleri ve hayatımızdaki yeri.",
+                    description: "<p><strong>Genel Özellikler:</strong> Sulu çözeltisine $H^+$ (veya $H_3O^+$) iyonu verenler <strong>Asit</strong> (ekşi, pH<7, tahriş edici, mavi turnusolu kırmızı yapar); $OH^-$ iyonu verenler <strong>Bazdır</strong> (acı, ele kayganlık verir, pH>7, kırmızı turnusolu mavi yapar). İkisi tepkimeye girerek <strong>Tuz ve Su</strong> (Nötralleşme) oluşturur.</p><p><strong>Asitlerin Metallerle Tepkimesi (Çok Önemli):</strong><br>- Aktif Metaller (Na, K, Ca, Mg vb.): Asitlerle tepkimeye girip $H_2$ gazı çıkarırlar.<br>- Yarı Soy Metaller (Cu, Ag, Hg): Oksijensiz asitlerle (HCl gibi) tepkime VERMEZLER. Sadece Oksijenli asitlerle ($HNO_3, H_2SO_4$) tepkime verip, asidin yapısındaki gazı ($NO_2, SO_2$) çıkarırlar.<br>- Soy Metaller (Au, Pt): Hiçbir asitle tek başına tepkime vermezler (sadece Kral Suyu çözer).</p><p><strong>Tuzlar:</strong> Nötralleşme sonucu oluşan iyonik yapılı katılardır. NaCl (Yemek tuzu), $Na_2CO_3$ (Çamaşır sodası), $NaHCO_3$ (Yemek sodası) günlük hayatta sıkça kullanılır.</p>",
+                    items: ["Asitlerin ve Bazların Ayırt Edici Özellikleri", "İndikatörler ve pH Ölçeği", "Nötralleşme Tepkimeleri", "Metallerin Asit ve Bazlarla Tepkimeleri (Soy Metaller)", "Günlük Hayattaki Önemli Asitler, Bazlar ve Tuzlar"],
+                    formula: "$$\\text{Asit} + \\text{Baz} \\rightarrow \\text{Tuz} + \\text{Su (Nötralleşme)}$$",
+                    question: "Sodyum Hidroksit ($NaOH$) ve Sülfürik Asit ($H_2SO_4$) sulu çözeltileri karıştırıldığında oluşan nötralleşme tepkimesi denklemini yazıp, oluşan tuzun adını belirtiniz.",
+                    solution: "1. Asit: $H_2SO_4$, Baz: $NaOH$<br>2. Asitteki $H^+$ iyonları ile bazdaki $OH^-$ iyonları birleşip suyu oluşturacaktır. Asitte 2 tane H var, o yüzden bazdan da 2 tane OH gelmesi için bazın katsayısını 2 yaparız.<br>3. Tepkime: $H_2SO_4(suda) + 2NaOH(suda) \\rightarrow Na_2SO_4(suda) + 2H_2O(s)$<br>4. Geriye kalan Sodyum ($Na$) ile Sülfat ($SO_4$) birleşerek tuzu oluşturur.<br><br><strong>Cevap: $Na_2SO_4$ (Sodyum Sülfat)</strong>",
+                    shortcut: "Bazlar (Kuvvetli olsalar bile) metallerle asla tepkime VERMEZLER. Bazlarla tepkimeye giren TEK metal grubu Amfoter Metallerdir (Çinko, Alüminyum, Kurşun, Kalay, Krom, Berilyum - Şifre: Zengin Ali Paşa Sanayi Merkezinden Kovuldu)."
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. Modern Atom Teorisi",
+                    summary: "Kuantum sayıları, elektron dizilimi ve periyodik özellikler.",
+                    description: "<p><strong>Kuantum Modeli:</strong> Elektronların bulunma ihtimalinin en yüksek olduğu bölgelere <em>Orbital</em> denir. Elektronların yeri 4 kuantum sayısı ile belirlenir: Baş (n - enerji seviyesi), Açısal momentum ($l$ - orbital türü s,p,d,f), Manyetik ($m_l$ - alt orbital sayısı) ve Spin ($m_s$ - dönüş yönü).</p><p><strong>Elektron Dizilimi:</strong> Aufbau kuralına (düşük enerjiden yükseğe: 1s, 2s, 2p, 3s, 3p, 4s, 3d...), Hund kuralına (eş enerjili orbitallere önce tek tek yerleşme) ve Pauli ilkesine (bir orbitale zıt spinli en fazla 2 elektron) göre yapılır. Küresel simetri (son orbitalin tam veya yarı dolu olması) atoma kararlılık katar.</p><br><p><strong>Periyodik Sistem:</strong> Elementler s, p, d ve f bloklarına ayrılır. Periyodik özellikler (Atom yarıçapı, İyonlaşma enerjisi, Elektronegatiflik, Elektron ilgisi) ve Yükseltgenme Basamakları (elementlerin bileşiklerinde aldığı yükler) incelenir.</p>",
+                    items: ["Bohr Atom Modelinin Eksiklikleri", "Orbitaller ve Kuantum Sayıları (n, l, ml, ms)", "Elektron Dizilimi Kuralları (Aufbau, Pauli, Hund)", "Küresel Simetri ve İyonların Dizilimi", "Periyodik Cetvelde Eğilimler ve Yükseltgenme Basamakları"],
+                    formula: "$$2n^2 \\text{ (Bir kabuktaki maksimum elektron sayısı)}$$",
+                    question: "$_{24}Cr$ (Krom) atomunun temel hal elektron dizilimini yazıp, küresel simetri özelliği gösterip göstermediğini belirtiniz.",
+                    solution: "Krom (24) ve Bakır (29) elektron diziliminde istisna olan iki elementtir. Kendiliklerinden küresel simetriye ulaşmak için 4s orbitalindeki bir elektronu 3d'ye aktarırlar.<br>1. Normal (beklenen) dizilim: $1s^2 \\, 2s^2 \\, 2p^6 \\, 3s^2 \\, 3p^6 \\, 4s^2 \\, 3d^4$ olmalıydı.<br>2. Ancak 3d'nin yarı dolu (d5) olup daha kararlı (küresel simetrik) olabilmesi için 4s'ten bir elektron d'ye geçer.<br>3. Gerçek (Temel hal) dizilim: $1s^2 \\, 2s^2 \\, 2p^6 \\, 3s^2 \\, 3p^6 \\, 4s^1 \\, 3d^5$<br><br><strong>Cevap: $4s^1 3d^5$ ile biter, evet küresel simetriktir.</strong>",
+                    shortcut: "Bir iyonun elektron dizilimini yazarken, ÖNCE nötr halinin dizilimini yaz. Sonra koparılacak elektronları DAİMA en büyük baş kuantum sayısına sahip olan (en dıştaki) orbitalden kopar. (Örn: $4s^2 3d^2$ den 2 elektron kopacaksa 4s'ten gider, 3d'den DEĞİL)."
+                },
+                {
+                    title: "2. Gazlar",
+                    summary: "İdeal gaz yasası, kinetik teori, gaz karışımları ve kısmi basınç.",
+                    description: "<p><strong>Gaz Yasaları:</strong> Gazların hacmi, basıncı, sıcaklığı ve mol sayısı arasındaki ilişkileri inceler (Boyle, Charles, Gay-Lussac, Avogadro yasaları). Tüm bu yasaların birleşimi <strong>İdeal Gaz Denklemi</strong>dir ($P\\cdot V = n\\cdot R\\cdot T$).</p><p><strong>Kinetik Teori:</strong> Gaz moleküllerinin sürekli, rastgele (Brown hareketi) hareket ettiğini ve bu hareketin sıcaklığa bağlı olduğunu savunur. Gazların <strong>Difüzyon (Yayılma) Hızı</strong>, mutlak sıcaklığın kareköküyle doğru, mol kütlesinin (MA) kareköküyle ters orantılıdır (Graham Yasası).</p><p><strong>Gaz Karışımları:</strong> Aynı kapta bulunan gazların toplam basıncı, her bir gazın tek başına yaptığı <strong>Kısmi Basınçların</strong> toplamına eşittir (Dalton Yasası). Suyun üzerinde toplanan gazların buhar basıncı ve gerçek gazların ideallikten sapmaları işlenir.</p>",
+                    items: ["Gazların Basınç, Hacim, Sıcaklık ve Mol İlişkisi", "İdeal Gaz Denklemi ($P\\cdot V = n\\cdot R\\cdot T$)", "Gazların Yoğunluğu ($P\\cdot MA = d\\cdot R\\cdot T$)", "Kinetik Teori ve Graham Difüzyon Yasası", "Gaz Karışımları, Kısmi Basınç ve Buhar Basıncı"],
+                    formula: "$$P \\cdot V = n \\cdot R \\cdot T \\quad \\frac{V_1}{V_2} = \\sqrt{\\frac{MA_2}{MA_1}} \\cdot \\sqrt{\\frac{T_1}{T_2}}$$ $$P_{\\text{toplam}} = P_A + P_B + ...$$",
+                    question: "$0^\\circ\\text{C}$ sıcaklıkta ve $1\\text{ atm}$ basınç altında (Normal Şartlar Altında - N.Ş.A) $11,2\\text{ Litre}$ hacim kaplayan $CH_4$ (Metan - $16\\text{ g/mol}$) gazı kaç moldür ve kaç gramdır?",
+                    solution: "1. N.Ş.A'da tüm ideal gazların $1\\text{ molü}$ $22,4\\text{ Litre}$ hacim kaplar.<br>2. Mol sayısını bulalım: $n = \\frac{V}{22,4} = \\frac{11,2}{22,4} = 0,5\\text{ mol}$ $CH_4$ gazı vardır.<br>3. Kütlesini bulmak için $n = \\frac{m}{MA}$ formülünü kullanalım.<br>4. $0,5 = \\frac{m}{16} \\implies m = 0,5 \\cdot 16 = 8\\text{ gram}$.<br><br><strong>Cevap: $0,5\\text{ mol}$ ve $8\\text{ gram}$</strong>",
+                    shortcut: "Gaz problemlerinde sıcaklık (T) SADECE VE SADECE Kelvin ($K$) cinsinden kullanılabilir! Santigrat dereceyi ($^\\circ\\text{C}$) Kelvin'e çevirmek için sayıya 273 eklemelisin. (Örn: $27^\\circ\\text{C} = 27 + 273 = 300\\text{ K}$)."
+                },
+                {
+                    title: "3. Sıvı Çözeltiler ve Çözünürlük",
+                    summary: "Molarite hesapları, koligatif özellikler ve çözünürlüğe etki eden faktörler.",
+                    description: "<p><strong>Derişim Birimleri:</strong> 1 litre çözeltide çözünen maddenin mol sayısına <strong>Molarite</strong> ($M = n/V$), 1 kg çözücüde çözünen maddenin mol sayısına ise <strong>Molalite</strong> ($m = n/m_{\\text{çözücü}}$) denir. Çözeltilerin karıştırılması veya seyreltilmesi ($M_1V_1 = M_2V_2$) hesaplamaları yapılır.</p><p><strong>Koligatif Özellikler:</strong> Çözeltideki tanecik (iyon/molekül) derişimine bağlı olarak değişen özelliklerdir. Suya tuz veya şeker atıldığında kaynama noktasının yükselmesi (ebülyoskopi), donma noktasının alçalması (kriyoskopi) ve buhar basıncının düşmesi olaylarıdır. Antifriz kullanımı bu mantığa dayanır.</p><p><strong>Çözünürlük:</strong> Belirli bir sıcaklıkta 100 gram çözücüde (genellikle su) çözünebilen maksimum madde miktarıdır. Katıların çözünürlüğü sıcaklıkla genellikle artarken (endotermik), gazların çözünürlüğü sıcaklık arttıkça daima azalır (ekzotermik). Basınç ise sadece gazların çözünürlüğünü artırır.</p>",
+                    items: ["Molarite ($M$) ve Molalite ($m$) Hesaplamaları", "Çözeltilerin Karıştırılması ve Seyreltilmesi", "Kaynama Noktası Yükselmesi ve Donma Noktası Alçalması", "Ozmotik Basınç ve Buhar Basıncı Düşmesi", "Çözünürlük ve Sıcaklık/Basınç Etkisi"],
+                    formula: "$$M = \\frac{n}{V} \\quad M = \\frac{d \\cdot \\% \\cdot 10}{MA}$$ $$\\Delta T_k = K_k \\cdot m \\cdot i \\text{ (Kaynama Yükselmesi)}$$",
+                    question: "$0,2\\text{ Molar}$ $500\\text{ mL}$ $NaOH$ (Sodyum hidroksit - $40\\text{ g/mol}$) sulu çözeltisi hazırlamak için kaç gram $NaOH$ katısı tartılıp suda çözülmelidir?",
+                    solution: "Önce mol sayısını, ardından kütleyi bulmalıyız.<br>1. Hacim mutlaka Litre (L) olmalıdır. $500\\text{ mL} = 0,5\\text{ L}$<br>2. Molarite formülü: $M = \\frac{n}{V}$<br>3. $0,2 = \\frac{n}{0,5} \\implies n = 0,2 \\cdot 0,5 = 0,1\\text{ mol NaOH}$ gerekir.<br>4. Şimdi molü kütleye çevirelim: $n = \\frac{m}{MA}$<br>5. $0,1 = \\frac{m}{40} \\implies m = 0,1 \\cdot 40 = 4\\text{ gram}$<br><br><strong>Cevap: $4\\text{ gram NaOH}$</strong>",
+                    shortcut: "Çözeltilere su eklendiğinde veya çözeltiden su buharlaştırıldığında, çözünen maddenin MİKTARI (molü) değişmez, sadece derişimi değişir. Bu tarz sorularda direkt $M_{ilk} \\cdot V_{ilk} = M_{son} \\cdot V_{son}$ formülünü kullan."
+                },
+                {
+                    title: "4. Kimyasal Tepkimelerde Enerji ve Hız",
+                    summary: "Entalpi değişimi (Isı), Hess yasası ve reaksiyon hızına etki eden faktörler.",
+                    description: "<p><strong>Enerji (Entalpi - $\\Delta H$):</strong> Sabit basınç altında gerçekleşen tepkimelerdeki ısı değişimidir. Isı alan tepkimelere <em>Endotermik</em> ($\\Delta H > 0$, ortam soğur), ısı verenlere <em>Ekzotermik</em> ($\\Delta H < 0$, ortam ısınır) denir. Entalpi; ürünlerin oluşum entalpilerinden girenlerin çıkarılmasıyla veya <strong>Hess Yasası</strong> (tepkimelerin toplanabilirliği) ile hesaplanır.</p><br>[Endotermik ve Ekzotermik tepkimelerin potansiyel enerji grafikleri]<p><strong>Tepkime Hızı:</strong> Birim zamanda harcanan veya oluşan madde miktarıdır ($r = \\Delta C / \\Delta t$). Çarpışma teorisine göre tepkimenin olması için taneciklerin uygun doğrultuda ve yeterli enerjiyle (Aktivasyon Enerjisi) çarpışması gerekir.</p><p><strong>Hıza Etki Eden Faktörler:</strong> Madde cinsi, Derişim (Molarite arttıkça hız artar), Sıcaklık (Kinetik enerjiyi artırarak hızı artırır), Temas Yüzeyi (Katıyı toz haline getirmek hızı artırır) ve <strong>Katalizör</strong> (Aktivasyon enerjisini düşürerek tepkimeyi hızlandıran ama yapıya katılmayan maddedir).</p>",
+                    items: ["Oluşum Entalpileri ve Bağ Enerjileri", "Hess Yasası (Tepkimelerin Toplanması)", "Çarpışma Teorisi ve Aktivasyon Enerjisi", "Tepkime Hızı ve Hız Bağıntısı ($r = k \\cdot [A]$)", "Hıza Etki Eden Faktörler (Katalizör)"],
+                    formula: "$$\\Delta H = \\Sigma \\Delta H_{\\text{ürünler}} - \\Sigma \\Delta H_{\\text{girenler}}$$ $$\\Delta H = \\text{Kırılan Bağlar} - \\text{Oluşan Bağlar}$$",
+                    question: "$C(k) + O_2(g) \\rightarrow CO_2(g) \\quad \\Delta H = -393\\text{ kJ}$ tepkimesine göre $12\\text{ gram}$ Karbon (C) yandığında açığa çıkan ısı kaç kJ olur? (C: $12\\text{ g/mol}$)",
+                    solution: "Denklemdeki katsayılar ve $\\Delta H$ değeri 1 mol madde içindir.<br>1. Önce yanan karbonun mol sayısını bulalım: $n = \\frac{m}{MA} = \\frac{12}{12} = 1\\text{ mol}$.<br>2. Denklem, 1 mol $C(k)$ yandığında $-393\\text{ kJ}$ entalpi değişimi olduğunu (yani ortamın dışarıya $393\\text{ kJ}$ ısı verdiğini) söylüyor.<br>3. Bizim yaktığımız miktar da tam $1\\text{ mol}$ olduğu için açığa çıkan ısı değişmeyecektir.<br><br><strong>Cevap: $393\\text{ kJ ısı açığa çıkar}$ (Not: Açığa çıkan ısı eksi olmaz).</strong>",
+                    shortcut: "Bir tepkimenin hız bağıntısı ($r = k \\cdot [A]^a$) SADECE gazlar (g) ve suda çözünmüş (suda/aq) maddeler kullanılarak yazılır. Saf katılar ve sıvılar derişimleri sabit olduğu için hız bağıntısına YAZILMAZ."
+                },
+                {
+                    title: "5. Kimyasal Denge ve Sulu Çözeltilerde Denge",
+                    summary: "İleri-geri hız eşitliği, Le Chatelier ilkesi ve Asit-Baz (Kç) dengesi.",
+                    description: "<p><strong>Kimyasal Denge:</strong> Kapalı bir sistemde ileri yöndeki tepkime hızının, geri yöndeki tepkime hızına eşitlendiği dinamik (hareketli) durumdur. Makroskobik olaylar (renk, basınç) durur, mikroskobik olaylar devam eder. <strong>Denge Sabiti ($K_c$)</strong>, sadece ürünlerin derişimlerinin girenlerin derişimlerine bölümüyle bulunur (Katı ve sıvılar alınmaz).</p><p><strong>Le Chatelier İlkesi:</strong> Dengedeki bir sisteme dışarıdan (basınç, hacim, sıcaklık, madde ekleme) etki edilirse, sistem bu etkiyi azaltacak yöne (sağa veya sola) kayarak tepki verir. Denge sabiti ($K_c$)'yi değiştiren <strong>TEK FAKTÖR SICAKLIKTIR</strong>.</p><p><strong>Sulu Çözeltilerde Denge:</strong> Zayıf asit ve bazların suda kısmen iyonlaşması ($K_a$, $K_b$) ve suyun otoiyonizasyonu ($K_{su} = 10^{-14}$) işlenir. pH ve pOH kavramları detaylandırılır. Suda az çözünen tuzların çözünürlük çarpımı ($K_{\\text{çç}}$) hesaplamaları yapılır.</p>",
+                    items: ["Denge Sabitleri ($K_c$ ve $K_p$) Hesabı", "Le Chatelier İlkesi (Dengeye Etki Eden Faktörler)", "Zayıf Asit-Baz Dengesi ($K_a$ ve $K_b$)", "pH, pOH Kavramları ve Tampon Çözeltiler", "Çözünürlük Çarpımı ($K_{\\text{çç}}$) ve Çökelme Şartları"],
+                    formula: "$$K_c = \\frac{[\\text{Ürünler}]^x}{[\\text{Girenler}]^y} \\quad pH = -\\log[H^+]$$ $$pH + pOH = 14 \\quad K_{\\text{çç}} = [A^+] \\cdot [B^-]$$",
+                    question: "$N_2(g) + 3H_2(g) \\rightleftharpoons 2NH_3(g) \\quad \\Delta H < 0$ tepkimesi dengedeyken, sabit hacimli kaba aynı sıcaklıkta bir miktar $N_2$ gazı eklenirse, denge hangi yöne kayar ve $NH_3$ derişimi nasıl değişir?",
+                    solution: "Le Chatelier ilkesine göre yorumlayacağız:<br>1. Ortama girenler tarafındaki $N_2$ gazından ekledik (etki).<br>2. Sistem, artan bu $N_2$ miktarını azaltmak (harcamak) için Ürünler (sağ) tarafına doğru kayar (tepki).<br>3. Denge sağa (ürünlere) kaydığı için, ortamdaki $N_2$ ve $H_2$ birleşerek daha fazla $NH_3$ üretir.<br>4. Sonuç olarak $NH_3$ moleküllerinin derişimi artar.<br><br><strong>Cevap: Denge sağa (ürünlere) kayar, $NH_3$ derişimi artar.</strong>",
+                    shortcut: "Eğer tepkimede girenlerin gaz mol sayısı ürünlerin gaz mol sayısına EŞİTSE, kabın hacmini artırmak veya azaltmak (basıncı değiştirmek) dengeyi BOZMAZ (sağa veya sola kaydırmaz)."
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. Kimya ve Elektrik (Elektrokimya)",
+                    summary: "Redoks tepkimeleri, galvanik piller ve elektroliz sistemleri.",
+                    description: "<p><strong>Redoks (Yükseltgenme-İndirgenme):</strong> Elektron alışverişi ile gerçekleşen tepkimelerdir. Elektron veren atom <strong>Yükseltgenir</strong> (kendi yükü artar, karşıdakini indirgediği için 'İndirgen' özellik gösterir). Elektron alan atom <strong>İndirgenir</strong> (kendi yükü azalır, karşıdakini yükseltgediği için 'Yükseltgen' özellik gösterir). Yükseltgenme basamakları kurallarla bulunur ve tepkimeler elektron denkliğiyle (yarı tepkime) denkleştirilir.</p><p><strong>Galvanik Hücreler (Piller):</strong> Kimyasal enerjiyi kendiliğinden (istemli) elektrik enerjisine çeviren sistemlerdir. Yükseltgenme potansiyeli büyük (aktif) olan metal <strong>Anot</strong>, diğeri <strong>Katot</strong> olur. Anotta aşınma (yükseltgenme), Katotta birikme (indirgenme) olur. Dış devrede elektronlar <em>Anot'tan Katot'a</em> doğru akar. <strong>Tuz Köprüsü</strong> kaplardaki yük denkliğini (anyonlar anota, katyonlar katota) sağlar. Derişimi 1 Molar olmayan pillerin gerilimi <strong>Nernst Denklemi</strong> ile hesaplanır.</p><br><p><strong>Elektroliz:</strong> Elektrik enerjisi verilerek istemsiz kimyasal tepkimelerin zorla gerçekleştirilmesidir (Pilin tam tersi). Bileşikleri elementlerine ayırmak (suyun elektrolizi) veya metalleri kaplamak için kullanılır. Faraday yasalarıyla kaplarda biriken madde miktarı ($m = Q\\cdot MA / n\\cdot 96500$) hesaplanır.</p>",
+                    items: ["Yükseltgenme Basamaklarının Bulunması", "Redoks Tepkimelerinin Denkleştirilmesi", "Anot ve Katot Belirleme (Aktiflik Sırası)", "Standart Pil Potansiyeli ($E^0_{\\text{pil}}$) ve Nernst Denklemi", "Faraday Elektroliz Yasaları ve Kaplamacılık"],
+                    formula: "$$E^0_{\\text{pil}} = E^0_{\\text{anot}} + E^0_{\\text{katot}}$$ $$\\text{Nernst: } E_{\\text{pil}} = E^0_{\\text{pil}} - \\frac{0,059}{n} \\log Q_c$$ $$Q = I \\cdot t \\text{ (Elektrik Yükü)}$$",
+                    question: "$Zn(k) \\rightarrow Zn^{2+}(suda) + 2e^-$ (Yükseltgenme Potansiyeli: $+0,76\\text{ V}$)<br>$Cu(k) \\rightarrow Cu^{2+}(suda) + 2e^-$ (Yükseltgenme Potansiyeli: $-0,34\\text{ V}$)<br>Bu iki metalden oluşturulan standart bir galvanik pilin başlangıç potansiyeli ($E^0_{\\text{pil}}$) kaç Volt olur?",
+                    solution: "Pilde anot ve katodu belirlemek için yükseltgenme potansiyellerine bakarız. Yükseltgenme potansiyeli büyük olan (daha aktif olan) metal Anot olur.<br>1. $+0,76 > -0,34$ olduğu için Çinko ($Zn$) <strong>Anot</strong>, Bakır ($Cu$) <strong>Katot</strong>'tur.<br>2. Anotta yükseltgenme olur, bu yüzden Zn'nin tepkimesini ve potansiyelini aynen alırız: $E^0_{\\text{anot}} = +0,76\\text{ V}$.<br>3. Katotta <strong>indirgenme</strong> olur. Bakırın yükseltgenme tepkimesini ters çevirmeliyiz (elektron alan hale getirmeliyiz). Tepkime ters dönünce voltajın işareti de değişir: $E^0_{\\text{katot}} = +0,34\\text{ V}$.<br>4. Pil potansiyeli formülü: $E^0_{\\text{pil}} = E^0_{\\text{anot}} + E^0_{\\text{katot}}$<br>5. $E^0_{\\text{pil}} = 0,76 + 0,34 = 1,10\\text{ Volt}$<br><br><strong>Cevap: $1,10\\text{ V}$</strong>",
+                    shortcut: "Elektrokimyada tüm şifre KİMYA kelimesidir: <strong>K</strong>atotta <strong>İ</strong>ndirgenme, <strong>M</strong>adde birikir; <strong>Y</strong>ükseltgenme <strong>A</strong>notta, <strong>A</strong>şınır."
+                },
+                {
+                    title: "2. Karbon Kimyasına Giriş",
+                    summary: "Karbon allotropları, Lewis yapıları ve hibritleşme (VSEPR).",
+                    description: "<p><strong>Organik Bileşikler:</strong> Temel yapısında Karbon (C) ve Hidrojen (H) atomu bulunduran bileşiklerdir (İstisnalar: $CO_2, CO, CS_2$ inorganiktir). Organik bileşiklerin sayısı inorganiklere göre çok fazladır çünkü Karbon atomu kendi aralarında tekli, ikili, üçlü, düz zincirli, dallanmış ve halkalı bağlar yapabilir.</p><p><strong>Karbon Allotropları:</strong> Aynı atomun uzayda farklı dizilmiş halleridir. Doğal allotropları Elmas (çok sert, yalıtkan, ağ örgülü) ve Grafit'tir (yumuşak, iletken, altıgen tabakalı). Yapay allotropları ise Fulleren ve çok sağlam olan Grafen'dir (Nanoteknolojinin temeli).</p><br><p><strong>Lewis Yapıları ve Hibritleşme:</strong> Moleküllerin nokta gösterimidir. Karbon atomunun değerlik orbitallerinin kaynaşarak yeni orbitaller (sp, sp², sp³) oluşturmasına hibritleşme denir. İki atom arasında oluşan ilk bağa Sigma ($\\sigma$) bağı (çok sağlam), ikinci veya üçüncü bağlara Pi ($\\pi$) bağı denir. Molekül geometrisi <strong>VSEPR</strong> ($AXE$) gösterimiyle bulunur (Doğrusal, Düzlem üçgen, Kırık doğru, Düzgün dörtyüzlü).</p>",
+                    items: ["Organik ve İnorganik Bileşiklerin Farkları", "Karbon Atomunun Özellikleri ve Allotropları", "Basit ve Molekül (Kapalı) Formül Bulma", "Lewis Formülleri ve Sigma ($\\sigma$) / Pi ($\\pi$) Bağları", "Hibritleşme (sp, sp², sp³) ve VSEPR Gösterimi"],
+                    formula: "$$\\text{Hibrit Türü} = \\text{Sigma Bağı Sayısı} + \\text{Ortaklanmamış Elektron Çifti}$$",
+                    question: "$CO_2$ (Karbondioksit) molekülünün Lewis yapısını çizerek merkez atomunun (C) hibritleşme türünü ve VSEPR gösterimini bulunuz. ($_{6}C, _{8}O$)",
+                    solution: "1. Değerlik elektronlarını bulalım: Karbon 4A grubundadır (4 elektronu var). Oksijen 6A grubundadır (6 elektronu var, 2 bağ yapar).<br>2. Merkezde C olur, Oksijenler iki yanda olur. İkişer elektron ortaklaşa kullanılarak çift bağlar oluşturulur: $\\ddot{O} = C = \\ddot{O}$<br>3. Sigma bağlarını (ilk bağları) sayalım: Karbon atomunun sağında ve solunda toplam 2 tane Sigma bağı vardır. (Çift bağlardan ikincisi Pi bağıdır, hibritleşmeye katılmaz).<br>4. Karbonun üzerinde ortaklanmamış (bağ yapmayan) elektron çifti yoktur.<br>5. Hibritleşme türü formülü = Sigma Bağı (2) + Ortaklanmamış Çift (0) = 2. İki harfli hibritleşme türü <strong>sp</strong> hibritleşmesidir.<br>6. VSEPR gösterimi: A (Merkez atom C), X (Bağlı atom sayısı 2 Oksijen) $\\implies AX_2$ olur.<br><br><strong>Cevap: sp hibritleşmesi yapar ve $AX_2$ (Doğrusal) geometriye sahiptir.</strong>",
+                    shortcut: "Bir organik molekülde Karbon atomu etrafında SADECE tekli bağlar varsa $sp^3$, bir tane İKİLİ bağ varsa $sp^2$, bir tane ÜÇLÜ bağ (veya iki tane ikili bağ) varsa $sp$ hibritleşmesi yapmıştır. (Parmak hesabı: Üstler toplamı sigma bağı sayısını verir)."
+                },
+                {
+                    title: "3. Organik Kimya (Hidrokarbonlar ve Fonksiyonel Gruplar)",
+                    summary: "Alkan, alken, alkin isimlendirmeleri (IUPAC) ve izomeri.",
+                    description: "<p><strong>Hidrokarbonlar:</strong> Sadece C ve H'den oluşurlar. 1'den 10'a kadar Karbon sayıları ezberlenmelidir (Metan, Etan, Propan, Bütan...).<br>- <strong>Alkanlar (Doymuş):</strong> Sadece tekli bağ ($\\sigma$) içerirler ($C_nH_{2n+2}$). Tepkimeye girmeye isteksizdirler (Parafin). Adlandırması sonuna '-an' getirilerek yapılır.<br>- <strong>Alkenler ve Alkinler (Doymamış):</strong> İkili veya üçlü bağ (Pi bağı) içerirler. Katılma ve polimerleşme tepkimesi verirler (Bromlu suyun rengini giderirler). Adlandırması çift bağın yerine göre '-en' veya '-in' getirilerek yapılır.<br>- <strong>Aromatikler (Arenler):</strong> Benzen ($C_6H_6$) halkası içeren kokulu bileşiklerdir (Toluen, Fenol, Anilin).</p><br><p><strong>Fonksiyonel Gruplar ve İzomeri:</strong> Hidrokarbon zincirine özel grupların bağlanmasıyla oluşurlar. Alkoller ($-OH$), Eterler ($-O-$), Karbonil bileşikleri (Aldehit ve Keton) ve Karboksilik Asit/Esterlerin ($-COOH$) genel özellikleri ve adlandırmaları işlenir. <strong>İzomeri</strong>; kapalı formülü aynı, açık formülü (atomların dizilişi veya bağların yeri) farklı olan, bu nedenle fiziksel özellikleri farklılaşan maddelerdir.</p>",
+                    items: ["Alkanların IUPAC Adlandırması ve Radikaller", "Alkenler ve Alkinlerin Katılma Tepkimeleri (Markovnikov Kuralı)", "Aromatik Bileşikler (Benzen Türevleri)", "Alkoller ve Eterlerin Yapı İzomerliği", "Karboksilik Asitler ve Esterlerin Özellikleri"],
+                    formula: "$$\\text{Alkan: } C_nH_{2n+2} \\quad \\text{Alken: } C_nH_{2n} \\quad \\text{Alkin: } C_nH_{2n-2}$$",
+                    question: "Kapalı formülü $C_4H_{10}$ olan hidrokarbon bileşiğinin doymuşluk durumunu belirtip, oluşabilecek iki farklı yapı izomerinin IUPAC isimlerini yazınız.",
+                    solution: "1. Kapalı formüle bakalım: $n=4$ ise hidrojen sayısı $2 \\cdot 4 + 2 = 10$'dur. Yani $C_nH_{2n+2}$ genel formülüne uyuyor. Bu bileşik bir alkandır ve yapısındaki tüm bağlar tekli olduğu için <strong>Doymuş</strong> bir hidrokarbondur.<br>2. 4 karbonlu düz bir zincir çizersek (dallanma olmadan): $CH_3-CH_2-CH_2-CH_3$. Bunun adı IUPAC'a göre <strong>n-Bütan</strong>'dır.<br>3. Şimdi 3 karbonlu düz zincir çizip, ortadaki karbona bir metil ($CH_3$) bağlayalım (dallanma yapalım):<br>   $CH_3-CH(CH_3)-CH_3$<br>4. Uzun zincir 3 karbonlu (Propan), 2. karbonda Metil dalı var. Adı: <strong>2-Metilpropan</strong> (Yaygın adı: İzobütan) olur.<br>5. Bu iki bileşiğin kapalı formülleri aynı ama bağlanış şekilleri (kaynama noktaları vb.) farklıdır, bu yüzden izomerdirler.<br><br><strong>Cevap: Doymuştur. İzomerleri: n-Bütan ve 2-Metilpropan.</strong>",
+                    shortcut: "Katılma tepkimelerinde hidrojeni zengin olan karbona hidrojen eklenir (Markovnikov Kuralı). Kısaca: 'Zengin daha da zenginleşir, hidrojen hidrojeni çok olan yere gider'."
+                }
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
