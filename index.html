@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijital Dershane - Ana Menü</title>
+    <style>
+        :root { 
+            --bg: #f8fafc; 
+            --primary: #4f46e5; 
+            --primary-dark: #3730a3;
+            --text: #1e293b; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 2rem; min-height: 100vh;}
+        
+        header { text-align: center; margin-bottom: 3rem; background: linear-gradient(135deg, #1e293b, #3730a3); color: white; padding: 3rem; border-radius: 20px; width: 100%; max-width: 1200px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);}
+        header h1 { font-size: 3rem; margin-bottom: 1rem; }
+        header p { font-size: 1.2rem; color: #c7d2fe; }
+
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; width: 100%; max-width: 1200px; }
+        
+        .subject-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 2.5rem 1rem; 
+            text-align: center; 
+            text-decoration: none; 
+            color: var(--text); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border: 2px solid transparent;
+        }
+        .subject-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.15); 
+            border-color: var(--primary); 
+        }
+        
+        .subject-icon { font-size: 4.5rem; margin-bottom: 1.5rem; line-height: 1; }
+        .subject-title { font-size: 1.5rem; font-weight: bold; color: var(--primary-dark);}
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 2rem; }
+            .subject-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏛️ Dijital Dershane</h1>
+        <p>Lise Müfredatı ve Yapay Zeka Destekli Soru Çözüm Platformu</p>
+    </header>
+
+    <div class="subject-grid">
+        <a href="edebiyat.html" class="subject-card">
+            <div class="subject-icon">📚</div>
+            <div class="subject-title">Türk Dili ve Edebiyatı</div>
+        </a>
+        <a href="matematik.html" class="subject-card">
+            <div class="subject-icon">📐</div>
+            <div class="subject-title">Matematik</div>
+        </a>
+        <a href="fizik.html" class="subject-card">
+            <div class="subject-icon">🧲</div>
+            <div class="subject-title">Fizik</div>
+        </a>
+        <a href="kimya.html" class="subject-card">
+            <div class="subject-icon">🧪</div>
+            <div class="subject-title">Kimya</div>
+        </a>
+        <a href="biyoloji.html" class="subject-card">
+            <div class="subject-icon">🧬</div>
+            <div class="subject-title">Biyoloji</div>
+        </a>
+        <a href="cografya.html" class="subject-card">
+            <div class="subject-icon">🌍</div>
+            <div class="subject-title">Coğrafya</div>
+        </a>
+        <a href="tarih.html" class="subject-card">
+            <div class="subject-icon">📜</div>
+            <div class="subject-title">Tarih</div>
+        </a>
+        <a href="felsefe.html" class="subject-card">
+            <div class="subject-icon">🤔</div>
+            <div class="subject-title">Felsefe</div>
+        </a>
+        <a href="din.html" class="subject-card">
+            <div class="subject-icon">🕌</div>
+            <div class="subject-title">Din Kültürü</div>
+        </a>
+            <a href="ingilizce.html" class="subject-card">
+            <div class="subject-icon">🗣️</div>
+            <div class="subject-title">İngilizce</div>
+        </a>
+
+    </div>
+
+</body>
+</html>
+
