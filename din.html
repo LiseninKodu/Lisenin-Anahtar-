@@ -383,7 +383,7 @@
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-    // --- YAPAY ZEKA KODLARI BAŞLANGICI ---
+/ --- YAPAY ZEKA KODLARI BAŞLANGICI ---
 
     let base64Image = "";
     
@@ -412,10 +412,10 @@
         resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
 
         // DİKKAT: YENİ ALDIĞIN ANAHTARI AŞAĞIDAKİ TIRNAKLARIN İÇİNE YAPIŞTIR
-        const apiKey = "AIzaSyAXLZVEpevTL7v7JX6w7pWijyhEBDiHelI";
+        const apiKey = "AIzaSyBomBkcs331o_rO8mg3FVBxmxtYcMmZOFo";
         
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const url = https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey};
             
             const response = await fetch(url, {
                 method: 'POST',
@@ -448,7 +448,6 @@
             resultBox.innerHTML = "<b>Bağlantı Hatası:</b> " + err.message;
         }
     }
-
         window.onload = () => loadGrade(9);
     </script>
 </body>
