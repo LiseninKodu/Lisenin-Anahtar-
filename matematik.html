@@ -354,21 +354,8 @@
 
     let base64Image = "";
     
-    // API Anahtarını buraya koyuyoruz
-    const apiKey = "AIzaSyCDQWieXsYuLKmmLUpwwGVp0Mo39SZsZgw";
 
-    document.getElementById('aiImageInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => { 
-                base64Image = e.target.result.split(',')[1]; 
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-       async function solveQuestion() {
+      async function solveQuestion() {
         if(!base64Image) {
             alert("Lütfen önce bir fotoğraf seçin!");
             return;
