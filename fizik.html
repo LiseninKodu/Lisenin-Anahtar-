@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders İçeriği - Dijital Dershane</title>
+    
+    <!-- MathJax (Formüller İçin) -->
+    <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #0f172a; --accent: #e11d48; --success: #059669; --bg-color: #f8fafc; --text-main: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, var(--secondary), var(--primary-dark)); color: white; padding: 2rem 1rem; text-align: center; position: relative; }
+        .back-btn { position: absolute; left: 20px; top: 30px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        header h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+        .grade-nav { display: flex; justify-content: center; background: white; padding: 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grade-btn { background: white; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 2.5rem; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .grade-btn.active, .grade-btn:hover { background: var(--primary); color: white; }
+
+        .container { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 2rem 1rem; gap: 2rem; }
+        
+        .sidebar { width: 300px; background: white; border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .topic-btn { display: block; width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.5rem; background: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .topic-btn.active, .topic-btn:hover { background: var(--secondary); color: white; }
+
+        .content { flex: 1; min-width: 0; }
+        
+        .content-card { background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: none; animation: fadeIn 0.4s ease; }
+        .content-card.active { display: block; }
+        .content-card h2 { color: var(--secondary); margin-bottom: 1.5rem; font-size: 2rem; }
+        
+        .summary-box { background: #e0e7ff; color: #3730a3; padding: 1.5rem; border-radius: 8px; font-size: 1.1rem; margin-bottom: 1.5rem; border-left: 5px solid #818cf8; line-height: 1.6; font-style: italic;}
+        .desc-text { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        
+        .formula-box { background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; text-align: center; overflow-x: auto; margin-bottom: 1.5rem;}
+        .example-box { background: #ecfdf5; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 1.1rem;}
+        .shortcut-box { background: #fff1f2; border-left: 5px solid var(--accent); padding: 1.5rem; border-radius: 0 8px 8px 0; font-size: 1.1rem;}
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* AI Butonu CSS */
+        .ai-fab-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); z-index: 1000; transition: transform 0.3s; }
+        .ai-fab-btn:hover { transform: scale(1.05); }
+        .ai-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
+        .ai-modal.active { display: flex; }
+        .ai-content { background: white; width: 90%; max-width: 600px; padding: 2.5rem; border-radius: 16px; position: relative; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2);}
+        
+        @media (max-width: 900px) { .container { flex-direction: column; } .sidebar { width: 100%; position: static; } .back-btn { position: static; display: inline-block; margin-bottom: 1rem;} }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">⬅ Ana Menüye Dön</a>
+        <h1 id="pageTitle">Ders Adı Yükleniyor...</h1>
+        <p>9, 10, 11 ve 12. Sınıf Konu Arşivi</p>
+    </header>
+
+    <div class="grade-nav">
+        <button class="grade-btn active" onclick="loadGrade(9)">9. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(10)">10. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(11)">11. Sınıf</button>
+        <button class="grade-btn" onclick="loadGrade(12)">12. Sınıf</button>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <h3>Konular</h3>
+            <div id="topicList"></div>
+        </aside>
+        
+        <main class="content" id="mainContent">
+            <div class="content-card active" style="text-align:center; color:#64748b;">
+                <h2>Hoş Geldin!</h2>
+                <p>Veriler bekleniyor. Lütfen kodu düzenleyin.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- YAPAY ZEKA BUTONU VE MODALI -->
+    <button class="ai-fab-btn" onclick="document.getElementById('aiModal').classList.add('active')">🤖 Soruyu Çöz</button>
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-content">
+            <button style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; cursor:pointer; color:#64748b;" onclick="document.getElementById('aiModal').classList.remove('active')">&times;</button>
+            <h2 style="color:#1e293b; margin-bottom:1rem;">🤖 Yapay Zeka Hoca</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Çözemediğin soruyu yükle, adım adım anlatayım.</p>
+            <div style="border:2px dashed #cbd5e1; padding:2rem; border-radius:12px; text-align:center; background:#f8fafc; margin-bottom:1rem;">
+                <input type="file" id="aiImageInput" accept="image/*" style="width:100%;">
+            </div>
+            <button onclick="solveQuestion()" style="padding:15px; background:#10b981; color:white; border:none; border-radius:8px; width:100%; font-size:1.2rem; font-weight:bold; cursor:pointer;">Çözümü Getir</button>
+            <div id="aiResult" style="margin-top:1.5rem; padding:1.5rem; background:#f1f5f9; border-radius:8px; display:none; border-left:4px solid #8b5cf6; font-size:1.1rem; line-height:1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa başlığını ayarla (Hangi dersin dosyasındaysak burayı değiştireceğiz)
+        const dersAdi = "Fizik";
+        document.getElementById('pageTitle').innerText = dersAdi + " Odası";
+
+        // İŞTE BİRLİKTE DOLDURACAĞIMIZ BOŞ VERİ TABANI
+        const dersVerisi = {
+            9: [
+                                {
+                    title: "1. Fizik Bilimine Giriş ve Madde",
+                    summary: "Fiziğin alt dalları, temel büyüklükler ve özkütle kavramı.",
+                    description: "<p><strong>Fiziğin Alt Dalları:</strong> Mekanik (hareket/kuvvet), Elektromanyetizma (elektrik/mıknatıs), Termodinamik (ısı/sıcaklık), Optik (ışık), Katı Hal Fiziği (kristal yapılar), Atom Fiziği (atomun yapısı), Nükleer Fizik (çekirdek), Yüksek Enerji ve Plazma Fiziği.</p><p><strong>Fiziksel Nicelikler:</strong> Kendi başına ifade edilebilen büyüklüklere <strong>Temel Büyüklükler</strong> denir (Kütle, Işık şiddeti, Sıcaklık, Akım şiddeti, Madde miktarı, Uzunluk, Zaman - KISA MUZ). Bunların dışında kalan hız, kuvvet, enerji gibi büyüklükler ise Türetilmiş Büyüklüklerdir. Ayrıca yön gerektiren büyüklüklere Vektörel (hız, kuvvet), yön gerektirmeyenlere Skaler (kütle, zaman) denir.</p><p><strong>Madde ve Özellikleri:</strong> Kütle ve hacim ortak özelliktir. Birim hacmin kütlesine <strong>Özkütle (Yoğunluk)</strong> denir ve ayırt edici bir özelliktir ($d=m/V$). Dayanıklılık (kesit alanı / hacim), kılcallık, adezyon (farklı moleküllerin birbirine yapışması) ve kohezyon (aynı cins moleküllerin birbirini tutması) kavramları işlenir.</p>",
+                    items: ["Fiziğin Alt Dalları ve İlgi Alanları", "Temel, Türetilmiş, Skaler ve Vektörel Büyüklükler", "Kütle, Hacim ve Özkütle Hesabı", "Katılarda Dayanıklılık", "Sıvılarda Yüzey Gerilimi, Adezyon ve Kohezyon"],
+                    formula: "$$d = \\frac{m}{V} \\quad \\text{Dayanıklılık} \\propto \\frac{\\text{Kesit Alanı}}{\\text{Hacim}}$$",
+                    question: "Kütlesi 120 g, hacmi 30 cm³ olan saf X sıvısı ile kütlesi 40 g, hacmi 20 cm³ olan saf Y sıvısı homojen olarak karıştırılıyor. Oluşan karışımın özkütlesi kaç g/cm³ olur?",
+                    solution: "Karışımın özkütlesi, toplam kütlenin toplam hacme bölünmesiyle bulunur.<br>1. Karışımın formülü: $d_{kar} = \\frac{m_{top}}{V_{top}}$<br>2. X'in kütlesi = 120g, Y'nin kütlesi = 40g. Toplam kütle: $120 + 40 = 160g$<br>3. X'in hacmi = 30cm³, Y'nin hacmi = 20cm³. Toplam hacim: $30 + 20 = 50\\text{cm}^3$<br>4. $d_{kar} = \\frac{160}{50} = \\frac{16}{5} = 3,2\\text{ g/cm}^3$<br><br><strong>Cevap: $3,2\\text{ g/cm}^3$</strong>",
+                    shortcut: "Eğer iki sıvıdan EŞİT HACİMDE karıştırıyorsan, karışımın özkütlesi iki sıvının özkütlesinin tam ortasıdır (Aritmetik ortalama: $(d_1+d_2)/2$). Eşit kütlede karıştırıyorsan formül $2d_1d_2 / (d_1+d_2)$'dir."
+                },
+                {
+                    title: "2. Hareket ve Kuvvet",
+                    summary: "Konum, hız, ivme kavramları ve Newton'un hareket yasaları.",
+                    description: "<p><strong>Hareket:</strong> Konum (vektörel), alınan yol (skaler) ve yer değiştirme (vektörel) kavramları karıştırılmamalıdır. Alınan yolun zamana bölümü <strong>Sürat</strong> (skaler), yer değiştirmenin zamana bölümü ise <strong>Hız</strong> (vektörel) değerini verir. Birim zamandaki hız değişimine ise <strong>İvme</strong> ($a$) denir.</p><br>[Sabit hızlı ve ivmeli hareketin konum-zaman, hız-zaman grafikleri]<p><strong>Newton'un Hareket Yasaları:</strong><br>1. Eylemsizlik Prensibi: Cisme etki eden net kuvvet sıfırsa, cisim duruyorsa durmaya, hareket ediyorsa sabit hızla hareketine devam eder.<br>2. Temel Prensip (Dinamiğin Temel Yasası): Bir cisme net bir kuvvet etki ediyorsa, o cisim kütlesiyle ters orantılı bir ivme kazanır ($F_{net} = m \\cdot a$).<br>3. Etki - Tepki Prensibi: Her etkiye karşılık eşit büyüklükte fakat zıt yönde bir tepki kuvveti doğar. Ayrıca hareket eden cisimlere, hareketi engelleyici yönde bir <strong>Sürtünme Kuvveti</strong> ($F_s = k \\cdot N$) etki eder.</p>",
+                    items: ["Konum, Yer Değiştirme ve Alınan Yol", "Sürat, Hız ve İvme Kavramları", "Sabit Hızlı ve İvmeli Hareket Grafikleri", "Newton'un I. ve II. Yasası ($F=m\\cdot a$)", "Etki-Tepki Prensibi ve Sürtünme Kuvveti"],
+                    formula: "$$\\vec{V} = \\frac{\\Delta \\vec{x}}{\\Delta t} \\quad \\vec{a} = \\frac{\\Delta \\vec{V}}{\\Delta t}$$ $$F_{net} = m \\cdot a \\quad F_s = k \\cdot N$$",
+                    question: "Sürtünmesiz yatay düzlemde durmakta olan 4 kg kütleli bir cisme 20 N büyüklüğünde yatay bir kuvvet 3 saniye boyunca uygulanıyor. Cismin 3. saniye sonundaki hızı kaç m/s olur?",
+                    solution: "1. Önce cismin ivmesini (hızlanma oranını) bulmalıyız. Newton'un Temel Prensibi: $F_{net} = m \\cdot a$<br>2. $20 = 4 \\cdot a \\implies a = 5\\text{ m/s}^2$ (Yani cisim saniyede 5 m/s hızlanıyor).<br>3. Cisim 3 saniye boyunca hareket ediyorsa; İvme formülünden $a = \\Delta V / \\Delta t$<br>4. $5 = \\Delta V / 3 \\implies \\Delta V = 15\\text{ m/s}$<br>5. Cisim başlangıçta durduğu (İlk hız = 0) için son hızı 15 m/s olur.<br><br><strong>Cevap: $15\\text{ m/s}$</strong>",
+                    shortcut: "Bir cisim sabit hızla hareket ediyorsa (ivmesi sıfırsa) cisme etki eden NET KUVVET kesinlikle SIFIRDIR. İleri çeken kuvvet, geriye doğru olan sürtünme kuvvetine eşittir."
+                },
+                {
+                    title: "3. İş, Güç ve Enerji",
+                    summary: "Fiziksel işin tanımı, mekanik enerjinin dönüşümü ve korunumu.",
+                    description: "<p><strong>İş ve Güç:</strong> Fiziksel anlamda İş (W) yapabilmek için, bir kuvvete ve o kuvvetin cisme <strong>kendi doğrultusunda</strong> yol aldırmasına ihtiyaç vardır ($W = F \\cdot \\Delta x$). Birim zamanda yapılan işe ise <strong>Güç</strong> (P) denir ($P = W / t$). Birimi Watt'tır.</p><p><strong>Enerji Çeşitleri:</strong> Bir cismin hareketinden (hızından) dolayı sahip olduğu enerjiye <strong>Kinetik Enerji</strong> ($E_k = \\frac{1}{2}mv^2$), konumundan (yüksekliğinden) veya esnekliğinden dolayı sahip olduğu enerjiye ise <strong>Potansiyel Enerji</strong> ($E_p = mgh$) denir.</p><br>[Potansiyel enerjinin kinetik enerjiye dönüşümünü gösteren sarkaç görseli]<p><strong>Mekanik Enerji Korunumu:</strong> Sürtünmelerin ihmal edildiği (sadece yerçekiminin iş yaptığı) bir sistemde, kinetik ve potansiyel enerjilerin toplamı olan Mekanik Enerji daima <strong>sabit kalır</strong> (korunur). Cismin yukarıdan aşağıya düşerken kaybettiği potansiyel enerji, kazandığı kinetik enerjiye eşittir.</p>",
+                    items: ["Fiziksel Anlamda İş (W)", "Güç (P) ve Verim", "Öteleme Kinetik Enerjisi", "Yerçekimi ve Esneklik Potansiyel Enerjisi", "Mekanik Enerjinin Korunumu Yasası"],
+                    formula: "$$W = F \\cdot \\Delta x \\quad P = \\frac{W}{t}$$ $$E_k = \\frac{1}{2}mv^2 \\quad E_p = mgh$$ $$\\text{Mekanik Enerji} = E_k + E_p = \\text{Sabit}$$",
+                    question: "2 kg kütleli bir cisim yerden 5 metre yüksekten 10 m/s hızla aşağı doğru fırlatılıyor. Sürtünmeler önemsiz olduğuna göre cisim yere kaç m/s hızla çarpar? (g=10 m/s²)",
+                    solution: "Sürtünme olmadığı için Mekanik Enerji Korunumu ilkesi geçerlidir. (Atıldığı andaki toplam enerji = Yere çarptığı andaki toplam enerji)<br>1. İlk Durumdaki Toplam Enerji = $E_p + E_k = mgh + \\frac{1}{2}mv^2$<br>2. $E_{ilk} = (2 \\cdot 10 \\cdot 5) + (\\frac{1}{2} \\cdot 2 \\cdot 10^2) = 100 + 100 = 200\\text{ Joule}$<br>3. Yere çarptığı anda yüksekliği 0 olduğu için potansiyel enerjisi kalmaz. Tüm enerji kinetik enerjiye dönüşür.<br>4. Son Durumdaki Enerji: $\\frac{1}{2}mV_{son}^2 = 200$<br>5. $\\frac{1}{2} \\cdot 2 \\cdot V_{son}^2 = 200 \\implies V_{son}^2 = 200 \\implies V_{son} = 10\\sqrt{2}\\text{ m/s}$<br><br><strong>Cevap: $10\\sqrt{2}\\text{ m/s}$</strong>",
+                    shortcut: "Bir kuvvet, hareket doğrultusuna DİK (90 derece) ise (örneğin yatayda giden arabanın ağırlığı veya normal kuvveti) fiziksel anlamda İŞ YAPMAZ. İş sıfırdır."
+                },
+                {
+                    title: "4. Isı, Sıcaklık ve Elektrostatik (Giriş)",
+                    summary: "Termometreler, hal değişimi, genleşme ve durgun elektrik yükleri.",
+                    description: "<p><strong>Isı ve Sıcaklık:</strong> Sıcaklık bir maddenin ortalama kinetik enerjisinin bir göstergesidir (termometreyle ölçülür). Isı ise sıcaklık farkından dolayı maddeler arasında <strong>aktarılan enerjidir</strong> (kalorimetreyle hesaplanır). Sıcaklığı farklı iki madde bir araya gelirse ısıl denge sağlanana kadar ısı alışverişi olur ($Q_{alinan} = Q_{verilen}$). Sıcaklığı artan maddelerde Boyca, Yüzeyce ve Hacimce <strong>Genleşme</strong> görülür.</p><p><strong>Hal Değişimi:</strong> Saf maddeler erirken veya kaynarken onlara ısı vermeye devam etseniz bile sıcaklıkları <strong>sabit kalır</strong> ($Q=mL$). Sıcaklık değişimi formülü ise $Q=mc\\Delta T$'dir.</p><p><strong>Elektrostatik:</strong> Durgun elektrik yüklerinin incelenmesidir. Aynı yükler iter, zıt yükler çeker. Sürtünme, Dokunma ve Etki ile elektriklenme çeşitleri. İletken ve yalıtkan cisimlerin yük dağılımları ve topraklama (cismi nötr yapma) olayı işlenir.</p>",
+                    items: ["Isı ve Sıcaklık Arasındaki Farklar", "Termometre Çeşitleri ve Çevrimler", "Özısı, Isı Sığası ve Hal Değişimi", "Isıl Denge ve Genleşme (Boy, Yüzey, Hacim)", "Elektrik Yükleri ve Elektriklenme Çeşitleri"],
+                    formula: "$$Q = m \\cdot c \\cdot \\Delta T \\text{ (Kel Macit)}$$ $$Q = m \\cdot L \\text{ (Kâmil)}$$ $$\\frac{C}{100} = \\frac{F-32}{180}$$",
+                    question: "Deniz seviyesinde ısıca yalıtılmış bir kapta bulunan 0 °C'deki 50 gram buza, sıcaklığı artmadan tamamen suya dönüşmesi (erimesi) için kaç kalori (cal) ısı verilmelidir? ($L_{erime} = 80\\text{ cal/g}$)",
+                    solution: "Soru bizden sıcaklık değişimi istemiyor, sadece hal değişimi (katıdan sıvıya geçiş) istiyor. Bu yüzden Q=mcΔT formülü değil, hal değişimi formülü (Q=mL) kullanılmalıdır.<br>1. Kütle (m) = 50 g<br>2. Erime Isısı ($L_e$) = 80 cal/g<br>3. Gereken Isı ($Q$) = $m \\cdot L_e = 50 \\cdot 80 = 4000\\text{ cal}$<br><br><strong>Cevap: 4000 kalori</strong>",
+                    shortcut: "Sorularda 'Bir maddenin ISISI' ifadesini görürsen hemen üstünü çiz. Bir maddenin 'İç Enerjisi' veya 'Sıcaklığı' olur, ancak ısısı olmaz. Isı sadece aktarılan bir enerjidir ve transfer esnasında anlam kazanır."
+                }
+
+            ],
+            10: [
+                                {
+                    title: "1. Elektrik ve Manyetizma",
+                    summary: "Ohm yasası, elektrik devreleri, eşdeğer direnç ve manyetik alan.",
+                    description: "<p><strong>Elektrik Akımı:</strong> Bir iletkenin kesitinden birim zamanda geçen yük miktarıdır ($I = q/t$). Direnç; iletkenin boyuyla doğru, kesit alanıyla ters orantılıdır ($R = \\rho \\cdot L/A$).</p><p><strong>Ohm Yasası ($V=I\\cdot R$):</strong> Elektriğin en temel formülüdür. Devredeki dirençler <strong>Seri</strong> bağlanırsa eşdeğer direnç artar (toplanır), <strong>Paralel</strong> bağlanırsa eşdeğer direnç azalır. Elektriksel güç ve lambaların parlaklığı devreden geçen akıma/gerilime bağlıdır.</p><p><strong>Manyetizma:</strong> Üzerinden akım geçen düz bir telin veya bobinin (elektromıknatıs) etrafında manyetik alan oluşur. Manyetik alanın yönü <strong>Sağ El Kuralı</strong> ile bulunur (Baş parmak akım, kıvrılan 4 parmak manyetik alan yönünü gösterir).</p>",
+                    items: ["Elektrik Akımı, Potansiyel Fark ve Direnç", "Ohm Yasası ve Eşdeğer Direnç Hesaplamaları", "Üreteçlerin Bağlanması ve Lamba Parlaklığı", "Elektriksel Enerji ve Güç", "Akımın Manyetik Etkisi ve Sağ El Kuralı"],
+                    formula: "$$R = \\rho \\frac{L}{A} \\quad V = I \\cdot R$$ $$\\frac{1}{R_{\\text{eş}}} = \\frac{1}{R_1} + \\frac{1}{R_2} \\text{ (Paralel)}$$",
+                    question: "Dirençleri $6 \\,\\Omega$ ve $3 \\,\\Omega$ olan iki lamba paralel bağlanmış ve $12\\text{ V}$'luk bir pile bağlanmıştır. Ana koldan geçen toplam akım kaç amperdir?",
+                    solution: "1. Paralel bağlamada önce Eşdeğer Direnç ($R_{\\text{eş}}$) bulunur: $\\frac{1}{R_{\\text{eş}}} = \\frac{1}{6} + \\frac{1}{3} = \\frac{1}{6} + \\frac{2}{6} = \\frac{3}{6}$. Ters çevir: $R_{\\text{eş}} = 2 \\,\\Omega$.<br>2. Ohm Yasasını uygula: $V = I_{toplam} \\cdot R_{\\text{eş}}$<br>3. $12 = I_{toplam} \\cdot 2 \\implies I_{toplam} = 6\\text{ Amper}$.<br><br><strong>Cevap: 6 Amper</strong>",
+                    shortcut: "Eğer sadece iki direnç PARALEL bağlıysa, uzun uzun kesirli toplama yapma. Eşdeğer Direnç = (Çarpımları) / (Toplamları) kuralını kullan. Örn: $(6 \\cdot 3) / (6 + 3) = 18 / 9 = 2$ ohm."
+                },
+                {
+                    title: "2. Basınç ve Kaldırma Kuvveti",
+                    summary: "Katı, sıvı, gaz basıncı ve Arşimet prensibi.",
+                    description: "<p><strong>Basınç:</strong> Birim yüzeye etki eden dik kuvvettir. Katılar basıncı yüzey alanlarına göre iletirken ($P = G/S$), sıvılar üzerine uygulanan basıncı her yöne aynen iletirler (<strong>Pascal Prensibi</strong>). Sıvı basıncı derinliğe ve özkütleye bağlıdır ($P = hdg$). Kapalı kaplardaki gaz basıncı manometreyle, açık hava basıncı barometreyle (Toriçelli deneyi) ölçülür.</p><p><strong>Kaldırma Kuvveti:</strong> Arşimet Prensibi'ne göre sıvıya bırakılan bir cisme sıvı tarafından, cismin batan hacminin taşırdığı sıvının ağırlığı kadar yukarı yönlü bir kuvvet uygulanır ($F_k = V_{\\text{batan}} \\cdot d_{\\text{sıvı}} \\cdot g$).</p><br>",
+                    items: ["Katı Basıncı ve Özellikleri", "Sıvı Basıncı, U Borusu ve Pascal Prensibi", "Açık Hava Basıncı ve Gaz Basıncı (Bernoulli)", "Kaldırma Kuvveti ve Yüzme Şartları"],
+                    formula: "$$P_{\\text{katı}} = \\frac{G}{S} \\quad P_{\\text{sıvı}} = h \\cdot d \\cdot g$$ $$F_k = V_{\\text{batan}} \\cdot d_{\\text{sıvı}} \\cdot g$$",
+                    question: "Özkütlesi $2 \\text{ g/cm}^3$ olan katı bir cisim, özkütlesi $1 \\text{ g/cm}^3$ olan suyun içine bırakılıyor. Cisim yüzer mi, askıda mı kalır, yoksa batar mı? Kaldırma kuvveti ile cismin ağırlığı arasındaki ilişki nedir?",
+                    solution: "1. Cismin özkütlesi (2), sıvının özkütlesinden (1) BÜYÜK olduğu için cisim kabın tabanına BATAR.<br>2. Batan cisimlerde sıvının uyguladığı kaldırma kuvveti ($F_k$), cismin ağırlığını ($G$) dengelemeye yetmez. Bu yüzden ağırlık, kaldırma kuvvetinden büyüktür ($G > F_k$).<br><br><strong>Cevap: Batar ve $G > F_k$ olur.</strong>",
+                    shortcut: "Yüzen ve askıda kalan cisimler dengede oldukları için Kaldırma Kuvveti, Cismin Ağırlığına EŞİTTİR ($F_k = G$). Sadece dibe batan cisimlerde kaldırma kuvveti ağırlıktan küçüktür."
+                },
+                {
+                    title: "3. Dalgalar",
+                    summary: "Dalga boyu, frekans, periyot kavramları ve dalga çeşitleri.",
+                    description: "<p><strong>Temel Kavramlar:</strong> Titreşim doğrultusu yayılma doğrultusuna dik olan dalgalara <strong>Enine</strong> (su, yay, elektromanyetik), paralel olanlara <strong>Boyuna</strong> (ses, yay, deprem) dalga denir. Bir tam dalganın oluşması için geçen süreye Periyot ($T$), saniyede oluşan dalga sayısına Frekans ($f$) denir ($T \\cdot f = 1$).</p><p><strong>Dalga Çeşitleri:</strong> Yay dalgalarında hız yayın kalınlığına ve gerginliğine bağlıdır. Su dalgalarında hız SADECE derinliğe bağlıdır (Derinde hızlı, sığda yavaş). Ses dalgaları mekaniktir, boşlukta yayılmaz. Sesin yüksekliği (ince/kalın) frekansa, şiddeti (gürlüğü) ise genliğe bağlıdır.</p>",
+                    items: ["Dalga Boyu, Periyot, Frekans, Hız ve Genlik", "Yay Dalgalarında Yansıma ve İletim", "Su Dalgalarında Doğrusal/Dairesel Dalgalar ve Stroboskop", "Ses Dalgaları ve Yankı", "Deprem (Sismik) Dalgaları"],
+                    formula: "$$V = \\lambda \\cdot f \\quad T = \\frac{1}{f}$$",
+                    question: "Frekansı $5\\text{ Hz}$ olan bir kaynağın oluşturduğu dalgaların yayılma hızı $20\\text{ cm/s}$'dir. Bu dalgaların dalga boyu ($\\lambda$) kaç cm'dir?",
+                    solution: "Dalgaların temel hız denklemi: Hız = Dalga Boyu $\\times$ Frekans<br>1. Formülü yazalım: $V = \\lambda \\cdot f$<br>2. Verilenleri yerine koyalım: $20 = \\lambda \\cdot 5$<br>3. $\\lambda = \\frac{20}{5} = 4\\text{ cm}$<br><br><strong>Cevap: 4 cm</strong>",
+                    shortcut: "Bu çok önemli bir kuraldır: Dalganın HIZI sadece yayıldığı ORTAMA bağlıdır (su derinleşirse hız artar). Dalganın FREKANSI ise sadece KAYNAĞA bağlıdır, ortam değişse de frekans asla değişmez."
+                },
+                {
+                    title: "4. Optik (Işık ve Aynalar/Mercekler)",
+                    summary: "Aydınlanma, yansıma, kırılma kuralları ve renkler.",
+                    description: "<p><strong>Aydınlanma ve Gölge:</strong> Işık şiddeti ($I$), ışık akısı ($\\Phi$) ve Aydınlanma şiddeti ($E = I/d^2$) optiğin temelidir. Noktasal ışık kaynağı engelin önüne konulduğunda tam ve yarı gölge oluşur.</p><br><p><strong>Aynalar ve Yansıma:</strong> Işığın bir yüzeye çarpıp geri dönmesidir. Düzlem aynada görüntü simetrik ve sanaldır. Çukur aynalar ışığı toplar (dev aynası, dişçi aynası), Tümsek aynalar ışığı dağıtır ve daima küçük/düz görüntü verir (kavşak, dikiz aynası).</p><p><strong>Kırılma ve Mercekler:</strong> Işığın saydam bir ortamdan diğerine geçerken doğrultu değiştirmesidir (Snell Yasası). Az yoğundan çok yoğuna geçen ışık normale yaklaşarak kırılır. İnce kenarlı mercek (yakınsak/hipermetrop), kalın kenarlı mercek (ıraksak/miyop) tedavilerinde kullanılır.</p>",
+                    items: ["Aydınlanma Şiddeti ve Gölge Oluşumu", "Yansıma Kanunları ve Düzlem Ayna", "Küresel Aynalar (Çukur ve Tümsek)", "Işığın Kırılması, Sınır Açısı ve Tam Yansıma", "İnce/Kalın Kenarlı Mercekler ve Renk Karışımları"],
+                    formula: "$$E = \\frac{I}{d^2} \\cdot \\cos\\alpha$$ $$\\frac{\\sin\\theta_1}{\\sin\\theta_2} = \\frac{n_2}{n_1} \\text{ (Snell Yasası)}$$",
+                    question: "Işık şiddeti $I$ olan bir kaynağın, $d$ kadar uzağındaki dik bir perde üzerinde oluşturduğu aydınlanma şiddeti $E$'dir. Perdenin uzaklığı $2d$ yapılırsa, yeni aydınlanma şiddeti kaç $E$ olur?",
+                    solution: "Aydınlanma şiddeti, kaynağa olan uzaklığın KARESİYLE TERS orantılıdır.<br>1. İlk durum: $E = \\frac{I}{d^2}$<br>2. İkinci durum: Uzaklık $2d$ yapıldı.<br>3. Formülde d yerine 2d yazarsak karesi alınır: $E_{yeni} = \\frac{I}{(2d)^2} = \\frac{I}{4d^2}$<br>4. İlk duruma göre aydınlanma şiddeti 4'te 1'ine düşmüştür.<br><br><strong>Cevap: $E/4$</strong>",
+                    shortcut: "Çukur aynada cisim Odak (F) ile Tepe Noktası (T) arasındaysa, görüntü daima aynanın ARKASINDA, DÜZ, SANAL ve cisimden BÜYÜKTÜR. Dev aynası mantığı buradan gelir."
+                }
+
+            ],
+            11: [
+                                {
+                    title: "1. Kuvvet ve Hareket (Mekanik)",
+                    summary: "Vektörler, bağıl hız, Newton yasaları ve atışlar.",
+                    description: "<p><strong>Vektörler ve Bağıl Hareket:</strong> Yönlü büyüklüklerin uç uca ekleme, paralelkenar ve bileşenlerine ayırma yöntemleriyle toplanmasıdır. Bağıl hız; gözlemcinin hızının, gözlenenin hızından vektörel olarak çıkarılmasıdır ($V_{bağ\\imath l} = V_{g\\ddot{o}zlenen} - V_{g\\ddot{o}zlemci}$). Nehir problemleri bu mantıkla çözülür.</p><p><strong>Newton'un Hareket Yasaları:</strong> Eğik düzlem, makaralar ve sürtünmeli yüzeylerdeki sistemlerin ivmesi $F_{net} = m_{toplam} \\cdot a$ formülüyle bulunur. İpteki gerilme kuvvetleri (T) serbest cisim diyagramı çizilerek hesaplanır.</p><br><p><strong>Bir Boyutta Sabit İvmeli Hareket (Atışlar):</strong> Hava sürtünmesinin ihmal edildiği ortamlarda; Serbest düşme ($h=5t^2$), Yukarı/Aşağı düşey atış, Yatay atış ve Eğik atış incelenir. Atış hareketlerinin tamamında <strong>ivme her zaman yerçekimi ivmesidir ($g$)</strong> ve yatay atışta cismin <strong>yatay hızı hareket boyunca asla değişmez</strong>.</p>",
+                    items: ["Vektörlerin Özellikleri ve Toplanması", "Bağıl Hareket ve Nehir Problemleri", "Newton'un Hareket Yasaları ve Makaralı Sistemler", "Serbest Düşme ve Düşey Atış", "İki Boyutta Hareket: Yatay ve Eğik Atış"],
+                    formula: "$$\\vec{R} = \\vec{A} + \\vec{B} \\quad V_{bağ\\imath l} = V_{c\\imath sim} - V_{g\\ddot{o}zlemci}$$ $$F_{net} = m \\cdot a \\quad h = \\frac{1}{2}gt^2$$",
+                    question: "Sürtünmelerin önemsiz olduğu bir ortamda 45 metre yükseklikten yatay olarak $20\\text{ m/s}$ hızla fırlatılan bir cismin, yere çarpma hızı ve yere düştüğü yatay uzaklık (menzil) nedir? ($g=10\\text{ m/s}^2$)",
+                    solution: "Yatay atışta, düşeyde serbest düşme, yatayda ise sabit hızlı hareket yapılır.<br>1. Önce uçuş süresini (t) düşey yükseklikten (h) bulalım: $h = \\frac{1}{2}gt^2 \\implies h = 5t^2$<br>2. $45 = 5t^2 \\implies t^2 = 9 \\implies t = 3\\text{ saniye}$ (Cisim 3 saniyede yere düşer).<br>3. Menzil (X), yatay hız ile sürenin çarpımıdır: $X = V_{yatay} \\cdot t = 20 \\cdot 3 = 60\\text{ metre}$.<br>4. Yere çarpma anındaki düşey hız: $V_{d\\ddot{u}\\text{s}ey} = g \\cdot t = 10 \\cdot 3 = 30\\text{ m/s}$.<br>5. Yere çarpma hızı (Bileşke hız) Pisagor'dan bulunur: $V_{son} = \\sqrt{20^2 + 30^2} = \\sqrt{400 + 900} = \\sqrt{1300} = 10\\sqrt{13}\\text{ m/s}$.<br><br><strong>Cevap: Menzil 60 m, Çarpma Hızı $10\\sqrt{13}\\text{ m/s}$</strong>",
+                    shortcut: "Serbest düşen (veya atılan) bir cismin aldığı yollar her saniye $5\\text{m}, 15\\text{m}, 25\\text{m}, 35\\text{m}...$ şeklinde artar. Bu altın kuralı bilmek formül kullanmadan zamanı şipşak bulmanı sağlar."
+                },
+                {
+                    title: "2. Enerji, İtme ve Çizgisel Momentum",
+                    summary: "Enerji korunumu, çarpışmalar ve roket mantığı.",
+                    description: "<p><strong>İş ve Enerji:</strong> Sürtünmeli yollarda mekanik enerji korunmaz, enerjinin bir kısmı ısıya dönüşür ($W_{s\\ddot{u}rt\\ddot{u}nme} = -F_s \\cdot \\Delta x$). Yaylarda depolanan esneklik potansiyel enerjisi ($E_p = \\frac{1}{2}kx^2$) işlenir.</p><p><strong>İtme ($I$) ve Momentum ($P$):</strong> Bir cisme uygulanan kuvvetin uygulama süresiyle çarpımına <strong>İtme</strong> ($I = F \\cdot \\Delta t$), cismin kütlesiyle hızının çarpımına <strong>Momentum</strong> ($P = m \\cdot V$) denir. <strong>İtme, cismin momentumundaki değişime eşittir</strong> ($I = \\Delta P$).</p><br><p><strong>Çarpışmalar:</strong> Dışarıdan net bir kuvvet etki etmedikçe sistemin toplam momentumu <strong>daima korunur</strong> ($P_{ilk} = P_{son}$). Esnek çarpışmalarda kinetik enerji de korunurken, esnek olmayan (kenetlenen) çarpışmalarda enerji korunmaz (ısıya/sese dönüşür).</p>",
+                    items: ["Yay Potansiyel Enerjisi", "Sürtünmeli Ortamlarda Enerjinin Korunumu", "İtme (I) ve Çizgisel Momentum (P)", "Esnek ve Esnek Olmayan Çarpışmalar", "Patlamalar ve Momentum Korunumu"],
+                    formula: "$$I = F \\cdot \\Delta t \\quad P = m \\cdot V$$ $$\\vec{I} = \\Delta\\vec{P} = \\vec{P}_{son} - \\vec{P}_{ilk}$$",
+                    question: "Sürtünmesiz yatay düzlemde $4\\text{ m/s}$ hızla ilerleyen $2\\text{ kg}$ kütleli bir X cismi, durmakta olan $3\\text{ kg}$ kütleli Y cismine çarpıp kenetleniyor. Ortak kütlenin çarpışmadan sonraki hızı kaç m/s olur?",
+                    solution: "Kenetlenen çarpışmalarda (esnek olmayan) Momentum korunur.<br>1. İlk momentum ($P_{ilk}$): Sadece X cismi hareketli. $P_{ilk} = m_x \\cdot V_x = 2 \\cdot 4 = 8\\text{ kg\\cdot m/s}$. (Y durduğu için momentumu sıfırdır).<br>2. Son momentum ($P_{son}$): Cisimler kenetlendiği için kütleleri toplanır. $P_{son} = (m_x + m_y) \\cdot V_{ortak} = (2 + 3) \\cdot V_{ortak} = 5 \\cdot V_{ortak}$.<br>3. Momentum Korunumu: $P_{ilk} = P_{son} \\implies 8 = 5 \\cdot V_{ortak}$<br>4. $V_{ortak} = \\frac{8}{5} = 1,6\\text{ m/s}$<br><br><strong>Cevap: $1,6\\text{ m/s}$</strong>",
+                    shortcut: "Momentum vektörel bir büyüklüktür. Formülde hızın yönü (sağa + ise sola -) mutlaka dikkate alınmalıdır, yoksa sonuç tamamen yanlış çıkar."
+                },
+                {
+                    title: "3. Tork, Denge ve Kütle Merkezi",
+                    summary: "Döndürme etkisi, kaldıraçlar ve ağırlık merkezi hesaplamaları.",
+                    description: "<p><strong>Tork (Moment):</strong> Kuvvetin döndürme etkisidir ($T = F \\cdot d$). Uygulama noktasına olan dik uzaklık ($d$) ile kuvvetin çarpımından oluşur. Torkun yönü Sağ El Kuralı ile bulunur.</p><p><strong>Denge Şartları:</strong> Bir cismin dengede (hareketsiz veya sabit hızlı) kalabilmesi için iki şart vardır:<br>1. Cisme etki eden <strong>Net Kuvvet sıfır</strong> olmalıdır ($\\sum F = 0$, sağa çekenler sola çekenlere, yukarı çekenler aşağı çekenlere eşit).<br>2. Cisme etki eden <strong>Net Tork sıfır</strong> olmalıdır ($\\sum T = 0$, saat yönünde çevirenler, tersi yönde çevirenlere eşit).</p><p><strong>Kütle (Ağırlık) Merkezi:</strong> Geometrik cisimlerin (kare, çember, küre) ağırlık merkezlerinin bulunması ve eklenen/çıkarılan parçalar sonrası merkezin ne kadar yer değiştirdiği incelenir.</p>",
+                    items: ["Tork Kavramı ve Yönü", "Kesişen Kuvvetlerin Dengesi (Lami Teoremi)", "Katı Cisimlerin Denge Şartları", "Kütle ve Ağırlık Merkezi Arasındaki Fark", "Basit Makineler (Kaldıraçlar, Makaralar)"],
+                    formula: "$$T = F \\cdot d\\sin\\alpha$$ $$\\sum F = 0 \\quad \\sum T = 0$$",
+                    question: "Ağırlığı önemsiz eşit bölmeli bir çubuğun sol ucuna 40 N, sağ ucuna 10 N ağırlığında iki yük asılmıştır. Bu çubuk nereden bir iple asılırsa yatay dengede kalır? (Bölmeler arası mesafe d kadardır, toplam 5 bölmedir).",
+                    solution: "Denge şartına göre asılan noktanın sağındaki ve solundaki torklar (döndürme etkileri) birbirine eşit olmalıdır.<br>1. Asılacak noktaya sol uçtan $x$ uzaklıkta diyelim. (Sağ uçtan uzaklığı $5-x$ olur).<br>2. Sol yükün torku: $40 \\cdot x$<br>3. Sağ yükün torku: $10 \\cdot (5 - x)$<br>4. Torkları eşitleyelim: $40x = 10(5 - x) \\implies 40x = 50 - 10x$<br>5. $50x = 50 \\implies x = 1\\text{ bölme}$<br><br><strong>Cevap: Çubuk, 40 N'luk yükün asılı olduğu uçtan 1 bölme içeriden asılmalıdır.</strong>",
+                    shortcut: "Bir çubuğu asıp dengede tutmak için her zaman AĞIR OLAN YÜKE DAHA YAKIN bir noktadan asmalısın. Eğer yükler eşitse tam ortadan asarsın."
+                },
+                {
+                    title: "4. Elektrik ve Manyetizma (Gelişmiş)",
+                    summary: "Elektrik alan, sığaçlar, indüksiyon akımı ve transformatörler.",
+                    description: "<p><strong>Elektrik Alan ve Potansiyel:</strong> Yüklü cisimlerin etrafında yarattığı etki alanıdır. Yüklü paralel levhalar arasında oluşan düzgün elektrik alan ve yapılan iş ($W = q \\cdot V$). İki iletken levha arasına yalıtkan konularak yük depolamaya yarayan araçlara <strong>Sığaç (Kondansatör)</strong> denir ($C = \\varepsilon \\cdot A/d$).</p><p><strong>Manyetizma:</strong> Üzerinden akım geçen düz telin, halkanın ve bobinin oluşturduğu manyetik alan (Sağ El Kuralı). Manyetik alan içindeki yüklü cisme etki eden <strong>Manyetik Kuvvet</strong> ($F = B\\cdot I\\cdot L$ veya $F = q\\cdot V\\cdot B$).</p><br><p><strong>Elektromanyetik İndüksiyon ve AC:</strong> Kapalı bir tel çerçeveden geçen manyetik akının (manyetik çizgi sayısı) zamanla değişmesiyle <strong>İndüksiyon EMK'sı (Gerilimi)</strong> oluşur (Jeneratörlerin elektriği üretme mantığı). Yönü Lenz Kanunu (kendisini oluşturan sebebe karşı koyma) ile bulunur. Transformatörler ise gerilimi yükseltip alçaltmaya yarar.</p>",
+                    items: ["Düzgün Elektrik Alan ve Paralel Levhalar", "Sığaçlar (Kondansatörler) ve Özellikleri", "Manyetik Alan ve Manyetik Kuvvet", "Manyetik Akı ($\\Phi$) ve Faraday İndüksiyon Yasası", "Alternatif Akım (AC) Devreleri ve Transformatörler"],
+                    formula: "$$E = \\frac{V}{d} \\quad C = \\frac{\\varepsilon \\cdot A}{d}$$ $$F = q \\cdot V \\cdot B \\sin\\alpha$$ $$\\varepsilon = -\\frac{\\Delta\\Phi}{\\Delta t}$$",
+                    question: "Sığası (Kapasitesi) $C$ olan hava aralıklı paralel plakalı bir kondansatörün levhaları arasındaki uzaklık ($d$) yarıya indirilip, levhaların alanı ($A$) iki katına çıkarılırsa yeni sığası kaç $C$ olur?",
+                    solution: "Kondansatörün sığa (kapasite) formülü: $C = \\frac{\\varepsilon \\cdot A}{d}$<br>1. İlk durum: $C = \\frac{\\varepsilon \\cdot A}{d}$<br>2. İkinci durum: Alan 2 katına çıktı ($2A$), uzaklık yarıya indi ($d/2$).<br>3. Yeni formülü yazalım: $C_{yeni} = \\frac{\\varepsilon \\cdot (2A)}{(d/2)}$<br>4. Alttaki 2 yukarı çarpım olarak geçer: $C_{yeni} = 4 \\cdot \\frac{\\varepsilon \\cdot A}{d}$<br>5. İlk duruma göre sığa 4 katına çıkmıştır.<br><br><strong>Cevap: 4C</strong>",
+                    shortcut: "Bir kondansatör pile (üretece) BAKIYORKEN levhalarını uzaklaştırsan bile POTANSİYELİ (V) asla değişmez (pil kadar kalır). Eğer pili SÖKÜP uzaklaştırırsan, bu sefer üstündeki YÜK (q) asla değişmez (kaçacak yeri yoktur)."
+                }
+
+            ],
+            12: [
+                                {
+                    title: "1. Düzgün Çembersel Hareket",
+                    summary: "Dairesel yörüngede dönüşler, merkezcil ivme ve viraj problemleri.",
+                    description: "<p><strong>Çembersel Hareket:</strong> Bir cismin sabit bir süratle (hızın büyüklüğü değişmez, ama yönü sürekli değiştiği için hız değişir) çembersel bir yörüngede dolanmasıdır. Hız değiştiği için <strong>ivmeli bir harekettir</strong>.</p><br><p><strong>Merkezcil Kuvvet ($F_{merkezcil}$):</strong> Cismi yörüngede tutan, her zaman merkeze doğru olan net kuvvettir. (Örneğin virajı dönen arabada sürtünme kuvveti, Güneş etrafında dönen Dünya için kütleçekim kuvvetidir). Çizgisel hız ($V$), Açısal hız ($\\omega$) ve Periyot ($T$) kavramları işlenir.</p><p><strong>Kepler Kanunları:</strong> Gezegenlerin Güneş etrafında dolanırken yörüngelerinin elips olduğunu (Yörüngeler Kanunu), Güneş'e yaklaştıkça hızlandıklarını (Alanlar Kanunu) ve periyotlarının karesinin ortalama yarıçaplarının küpüne oranının sabit olduğunu (Periyotlar Kanunu) açıklar.</p>",
+                    items: ["Çizgisel ve Açısal Hız ($\\omega = 2\\pi/T$)", "Merkezcil İvme ve Merkezcil Kuvvet Hesaplamaları", "Yatay, Düşey ve Eğimli Viraj Problemleri", "Kepler Kanunları (Elips Yörüngeler)", "Kütleçekim Kuvveti ve Çekim İvmesi"],
+                    formula: "$$V = \\omega \\cdot r \\quad a = \\frac{V^2}{r} = \\omega^2 \\cdot r$$ $$F_{merkezcil} = \\frac{m \\cdot V^2}{r}$$",
+                    question: "Sürtünme katsayısının $k = 0,5$ olduğu yatay bir virajın yarıçapı $20\\text{ m}$'dir. Bir aracın bu virajı güvenle dönebilmesi için sahip olabileceği maksimum sürat kaç m/s olmalıdır? ($g=10\\text{ m/s}^2$)",
+                    solution: "Yatay virajda aracı dışarı savrulmaktan kurtaran kuvvet Sürtünme Kuvvetidir ($F_s$). Güvenli dönüş için Sürtünme Kuvveti en az Merkezcil Kuvvete eşit olmalıdır ($F_s = F_{merkezcil}$).<br>1. $k \\cdot m \\cdot g = \\frac{m \\cdot V^2}{r}$ (Kütleler 'm' birbirini götürür, aracın kütlesi önemsizdir).<br>2. Formül şuna dönüşür: $V^2 = k \\cdot g \\cdot r$ (Karga formülü).<br>3. Verilenleri yerine koyalım: $V^2 = 0,5 \\cdot 10 \\cdot 20$<br>4. $V^2 = 100 \\implies V = 10\\text{ m/s}$<br><br><strong>Cevap: $10\\text{ m/s}$</strong>",
+                    shortcut: "Bir tekerlek veya disk dönerek ilerliyorsa (hem öteleme hem dönme), tepe noktasının yere göre hızı, merkezin (öteleme) hızının tam 2 KATIDIR. (Alt nokta ise o an için durur, hızı 0'dır)."
+                },
+                {
+                    title: "2. Basit Harmonik Hareket",
+                    summary: "Sarkaçlar, yaylar ve periyodik titreşim hareketleri.",
+                    description: "<p><strong>Basit Harmonik Hareket (BHH):</strong> Geri çağırıcı bir kuvvetin (yay veya yerçekimi) etkisiyle iki nokta arasında gidip gelme hareketidir (salınım). Cisim denge noktasına (tam ortaya) yaklaşırken hızlanır, uç noktalara yaklaşırken yavaşlar ve anlık olarak durur.</p><p><strong>Yay Sarkacı:</strong> Yayın ucuna asılan kütlenin titreşimidir. Periyodu ($T = 2\\pi\\sqrt{m/k}$) sadece kütleye ve yayın sertliğine (k) bağlıdır; yerçekimine veya çekilme miktarına (genliğe) bağlı değildir.</p><br><p><strong>Basit Sarkaç:</strong> Bir ipin ucuna asılan kütlenin salınımıdır. Periyodu ($T = 2\\pi\\sqrt{\\ell/g}$) sadece ipin boyuna ($\\ell$) ve yerçekimine ($g$) bağlıdır; asılan kütleye veya salınım açısına (küçük açılar için) bağlı değildir.</p>",
+                    items: ["BHH'de Konum, Hız, İvme ve Kuvvet Denklemleri", "Yay Sarkacı (Tam Ek Formülü)", "Basit Sarkaç (Tolga Formülü)", "Sönümlü ve Sönümsüz Titreşimler", "Rezonans Olayı"],
+                    formula: "$$T = 2\\pi\\sqrt{\\frac{m}{k}} \\text{ (Yay Sarkacı)}$$ $$T = 2\\pi\\sqrt{\\frac{\\ell}{g}} \\text{ (Basit Sarkaç)}$$",
+                    question: "Dünyada periyodu $T$ olan bir basit sarkacın ipinin uzunluğu 4 katına çıkarılıp, yerçekimi ivmesinin dünyanın 1/4'ü kadar olduğu bir gezegene götürülürse yeni periyodu kaç $T$ olur?",
+                    solution: "Basit sarkacın periyot formülü: $T = 2\\pi\\sqrt{\\frac{\\ell}{g}}$<br>1. İpin uzunluğu 4 katına çıktı ($\\ell \\implies 4\\ell$).<br>2. Yerçekimi 1/4'üne indi ($g \\implies g/4$).<br>3. Yeni formülde yerine koyalım: $T_{yeni} = 2\\pi\\sqrt{\\frac{4\\ell}{g/4}}$<br>4. Alttaki 4 yukarı çarpım olarak geçer: $T_{yeni} = 2\\pi\\sqrt{\\frac{16\\ell}{g}}$<br>5. Karekök içindeki 16 dışarı 4 olarak çıkar: $T_{yeni} = 4 \\cdot \\left(2\\pi\\sqrt{\\frac{\\ell}{g}}\\right)$<br><br><strong>Cevap: 4T</strong>",
+                    shortcut: "Basit harmonik harekette bir cisim uç noktalardayken (maksimum uzanım) hızı 0'dır ama İVMESİ ve KUVVETİ maksimumdur. Denge noktasından geçerken ise HIZI maksimumdur ama ivmesi ve kuvveti 0'dır."
+                },
+                {
+                    title: "3. Dalga Mekaniği ve Elektromanyetik Dalgalar",
+                    summary: "Kırınım, girişim (çift yarık) ve ışığın dalga doğası.",
+                    description: "<p><strong>Su Dalgalarında Girişim:</strong> İki noktasal kaynaktan yayılan dairesel dalgaların üst üste binmesidir. İki tepe veya iki çukur üst üste gelirse genlik maksimum (Katar/Karın noktası), bir tepe bir çukur gelirse birbirini sönümler (Düğüm noktası).</p><p><strong>Işıkta Girişim (Young Deneyi):</strong> Işığın dalga doğasına sahip olduğunu kanıtlayan en önemli deneydir. Tek renkli ışık çift yarıktan geçirilince perdede aydınlık ve karanlık saçaklar (girişim deseni) oluşturur.</p><br><p><strong>Elektromanyetik Dalgalar (EMD):</strong> Yüklü parçacıkların ivmeli hareketiyle oluşurlar. Boşlukta ışık hızıyla yayılırlar ve enine dalgalardır. (Radyo, Mikrodalga, Kızılötesi, Görünür Işık, Morötesi, X-Işınları, Gama Işınları).</p>",
+                    items: ["Su Dalgalarında Kırınım ve Girişim", "Işığın Çift Yarıkta Girişimi (Young Deneyi)", "Işığın Tek Yarıkta Kırınımı", "Doppler Olayı (Ses ve Işıkta)", "Elektromanyetik Spektrum ve EMD Özellikleri"],
+                    formula: "$$\\Delta x = \\frac{\\lambda \\cdot L}{d \\cdot n} \\text{ (Çift Yarık Saçak Aralığı)}$$",
+                    question: "Çift yarıkla yapılan bir girişim deneyinde (Young deneyi), perde üzerindeki saçak aralığını ($\\Delta x$) büyütmek (saçakları kalınlaştırmak) için hangileri yapılabilir?<br>I. Işığın dalga boyunu ($\\lambda$) artırmak<br>II. Yarıklar arası mesafeyi ($d$) artırmak<br>III. Perde ile yarıklar düzlemi arasını ($n$) su ile doldurmak",
+                    solution: "Saçak aralığı formülü: $\\Delta x = \\frac{\\lambda \\cdot L}{d \\cdot n}$ (L: perde uzaklığı, n: ortamın kırıcılık indisi).<br>1. $\\Delta x$'i büyütmek için paydaki ifadeleri ($\\lambda, L$) artırmalı veya paydadaki ifadeleri ($d, n$) azaltmalıyız.<br>2. I. öncül: Dalga boyunu ($\\lambda$) artırmak payı artırır, $\\Delta x$ büyür. (Doğru)<br>3. II. öncül: Yarıklar arası mesafeyi ($d$) artırmak paydayı büyütür, $\\Delta x$ küçülür. (Yanlış)<br>4. III. öncül: Arayı su ile doldurmak ($n$'i artırmak) paydayı büyütür, $\\Delta x$ küçülür. (Yanlış)<br><br><strong>Cevap: Yalnız I</strong>",
+                    shortcut: "Çift yarık (Young) deneyinde merkezi aydınlık saçak ile diğer saçakların genişliği AYNI iken; Tek yarık deneyinde merkezi aydınlık saçak, diğer saçakların 2 KATI genişliğindedir ve çok daha parlaktır."
+                },
+                {
+                    title: "4. Modern Fizik ve Atom Fiziğine Giriş",
+                    summary: "Görelilik, fotoelektrik, kuantum ve atom altı parçacıklar.",
+                    description: "<p><strong>Özel Görelilik (Einstein):</strong> Işık hızı evrendeki en yüksek hızdır ve her gözlemciye göre sabittir. Işık hızına yakın hızlarda hareket eden bir uzay gemisindeki saat, dünyadakine göre yavaş çalışır (<strong>Zaman Genişlemesi</strong>) ve geminin hareket doğrultusundaki boyu kısalmış ölçülür (<strong>Uzunluk Kısalması</strong>).</p><p><strong>Kuantum Fiziği ve Fotoelektrik Olay:</strong> Enerji kesikli paketler (Foton) halindedir ($E = h\\cdot f$). Yeterli enerjiye sahip bir fotonun metal yüzeyden elektron koparmasına Fotoelektrik olay denir ($E_{\\text{foton}} = E_{\\text{bağlanma}} + E_{\\text{kinetik}}$). Kopan elektronların kinetik enerjisi gelen ışığın frekansına bağlıdır; kopan elektron sayısı (akım) ise ışık şiddetine bağlıdır.</p><p><strong>Atom Modelleri ve Radyoaktivite:</strong> Bohr atom modeli (enerji yörüngeleri), de Broglie dalga boyu. Kararsız çekirdeklerin alfa, beta veya gama ışıması yaparak kararlı hale geçmesi (Radyoaktif bozunma) ve çekirdek tepkimeleri (Fisyon/Füzyon).</p>",
+                    items: ["Michelson-Morley Deneyi ve Özel Görelilik", "Siyah Cisim Işıması ve Planck Hipotezi", "Fotoelektrik Olay ve Compton Saçılması", "Bohr Atom Modeli ve Uyarılma", "Radyoaktivite ve Standart Model (Kuarklar)"],
+                    formula: "$$E = m \\cdot c^2$$ $$E_{\\text{foton}} = h \\cdot f = \\frac{h \\cdot c}{\\lambda}$$",
+                    question: "Fotoelektrik olayda bir metale düşürülen ışığın frekansı (enerjisi) sabit tutulup, ışık şiddeti (foton sayısı) artırılırsa, kopan elektronların maksimum kinetik enerjisi nasıl değişir?",
+                    solution: "Fotoelektrik denklem: $E_{\\text{foton}} = E_{\\text{bağlanma}} + E_{\\text{kinetik}}$<br>1. Kopan elektronun kinetik enerjisi SADECE gelen fotonun enerjisine (frekansına) ve metalin cinsine (bağlanma enerjisine) bağlıdır.<br>2. Işık şiddetini artırmak, sadece yüzeye düşen mermi (foton) SAYISINI artırır. Bu da sadece kopan elektron SAYISINI (yani devreden geçen akımı) artırır.<br>3. Fotonun frekansı (enerjisi) değişmediği için, kopardığı tek bir elektronun enerjisi de değişmez.<br><br><strong>Cevap: Değişmez.</strong>",
+                    shortcut: "Radyoaktif Gama ($\\gamma$) bozunumunda çekirdekten bir parçacık fırlamaz, sadece fazla enerji atılır. Bu yüzden çekirdeğin kütle numarası da atom numarası da ASLA değişmez."
+                }
+
+            ]
+        };
+
+        // --- SİSTEM MOTORU (DOKUNMA) ---
+        let currentTopics = [];
+
+        function loadGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(grade)) btn.classList.add('active');
+            });
+
+            currentTopics = dersVerisi[grade] || [];
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+
+            if(currentTopics.length === 0) {
+                topicList.innerHTML = '<p style="color:#64748b;">Bu sınıfa ait konu henüz eklenmedi.</p>';
+                document.getElementById('mainContent').innerHTML = '<div class="content-card active" style="text-align:center;">Lütfen yapay zekanın vereceği kod bloğunu bu dosyanın içine yapıştırın.</div>';
+                return;
+            }
+
+            currentTopics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => renderTopic(index, btn);
+                topicList.appendChild(btn);
+            });
+
+            renderTopic(0, topicList.firstChild);
+        }
+
+        function renderTopic(index, btnElement) {
+            document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            const topic = currentTopics[index];
+            const mainContent = document.getElementById('mainContent');
+            
+            let html = `<div class="content-card active">
+                <h2>${topic.title}</h2>
+                <div class="summary-box">${topic.summary}</div>
+                <div class="desc-text">${topic.description}</div>
+            `;
+
+            if(topic.formula) html += `<div class="formula-box">${topic.formula}</div>`;
+            if(topic.question) {
+                html += `<div class="example-box">
+                            <h5 style="color:#047857; margin-bottom:0.8rem; display:flex; align-items:center;">✍️ Çözümlü Örnek</h5>
+                            <div style="font-weight:600; color:#065f46; margin-bottom:1rem;">Soru: ${topic.question}</div>
+                            <div style="color:#064e3b; border-top:2px dashed #a7f3d0; padding-top:1rem; line-height:1.7;">
+                                <strong>Çözüm:</strong> ${topic.solution}
+                            </div>
+                         </div>`;
+            }
+            if(topic.shortcut) html += `<div class="shortcut-box"><strong>🚀 Püf Noktası:</strong> ${topic.shortcut}</div>`;
+            
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Gemini API
+        const GEMINI_API_KEY = 'BURAYA_API_ANAHTARINI_YAZ'; 
+        let base64Image = '';
+
+        document.getElementById('aiImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { base64Image = e.target.result.split(',')[1]; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function solveQuestion() {
+            if(!base64Image) return alert("Lütfen önce bir fotoğraf seçin!");
+            const resultBox = document.getElementById('aiResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = 'Soruyu inceliyorum, lütfen bekle... ⏳';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AIzaSyCTHdkBEVWeD-ym3ZrPYp3iE3Pguaofb_Y}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [ { text: "Sen uzman bir öğretmensin. Bu soruyu adım adım, mantığını anlatarak çöz. Formülleri LaTeX ($$x^2$$) formatında yaz." }, { inline_data: { mime_type: "image/jpeg", data: base64Image } } ] }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+                if (window.MathJax) MathJax.typesetPromise();
+            } catch (err) {
+                resultBox.innerHTML = "Bir hata oluştu veya API anahtarınız eksik.";
+            }
+        }
+
+        window.onload = () => loadGrade(9);
+    </script>
+</body>
+</html>
+
